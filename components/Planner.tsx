@@ -252,6 +252,7 @@ export default function Planner() {
           title="출발지 선택"
           description="출발할 곳을 현재 위치나 주소로 찾아 보세요."
           autoLocate={firstOrigin}
+          near={form.destination ?? undefined}
           locateLabel="현재 위치로 선택"
           confirmQuestion="여기를 출발지로 선택할까요?"
           confirmLabel="네, 여기서 출발할게요"
@@ -268,6 +269,7 @@ export default function Planner() {
       {picker === "destination" && (
         <LocationPicker
           title="도착지 선택"
+          near={form.origin ?? undefined}
           description="약속 장소를 현재 위치나 주소로 찾아 보세요."
           locateLabel="현재 위치로 선택"
           confirmQuestion="여기를 도착지로 선택할까요?"

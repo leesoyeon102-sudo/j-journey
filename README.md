@@ -30,7 +30,10 @@ lib/
 ## 참고
 
 - 출발지·도착지를 현재 위치(브라우저 위치 허용) 또는 주소 검색으로 고르고 도착 시각만 입력하면 "몇 시에 출발해야 하는지"를 알려줍니다. 마지막으로 고른 출발지는 기본값으로 기억합니다. 도보 시간은 실제 보행 경로 API로, 열차 시간은 노선 데이터로 계산합니다.
-- 외부 API는 키 없이 쓰는 공개 서버입니다: 주소·장소 검색은 Nominatim, 도보 경로는 Valhalla (`app/api/*`, `lib/server/osm.ts`). 호출 제한이 있어 운영 시 카카오·네이버 등으로 교체하세요.
+- 외부 API (`app/api/*`, `lib/server/*`):
+  - 주소·장소 검색, 좌표 → 주소: **카카오 로컬 API** (`KAKAO_REST_KEY` 필요). 키가 없거나 호출이 실패하면 OpenStreetMap Nominatim으로 대신 찾습니다. 검색어에 "근처·주변"이 있으면 기준 좌표(출발지·도착지) 반경 5km 안에서 가까운 순으로 찾습니다.
+  - 도보 경로: Valhalla(OpenStreetMap 공개 서버, 키 없음). 호출 제한이 있어 운영 시 교체를 검토하세요.
+  - 지하철 시간표: 서울 열린데이터광장 (`SEOUL_SUBWAY_KEY`).
 - 위치 허용은 HTTPS 또는 localhost에서만 동작합니다. 같은 와이파이의 휴대폰에서 `http://IP:3000`으로 접속하면 위치 허용이 막히니 주소 검색으로 등록하세요.
 - 지하철 데이터는 서울·경기·인천 22개 노선, 583개 역입니다. [KoreaMetroGraph](https://github.com/ledyx/KoreaMetroGraph)(MIT) 데이터를 `scripts/build-metro.py`로 가공해 `lib/data/metro.json`에 담았습니다.
   - 원본이 2018년경 기준이라 이후 개통한 노선·역(신림선, 김포골드라인, 9호선 연장 등)은 없습니다.

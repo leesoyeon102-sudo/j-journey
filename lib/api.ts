@@ -12,8 +12,10 @@ interface Point {
   lng: number;
 }
 
-export async function searchAddress(q: string): Promise<GeoResult[]> {
-  const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
+/** `near`는 가까운 곳을 먼저 보여 주고 "근처" 검색에 쓰는 기준 좌표 */
+export async function searchAddress(q: string, near?: Point): Promise<GeoResult[]> {
+  const bias = near ? `&lat=${near.lat}&lng=${near.lng}` : "";
+  const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}${bias}`);
   if (!res.ok) throw new Error("search_failed");
   return (await res.json()).results as GeoResult[];
 }

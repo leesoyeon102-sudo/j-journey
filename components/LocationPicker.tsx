@@ -21,6 +21,8 @@ interface Props {
   confirmLabel: string;
   /** 열리자마자 브라우저 위치 허용 창을 띄운다 */
   autoLocate?: boolean;
+  /** 검색 때 가까운 곳을 먼저 보여 줄 기준 좌표 (예: 도착지 검색 때 출발지) */
+  near?: { lat: number; lng: number };
   onSelect: (place: PickedLocation) => void;
   onClose?: () => void;
 }
@@ -55,6 +57,7 @@ export default function LocationPicker({
   confirmQuestion,
   confirmLabel,
   autoLocate = false,
+  near,
   onSelect,
   onClose,
 }: Props) {
@@ -109,7 +112,7 @@ export default function LocationPicker({
     setSearching(true);
     setSearchError(false);
     try {
-      setResults(await searchAddress(q.trim()));
+      setResults(await searchAddress(q.trim(), near));
     } catch {
       setSearchError(true);
       setResults(null);
@@ -175,7 +178,7 @@ export default function LocationPicker({
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="예: 천호대로 995, 경복궁역"
+              placeholder="예: 경복궁역, 천호대로 995, 집 근처 병원"
               className="h-12 min-w-0 flex-1 rounded-xl bg-soft px-4 text-[16px] outline-none placeholder:text-sub"
             />
             <button
