@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #111111;
+  --color-sub: #8b8b8b;
+  --color-line: #ececec;
+  --color-soft: #f6f6f6;
+  --color-accent: #2f5bff;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+    "Noto Sans KR", "Segoe UI", sans-serif;
+}
+
+html {
+  background: #f1f1f1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+/* 모바일 390px 기준 앱 화면 */
+.app-shell {
+  margin: 0 auto;
+  width: 390px;
+  max-width: 100%;
+  min-height: 100dvh;
+  background: #fff;
+  position: relative;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0.4;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+.fade-backdrop {
+  animation: backdrop-in 0.2s ease-out both;
+}
+
+@keyframes alert-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.alert-in {
+  animation: alert-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
