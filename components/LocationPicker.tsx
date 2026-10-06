@@ -23,6 +23,8 @@ interface Props {
   autoLocate?: boolean;
   /** 검색 때 가까운 곳을 먼저 보여 줄 기준 좌표 (예: 도착지 검색 때 출발지) */
   near?: { lat: number; lng: number };
+  /** "현재 위치로 선택" 버튼 위에 놓이는 집 칩. 누르면 집 주소가 선택된다. */
+  homeChip?: { address: string; onPick: () => void; onEdit: () => void };
   onSelect: (place: PickedLocation) => void;
   onClose?: () => void;
 }
@@ -58,6 +60,7 @@ export default function LocationPicker({
   confirmLabel,
   autoLocate = false,
   near,
+  homeChip,
   onSelect,
   onClose,
 }: Props) {
@@ -162,6 +165,23 @@ export default function LocationPicker({
             <p role="alert" className="mb-4 rounded-xl bg-soft px-4 py-3 text-sm text-ink/80">
               {denied}
             </p>
+          )}
+          {homeChip && (
+            <div className="mb-3 flex items-center gap-3">
+              <button
+                onClick={homeChip.onPick}
+                className="inline-flex h-10 min-w-0 max-w-full items-center gap-2 rounded-full border border-line bg-white px-4 text-sm font-medium active:bg-soft"
+              >
+                <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z" />
+                </svg>
+                <span className="shrink-0">집</span>
+                <span className="truncate text-xs font-normal text-sub">{homeChip.address}</span>
+              </button>
+              <button onClick={homeChip.onEdit} className="h-10 shrink-0 text-xs text-sub">
+                변경
+              </button>
+            </div>
           )}
           <button
             onClick={() => {

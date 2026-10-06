@@ -82,16 +82,18 @@ export function recordArrival(id: string, onTime: boolean, plan?: Plan) {
 function createPlaceStore(key: string) {
   let raw: string | null | undefined;
   let value: Place | null = null;
+  // 저장소에 쓰지 못하는 환경(사생활 보호 모드 등)에서도 이번 방문 중에는 값이 유지되도록 한다.
+  let memory: Place | null = null;
 
   const read = (): Place | null => {
     try {
       const next = localStorage.getItem(key);
-      if (next === raw) return value;
+      if (next === raw) return value ?? memory;
       raw = next;
       value = next ? (JSON.parse(next) as Place) : null;
-      return value;
+      return value ?? memory;
     } catch {
-      return null;
+      return memory;
     }
   };
 
@@ -99,10 +101,11 @@ function createPlaceStore(key: string) {
     /** 서버 렌더·하이드레이션 중에는 undefined, 고른 적이 없으면 null */
     use: () => useSyncExternalStore<Place | null | undefined>(subscribe, read, () => undefined),
     save: (place: Place) => {
+      memory = place;
       try {
         localStorage.setItem(key, JSON.stringify(place));
       } catch {
-        // 저장할 수 없는 환경에서는 무시
+        // 저장할 수 없는 환경에서는 메모리 값만 쓴다.
       }
       listeners.forEach((l) => l());
     },
@@ -112,6 +115,11 @@ function createPlaceStore(key: string) {
 const originStore = createPlaceStore("j-outing:origin");
 const destinationStore = createPlaceStore("j-outing:destination");
 
+const homeStore = createPlaceStore("j-outing:home-place");
+
+/** 집 주소. 미등록이면 null, 불러오는 중이면 undefined */
+export const useHome = homeStore.use;
+export const saveHome = homeStore.save;
 export const useLastOrigin = originStore.use;
 export const saveLastOrigin = originStore.save;
 export const useLastDestination = destinationStore.use;

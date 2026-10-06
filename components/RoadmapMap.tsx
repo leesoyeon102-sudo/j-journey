@@ -8,10 +8,13 @@ const PAD = 28;
 const DEFAULT_BOX = { minLat: 37.43, maxLat: 37.65, minLng: 126.85, maxLng: 127.15 };
 const MIN_SPAN = 0.08; // 위·경도 최소 표시 폭(도): 너무 확대되지 않도록
 
-function viewBox(names: string[]) {
-  if (names.length === 0) return DEFAULT_BOX;
-  const lats = names.map((n) => STATIONS[n].lat);
-  const lngs = names.map((n) => STATIONS[n].lng);
+type Point = { lat: number; lng: number };
+
+/** 기록이 있으면 다닌 역과 집이 모두 보이는 범위, 없으면 집 주변(집도 없으면 서울 중심) */
+function viewBox(points: Point[]) {
+  if (points.length === 0) return DEFAULT_BOX;
+  const lats = points.map((p) => p.lat);
+  const lngs = points.map((p) => p.lng);
   let minLat = Math.min(...lats);
   let maxLat = Math.max(...lats);
   let minLng = Math.min(...lngs);
@@ -25,9 +28,9 @@ function viewBox(names: string[]) {
   return { minLat, maxLat, minLng, maxLng };
 }
 
-export default function RoadmapMap({ roadmap }: { roadmap: Roadmap }) {
+export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?: Point }) {
   const visited = [...roadmap.stations];
-  const box = viewBox(visited);
+  const box = viewBox([...visited.map((n) => STATIONS[n]), ...(home ? [home] : [])]);
   // 위도에 따른 경도 길이 보정
   const kx = Math.cos(((box.minLat + box.maxLat) / 2) * (Math.PI / 180));
   const spanX = (box.maxLng - box.minLng) * kx;
@@ -35,10 +38,12 @@ export default function RoadmapMap({ roadmap }: { roadmap: Roadmap }) {
   const scale = Math.min((W - PAD * 2) / spanX, (H - PAD * 2) / spanY);
   const offX = (W - spanX * scale) / 2;
   const offY = (H - spanY * scale) / 2;
-  const pos = (name: string): [number, number] => {
-    const s = STATIONS[name];
-    return [offX + (s.lng - box.minLng) * kx * scale, offY + (box.maxLat - s.lat) * scale];
-  };
+  const at = (s: Point): [number, number] => [
+    offX + (s.lng - box.minLng) * kx * scale,
+    offY + (box.maxLat - s.lat) * scale,
+  ];
+  const pos = (name: string) => at(STATIONS[name]);
+  const homeAt = home ? at(home) : null;
 
   const labels = visited.length <= 14;
 
@@ -87,6 +92,25 @@ export default function RoadmapMap({ roadmap }: { roadmap: Roadmap }) {
             {n}
           </text>
         ))}
+      {/* 내 집 위치: 빨간 동그라미와 "집" 글자 */}
+      {homeAt && (
+        <g>
+          <circle cx={homeAt[0]} cy={homeAt[1]} r={6} fill="#ef4444" stroke="#fff" strokeWidth={2} />
+          <text
+            x={homeAt[0]}
+            y={homeAt[1] - 12}
+            textAnchor="middle"
+            fontSize={12}
+            fontWeight={700}
+            fill="#ef4444"
+            stroke="#fff"
+            strokeWidth={3}
+            paintOrder="stroke"
+          >
+            집
+          </text>
+        </g>
+      )}
     </svg>
   );
 }

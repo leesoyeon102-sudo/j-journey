@@ -13,8 +13,10 @@ import type { Place } from "@/lib/places";
 import {
   addTrip,
   recordArrival,
+  saveHome,
   saveLastDestination,
   saveLastOrigin,
+  useHome,
   useLastDestination,
   useLastOrigin,
   useTrips,
@@ -37,6 +39,7 @@ const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorro
 
 export default function Planner() {
   const trips = useTrips();
+  const home = useHome();
   const savedOrigin = useLastOrigin();
   const savedDestination = useLastDestination();
 
@@ -55,11 +58,20 @@ export default function Planner() {
     if (homeTimer.current) clearTimeout(homeTimer.current);
   }, []);
   const [editing, setEditing] = useState(false);
-  // 장소 고르는 화면. 출발지를 한 번도 고른 적이 없으면 처음 열 때 위치 허용을 요청한다.
-  const [picker, setPicker] = useState<"origin" | "destination" | null>(null);
-  const [firstOriginDismissed, setFirstOriginDismissed] = useState(false);
-  const firstOrigin = savedOrigin === null && !firstOriginDismissed && picker === null;
-  const showOriginPicker = picker === "origin" || firstOrigin;
+  // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
+  const [picker, setPicker] = useState<"origin" | "destination" | "home" | null>(null);
+  const needHome = home === null;
+  const showHomePicker = needHome || picker === "home";
+
+  /** 출발지·도착지 선택 화면에서 "현재 위치" 버튼 위에 놓는 집 칩 */
+  const homeChip = (apply: (place: Place) => void) =>
+    home
+      ? {
+          address: home.area,
+          onPick: () => apply(home),
+          onEdit: () => setPicker("home"),
+        }
+      : undefined;
 
   // 입력 초기값: 아무것도 고르지 않았으면 "장소 선택", 고른 기록이 있으면 그대로 유지한다.
   const form: Form = {
@@ -247,12 +259,42 @@ export default function Planner() {
     <main className="fade-in">
       <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." />
 
-      {showOriginPicker && (
+      {showHomePicker && (
+        <LocationPicker
+          title="집 주소 등록"
+          description={
+            needHome ? (
+              <>
+                집 주소를 먼저 등록해 주세요.
+                <br />
+                출발지·도착지를 고를 때 &lsquo;집&rsquo;으로 바로 선택할 수 있어요.
+              </>
+            ) : (
+              "새 집 주소를 현재 위치나 주소로 찾아 보세요."
+            )
+          }
+          autoLocate={needHome}
+          locateLabel="현재 위치로 등록"
+          confirmQuestion="여기가 집이 맞나요?"
+          confirmLabel="네, 집으로 등록할게요"
+          onSelect={(p) => {
+            saveHome({ name: "집", area: p.address || p.name, lat: p.lat, lng: p.lng });
+            setPicker(null);
+          }}
+          onClose={needHome ? undefined : () => setPicker(null)}
+        />
+      )}
+
+      {picker === "origin" && (
         <LocationPicker
           title="출발지 선택"
           description="출발할 곳을 현재 위치나 주소로 찾아 보세요."
-          autoLocate={firstOrigin}
           near={form.destination ?? undefined}
+          homeChip={homeChip((place) => {
+            set("origin", place);
+            saveLastOrigin(place);
+            setPicker(null);
+          })}
           locateLabel="현재 위치로 선택"
           confirmQuestion="여기를 출발지로 선택할까요?"
           confirmLabel="네, 여기서 출발할게요"
@@ -262,7 +304,7 @@ export default function Planner() {
             saveLastOrigin(place);
             setPicker(null);
           }}
-          onClose={picker === "origin" ? () => setPicker(null) : () => setFirstOriginDismissed(true)}
+          onClose={() => setPicker(null)}
         />
       )}
 
@@ -270,6 +312,11 @@ export default function Planner() {
         <LocationPicker
           title="도착지 선택"
           near={form.origin ?? undefined}
+          homeChip={homeChip((place) => {
+            set("destination", place);
+            saveLastDestination(place);
+            setPicker(null);
+          })}
           description="약속 장소를 현재 위치나 주소로 찾아 보세요."
           locateLabel="현재 위치로 선택"
           confirmQuestion="여기를 도착지로 선택할까요?"

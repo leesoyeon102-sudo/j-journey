@@ -3,10 +3,11 @@
 import Header from "@/components/Header";
 import RoadmapMap from "@/components/RoadmapMap";
 import { buildRoadmap } from "@/lib/routes";
-import { useTrips } from "@/lib/storage";
+import { useHome, useTrips } from "@/lib/storage";
 
 export default function RoadmapPage() {
   const trips = useTrips();
+  const home = useHome();
   const map = buildRoadmap(trips);
   const empty = map.tripCount === 0;
 
@@ -21,7 +22,7 @@ export default function RoadmapPage() {
       </dl>
 
       <div className="relative">
-        <RoadmapMap roadmap={map} />
+        <RoadmapMap roadmap={map} home={home ?? undefined} />
         {empty && (
           <p className="absolute inset-x-0 bottom-6 text-center text-xs text-sub">
             도착 기록을 남기면 이곳에 선이 그려져요
