@@ -59,7 +59,30 @@ export interface RideLeg {
   waitMin: number;
 }
 
-export type Leg = WalkLeg | RideLeg;
+export interface BusLeg {
+  type: "bus";
+  routeName: string;
+  /** 간선·지선·마을·광역 등 */
+  kind: string;
+  color: string;
+  from: string;
+  to: string;
+  /** 지나는 정류장 수 (승차 정류장 제외) */
+  stopCount: number;
+  /** 승차 정류장에 도착하는 시각 */
+  arriveStop: number;
+  /** 버스 탑승 시각 (현재 도착 정보로 예상했거나, 배차 간격 기준 늦어도 이 시각) */
+  start: number;
+  end: number;
+  /** 정류장에 도착해서 탈 때까지 기다리는 시간 */
+  waitMin: number;
+  /** 배차 간격(분) */
+  headway: number;
+  /** 현재 도착 정보를 바탕으로 예상했는지 (false면 배차 간격 기준) */
+  realtime: boolean;
+}
+
+export type Leg = WalkLeg | RideLeg | BusLeg;
 
 export interface Plan {
   /** 출발(집)·도착 장소 */
@@ -72,6 +95,8 @@ export interface Plan {
   walkEstimated?: boolean;
   /** 일부 열차 시각이 시간표가 아닌 배차 간격 기준 예상인지 */
   scheduleEstimated?: boolean;
+  /** 버스 시각이 현재 도착 정보가 아닌 배차 간격 기준 예상인지 (버스가 있는 안에서만) */
+  busEstimated?: boolean;
   /** 계산에 쓴 시간표 요일 */
   dayType?: "weekday" | "saturday" | "sunday";
   /** 도보 시간을 기준으로 자동 선택된 이용 역 */

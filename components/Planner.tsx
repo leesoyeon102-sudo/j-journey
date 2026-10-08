@@ -401,7 +401,7 @@ export default function Planner() {
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 
 function PlanView({ plan }: { plan: Plan }) {
-  const walkOnly = plan.originStation === "";
+  const walkOnly = !plan.legs.some((l) => l.type === "ride" || l.type === "bus");
   return (
     <>
       <section className="px-5 pb-8">
@@ -436,18 +436,30 @@ function PlanView({ plan }: { plan: Plan }) {
 /** 경로 아래에 작게 적는 출처·기준 안내 */
 function SourceNote({ plan }: { plan: Plan }) {
   const notes: string[] = [];
-  if (plan.originStation !== "") {
+  const hasRide = plan.legs.some((l) => l.type === "ride");
+  const hasBus = plan.legs.some((l) => l.type === "bus");
+  if (hasRide) {
     const day = DAY[plan.dayType ?? "weekday"];
     notes.push(`${day} 열차 시간표 기준 · 출처 서울교통공사`);
     if (plan.scheduleEstimated) notes.push("시간표가 없는 노선은 배차 간격으로 예상한 시각이에요");
   }
   if (plan.walkEstimated) notes.push("일부 도보 시간은 직선거리로 추정했어요");
-  if (notes.length === 0) return null;
   return (
-    <div className="mt-6 space-y-0.5 text-[11px] leading-relaxed text-sub">
-      {notes.map((n) => (
-        <p key={n}>{n}</p>
-      ))}
-    </div>
+    <>
+      {notes.length > 0 && (
+        <div className="mt-6 space-y-0.5 text-[11px] leading-relaxed text-sub">
+          {notes.map((n) => (
+            <p key={n}>{n}</p>
+          ))}
+        </div>
+      )}
+      {hasBus && (
+        <p className="mt-4 rounded-lg bg-soft px-3 py-2.5 text-[12px] leading-relaxed text-ink/70">
+          {plan.busEstimated
+            ? "버스는 정해진 시각표가 없어, 약속이 2시간 이상 뒤이거나 도착 정보를 알 수 없을 때는 배차 간격으로 계산했어요. 양해 부탁드려요. 약속 1~2시간 전에 한 번 더 검색하면 더 정확한 시각을 알려드려요."
+            : "버스 시각은 지금 버스 도착 정보를 바탕으로 예상했어요. 실제와 몇 분 다를 수 있어요."}
+        </p>
+      )}
+    </>
   );
 }

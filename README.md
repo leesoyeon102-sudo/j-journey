@@ -34,6 +34,14 @@ lib/
   - 주소·장소 검색, 좌표 → 주소: **카카오 로컬 API** (`KAKAO_REST_KEY` 필요). 키가 없거나 호출이 실패하면 OpenStreetMap Nominatim으로 대신 찾습니다. 검색어에 "근처·주변"이 있으면 기준 좌표(출발지·도착지) 반경 5km 안에서 가까운 순으로 찾습니다.
   - 도보 경로: Valhalla(OpenStreetMap 공개 서버, 키 없음). 호출 제한이 있어 운영 시 교체를 검토하세요.
   - 지하철 시간표: 서울 열린데이터광장 (`SEOUL_SUBWAY_KEY`).
+- **버스** (서울·경기):
+  - 데이터는 스크립트로 한 번 받아 `lib/data/bus.json`에 저장합니다. 정류장·노선·경유 순서·구간 소요 시간·배차 간격·첫차/막차가 들어 있습니다.
+    1. `python3 scripts/bus/seoul.py` — 서울 노선(경기 노선 포함)과 경유 정류소 (공공데이터포털 `DATA_GO_KR_KEY`)
+    2. `python3 scripts/bus/gg_stops.py` — 경기 정류소·경유 정류소 (경기데이터드림 `GG_DATA_KEY`)
+    3. `python3 scripts/bus/gg_info.py` — 경기 노선별 배차 간격·첫차/막차. 일일 호출 한도에 걸리면 멈추고, 다시 실행하면 이어받습니다.
+    4. `python3 scripts/bus/build.py` — 위를 합쳐 `lib/data/bus.json` 생성
+  - 안내할 때 약속이 오늘이고 2시간 안이면 서버가 정류장의 **현재 도착 정보**(서울 `getStationByUid`, 경기 `getBusArrivalItemv2`)를 조회해 이후 버스를 간격으로 이어 붙여 예상하고, 3분 여유를 두고 안내합니다. 화면에는 실시간이라고 표시하지 않습니다. 그 밖(내일, 2시간 이상 뒤, 도착 정보 없음)은 배차 간격 기준 예상이며, 약속 1~2시간 전에 다시 검색해 달라는 안내를 함께 보여 줍니다.
+  - 버스 안은 버스만 / 지하철→버스 / 버스→지하철 세 가지입니다. 버스끼리 환승은 아직 없습니다.
 - 위치 허용은 HTTPS 또는 localhost에서만 동작합니다. 같은 와이파이의 휴대폰에서 `http://IP:3000`으로 접속하면 위치 허용이 막히니 주소 검색으로 등록하세요.
 - 지하철 데이터는 서울·경기·인천 22개 노선, 583개 역입니다. [KoreaMetroGraph](https://github.com/ledyx/KoreaMetroGraph)(MIT) 데이터를 `scripts/build-metro.py`로 가공해 `lib/data/metro.json`에 담았습니다.
   - 원본이 2018년경 기준이라 이후 개통한 노선·역(신림선, 김포골드라인, 9호선 연장 등)은 없습니다.

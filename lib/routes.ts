@@ -1,4 +1,4 @@
-import type { RideLeg, Trip } from "./types";
+import type { Trip } from "./types";
 import { distanceKm } from "./stations";
 
 export interface RouteSummary {
@@ -25,13 +25,19 @@ export function groupRoutes(trips: Trip[]): RouteSummary[] {
     .map(([key, list]) => {
       const sorted = [...list].sort((a, b) => b.createdAt - a.createdAt);
       const latest = sorted[0];
-      const rides = latest.plan.legs.filter((l): l is RideLeg => l.type === "ride");
+      const rides = latest.plan.legs.flatMap((l) =>
+        l.type === "ride"
+          ? [{ id: l.line, name: l.lineName, color: l.color }]
+          : l.type === "bus"
+            ? [{ id: `bus${l.routeName}`, name: `${l.routeName}번 버스`, color: l.color }]
+            : [],
+      );
       const used = sorted.filter(arrived);
       return {
         key,
         origin: latest.plan.origin,
         destination: latest.plan.destination,
-        lines: rides.map((r) => ({ id: r.line, name: r.lineName, color: r.color })),
+        lines: rides,
         transfers: latest.plan.transfers,
         usageCount: used.length,
         lastUsedAt: used[0]?.arrivedAt ?? latest.createdAt,

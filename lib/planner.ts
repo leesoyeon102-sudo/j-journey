@@ -14,9 +14,9 @@ const MAX_WALK_ONLY = 60;
 /** 추천보다 이만큼 이상 일찍 나가야 하는 대안은 보여주지 않는다 */
 const MAX_ALT_GAP = 40;
 
-const TRANSFER_WALK = 4; // 환승 이동 + 승강장 이동
-const PLATFORM = 2; // 역 도착 후 승강장까지
-const FIRST_TRAIN = 5 * 60 + 30;
+export const TRANSFER_WALK = 4; // 환승 이동 + 승강장 이동
+export const PLATFORM = 2; // 역 도착 후 승강장까지
+export const FIRST_TRAIN = 5 * 60 + 30;
 const DIR_PHASE = 2; // 상·하행 시간표 어긋남
 const TRANSFER_PENALTY = 8; // 경로 선택 시 환승 1회를 이만큼의 시간으로 간주
 
@@ -34,6 +34,8 @@ export interface PlanInput {
   /** 실제 열차 시간표를 받아 오는 함수. 없으면 배차 간격 기준 예상으로 계산한다. */
   loadTimetable?: (stops: { line: string; station: string }[]) => Promise<Timetable | undefined>;
   dayType?: Plan["dayType"];
+  /** 지하철 외 다른 수단(버스 등)을 섞은 안을 추가로 만들어 주는 함수 */
+  extraPlans?: () => Promise<Plan[]>;
 }
 
 interface StationPlanInput {
@@ -47,7 +49,7 @@ interface StationPlanInput {
   buffer: number;
 }
 
-interface Ride {
+export interface Ride {
   line: Line;
   /** 승차역부터 하차역까지 지나는 역 */
   path: string[];
@@ -55,7 +57,7 @@ interface Ride {
   dir: 0 | 1;
 }
 
-const lineById = (id: LineId) => LINES.find((l) => l.id === id)!;
+export const lineById = (id: LineId) => LINES.find((l) => l.id === id)!;
 
 function hopDir(line: Line, a: string, b: string): 0 | 1 {
   return line.dist.get(b)! >= line.dist.get(a)! ? 0 : 1;
@@ -66,7 +68,7 @@ function hopMin(line: Line, a: string, b: string) {
 }
 
 /** 출발역~도착역 최소 시간 경로 (환승 페널티 포함 다익스트라) */
-function findRides(origin: string, destination: string): Ride[] | null {
+export function findRides(origin: string, destination: string): Ride[] | null {
   type Node = { line: Line; station: string };
   const key = (n: Node) => `${n.line.id}:${n.station}`;
   const dist = new Map<string, number>();
@@ -150,13 +152,13 @@ function phaseAt(line: Line, dir: 0 | 1, station: string) {
   return ((p % line.headway) + line.headway) % line.headway;
 }
 
-function latestDeparture(line: Line, dir: 0 | 1, station: string, notAfter: number) {
+export function latestDeparture(line: Line, dir: 0 | 1, station: string, notAfter: number) {
   const phase = phaseAt(line, dir, station);
   const diff = (((notAfter - phase) % line.headway) + line.headway) % line.headway;
   return notAfter - diff;
 }
 
-function rideDuration(r: Ride) {
+export function rideDuration(r: Ride) {
   let t = 0;
   for (let k = 0; k < r.path.length - 1; k++) t += hopMin(r.line, r.path[k], r.path[k + 1]);
   return t;
@@ -178,7 +180,7 @@ function loopLabel(prev: string, cur: string) {
 }
 
 /** 열차 진행 방향의 종착역(또는 순환 방향) 표시 */
-function directionLabel(r: Ride) {
+export function directionLabel(r: Ride) {
   const { line, path } = r;
   const a = path[path.length - 2];
   const b = path[path.length - 1];
@@ -267,6 +269,15 @@ export async function planTrip(input: PlanInput): Promise<PlanResult> {
   const walk = walkOnlyPlan(origin, destination, arriveBy, buffer, input.directWalkMin);
   if (walk) candidates.push(walk);
 
+  // 버스를 섞은 안
+  if (input.extraPlans) {
+    try {
+      candidates.push(...(await input.extraPlans()));
+    } catch {
+      // 버스 안을 만들지 못해도 지하철·도보 안은 그대로 보여 준다.
+    }
+  }
+
   // 집에서 나서는 시각이 늦은(= 총 소요 시간이 짧은) 순, 같으면 환승이 적은 순
   candidates.sort((x, y) => y.leaveAt - x.leaveAt || x.transfers - y.transfers);
   const plans = pickDistinct(candidates, (p) => p, MAX_PLANS, true);
@@ -294,7 +305,10 @@ function pickDistinct<T>(items: T[], get: (t: T) => Plan, max: number, limitGap 
   const out: T[] = [];
   for (const item of items) {
     const p = get(item);
-    const sig = routeKeyOf(p) + `|${p.originStation}|${p.destinationStation}`;
+    // 같은 구간을 다른 버스 번호로만 타는 안은 하나로 본다.
+    const sig = p.legs
+      .map((l) => (l.type === "ride" ? `${l.line}:${l.from}>${l.to}` : l.type === "bus" ? `bus:${l.from}>${l.to}` : ""))
+      .join("|") + `|${p.originStation}|${p.destinationStation}`;
     if (seen.has(sig)) continue;
     if (limitGap && out.length > 0 && get(out[0]).leaveAt - p.leaveAt > MAX_ALT_GAP) continue;
     seen.add(sig);
@@ -443,8 +457,58 @@ function planBetweenStations(input: StationPlanInput, tt?: Timetable): StationRe
 /** 같은 출발·도착·노선이면 같은 경로로 묶는 키 */
 export function routeKeyOf(plan: Plan) {
   const lines = plan.legs
-    .filter((l): l is RideLeg => l.type === "ride")
-    .map((l) => l.line)
+    .flatMap((l) => (l.type === "ride" ? [l.line] : l.type === "bus" ? [`bus${l.routeName}`] : []))
     .join("-");
   return `${plan.origin}>${plan.destination}>${lines}`;
+}
+
+/**
+ * 한 역에서 모든 역까지의 예상 소요 시간(분, 환승 페널티 포함). 버스와 이어 붙일 지하철 구간을 고를 때 쓴다.
+ */
+export function subwayTimes(origin: string): Map<string, number> {
+  type Node = { line: Line; station: string };
+  const key = (n: Node) => `${n.line.id}:${n.station}`;
+  const dist = new Map<string, number>();
+  const nodes = new Map<string, Node>();
+  const open = new Set<string>();
+  const done = new Set<string>();
+  for (const line of linesOf(origin)) {
+    const n = { line, station: origin };
+    dist.set(key(n), 0);
+    nodes.set(key(n), n);
+    open.add(key(n));
+  }
+  const best = new Map<string, number>();
+  while (open.size) {
+    let cur = "";
+    let d = Infinity;
+    for (const k of open) {
+      const v = dist.get(k)!;
+      if (v < d) {
+        d = v;
+        cur = k;
+      }
+    }
+    open.delete(cur);
+    done.add(cur);
+    const node = nodes.get(cur)!;
+    if (!best.has(node.station)) best.set(node.station, d);
+    const relax = (n: Node, cost: number) => {
+      const k = key(n);
+      if (done.has(k)) return;
+      const nd = d + cost;
+      if (nd < (dist.get(k) ?? Infinity)) {
+        dist.set(k, nd);
+        nodes.set(k, n);
+        open.add(k);
+      }
+    };
+    for (const nb of node.line.adj.get(node.station) ?? []) {
+      relax({ line: node.line, station: nb.to }, nb.min);
+    }
+    for (const other of linesOf(node.station)) {
+      if (other.id !== node.line.id) relax({ line: other, station: node.station }, TRANSFER_PENALTY);
+    }
+  }
+  return best;
 }

@@ -92,7 +92,7 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
             {n}
           </text>
         ))}
-      {/* 내 집 위치: 빨간 동그라미와 "집" 글자 */}
+      {/* 내 집 위치: 빨간 동그라미와 검정 "집" 글자 */}
       {homeAt && (
         <g>
           <circle cx={homeAt[0]} cy={homeAt[1]} r={6} fill="#ef4444" stroke="#fff" strokeWidth={2} />
@@ -102,7 +102,7 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
             textAnchor="middle"
             fontSize={12}
             fontWeight={700}
-            fill="#ef4444"
+            fill="#111"
             stroke="#fff"
             strokeWidth={3}
             paintOrder="stroke"
