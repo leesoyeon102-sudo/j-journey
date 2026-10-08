@@ -457,7 +457,7 @@ function SourceNote({ plan }: { plan: Plan }) {
         <p className="mt-4 rounded-lg bg-soft px-3 py-2.5 text-[12px] leading-relaxed text-ink/70">
           {plan.busEstimated
             ? "버스는 정해진 시각표가 없어, 약속이 2시간 이상 뒤이거나 도착 정보를 알 수 없을 때는 배차 간격으로 계산했어요. 양해 부탁드려요. 약속 1~2시간 전에 한 번 더 검색하면 더 정확한 시각을 알려드려요."
-            : "버스 시각은 지금 버스 도착 정보를 바탕으로 예상했어요. 실제와 몇 분 다를 수 있어요."}
+            : "버스 시각은 지금 버스 도착 정보를 바탕으로 예상하여 실제와 몇 분 차이가 있을 수 있어요."}
         </p>
       )}
     </>
