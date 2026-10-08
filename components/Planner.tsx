@@ -52,6 +52,9 @@ export default function Planner() {
   const [plans, setPlans] = useState<Plan[]>(() => peekPendingResult()?.plans ?? []);
   const [page, setPage] = useState(0);
   const slider = useRef<HTMLDivElement>(null);
+  // 마우스로 끌어서 넘길 때의 시작 좌표. 터치는 브라우저 스크롤 스냅이 알아서 처리한다.
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+  const justDragged = useRef(false);
   // "제시간에 도착했어요" 기록 후 홈으로 돌아가는 타이머
   const homeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => {
@@ -152,6 +155,39 @@ export default function Planner() {
     };
     const goTo = (i: number) =>
       slider.current?.scrollTo({ left: i * slider.current.clientWidth, behavior: "smooth" });
+    const onDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
+      const el = slider.current;
+      if (!el || e.pointerType !== "mouse" || e.button !== 0) return;
+      drag.current = { x: e.clientX, left: el.scrollLeft, moved: false };
+    };
+    const onDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
+      const el = slider.current;
+      const d = drag.current;
+      if (!el || !d) return;
+      const dx = e.clientX - d.x;
+      if (!d.moved && Math.abs(dx) < 6) return;
+      if (!d.moved) {
+        d.moved = true;
+        el.setPointerCapture(e.pointerId);
+        el.style.scrollSnapType = "none"; // 끄는 동안은 스냅이 위치를 되돌리지 않게
+        el.style.userSelect = "none";
+      }
+      el.scrollLeft = d.left - dx;
+    };
+    const onDragEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+      const el = slider.current;
+      const d = drag.current;
+      drag.current = null;
+      if (!el || !d?.moved) return;
+      el.style.scrollSnapType = "";
+      el.style.userSelect = "";
+      justDragged.current = true; // 곧 이어지는 click을 한 번 무시한다
+      setTimeout(() => (justDragged.current = false), 0);
+      const dx = e.clientX - d.x;
+      const from = Math.round(d.left / el.clientWidth);
+      const to = Math.abs(dx) > 50 ? from + (dx < 0 ? 1 : -1) : from;
+      goTo(Math.max(0, Math.min(shown.length - 1, to)));
+    };
     const arrive = (plan: Plan, onTime: boolean) => {
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
       if (!onTime) return;
@@ -220,6 +256,14 @@ export default function Planner() {
         <div
           ref={slider}
           onScroll={onScroll}
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
+          onClickCapture={(e) => {
+            // 끌고 난 직후에는 버튼이 눌리지 않게 막는다.
+            if (justDragged.current) e.stopPropagation();
+          }}
           className="flex snap-x snap-mandatory items-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {shown.map((plan, i) => (
@@ -456,7 +500,7 @@ function SourceNote({ plan }: { plan: Plan }) {
       {hasBus && (
         <p className="mt-4 rounded-lg bg-soft px-3 py-2.5 text-[12px] leading-relaxed text-ink/70">
           {plan.busEstimated
-            ? "버스는 정해진 시각표가 없어, 약속이 2시간 이상 뒤이거나 도착 정보를 알 수 없을 때는 배차 간격으로 계산했어요. 양해 부탁드려요. 약속 1~2시간 전에 한 번 더 검색하면 더 정확한 시각을 알려드려요."
+            ? "버스 도착 정보가 없거나 약속이 2시간 이상 남은 경우, 배차 간격을 기준으로 안내해요. 약속 1~2시간 전에 다시 확인하면 좀 더 명확하게 알려드려요."
             : "버스 시각은 지금 버스 도착 정보를 바탕으로 예상하여 실제와 몇 분 차이가 있을 수 있어요."}
         </p>
       )}
