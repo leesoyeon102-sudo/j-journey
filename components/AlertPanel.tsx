@@ -2,6 +2,7 @@
 
 import { useEffect, useId } from "react";
 import { createPortal } from "react-dom";
+import { useFeedbackBlock } from "@/lib/feedbackGate";
 
 interface Props {
   title: string;
@@ -17,6 +18,8 @@ interface Props {
 /** 화면 가운데에 뜨는 확인 얼럿. 출발 안내 화면을 나갈 때와 도착을 기록할 때 같이 쓴다. */
 export default function AlertPanel({ title, description, content, onClose, children }: Props) {
   const id = useId();
+  // 얼럿이 떠 있는 동안에는 피드백 얼럿을 겹쳐 띄우지 않는다.
+  useFeedbackBlock(true);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();

@@ -2,8 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
-import FeedbackAlert from "@/components/FeedbackAlert";
-import Toast from "@/components/Toast";
 import { useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
@@ -12,7 +10,7 @@ import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
-import { hasAskedFeedback, markFeedbackAsked, submitFeedback } from "@/lib/feedback";
+import { useFeedbackBlock } from "@/lib/feedbackGate";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { clearPendingResult, peekPendingResult } from "@/lib/pending";
 import type { Place } from "@/lib/places";
@@ -63,24 +61,8 @@ export default function Planner() {
   const justDragged = useRef(false);
   // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
   const [arrivedAlert, setArrivedAlert] = useState(false);
-  // 첫 도착 기록 뒤 홈으로 돌아왔을 때 한 번만 띄우는 별점·의견 창과, 보낸 뒤의 안내
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
   const arrivalTracked = useRef<string | null>(null);
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  // 홈에 들어오고 잠깐 지난 뒤에 띄우기 위한 타이머. 다른 화면으로 가면 취소한다.
-  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
-    },
-    [],
-  );
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 2000);
-    return () => clearTimeout(t);
-  }, [toast]);
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
   const [picker, setPicker] = useState<"origin" | "destination" | "home" | null>(null);
@@ -118,6 +100,8 @@ export default function Planner() {
 
   // 버튼을 눌러 계산한 결과만 보여준다. 다른 탭에 다녀오면 입력 화면부터 시작한다.
   const current = editing || !activeId ? undefined : trips.find((t) => t.id === activeId);
+  // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
+  useFeedbackBlock(Boolean(current));
 
   // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다.
   const showingResult = Boolean(current);
@@ -234,14 +218,6 @@ export default function Planner() {
       setEditing(true);
       setActiveId(null);
       setPlans([]);
-      // 도착을 기록한 적이 있고 아직 피드백을 물은 적이 없으면, 홈에 들어오고 2초 뒤에 한 번 묻는다.
-      // 실제로 띄울 때 "물었다"고 기록하므로, 그 전에 다른 화면으로 가면 다음 기회에 다시 묻는다.
-      if (trips.some((t) => t.status !== "planned") && !hasAskedFeedback()) {
-        feedbackTimer.current = setTimeout(() => {
-          markFeedbackAsked();
-          setFeedbackOpen(true);
-        }, FEEDBACK_DELAY_MS);
-      }
     };
 
     return (
@@ -350,18 +326,6 @@ export default function Planner() {
   return (
     <main className="fade-in">
       <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." />
-
-      {feedbackOpen && (
-        <FeedbackAlert
-          onClose={() => setFeedbackOpen(false)}
-          onSubmit={(rating, comment) => {
-            submitFeedback(rating, comment);
-            setFeedbackOpen(false);
-            setToast("의견을 보냈어요. 고맙습니다!");
-          }}
-        />
-      )}
-      {toast && <Toast message={toast} />}
 
       {showHomePicker && (
         <LocationPicker
@@ -499,9 +463,6 @@ export default function Planner() {
     </main>
   );
 }
-
-/** 홈으로 돌아온 뒤 피드백 창이 뜨기까지 기다리는 시간 */
-const FEEDBACK_DELAY_MS = 2000;
 
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 

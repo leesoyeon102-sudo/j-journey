@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useFeedbackBlock } from "@/lib/feedbackGate";
 
 interface Props {
   label: string;
@@ -39,6 +40,8 @@ function display(ampm: number, hourIdx: number, minute: number) {
 /** 시각 카드. 누르면 화면 가운데 얼럿 창에서 오전/오후·시·분을 고른다. */
 export default function TimeSheet({ label, value, onChange }: Props) {
   const [open, setOpen] = useState(false);
+  // 시각을 고르는 창이 열려 있는 동안에는 피드백 얼럿을 띄우지 않는다.
+  useFeedbackBlock(open);
   const [a, h, m] = split(value);
   return (
     <>

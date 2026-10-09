@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import { markVisited } from "@/lib/feedback";
+import { useFeedbackBlock } from "@/lib/feedbackGate";
 import Timeline from "@/components/Timeline";
 import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
@@ -22,6 +24,9 @@ export default function HistoryPage() {
   const routes = groupRoutes(trips);
   const router = useRouter();
   const [openKey, setOpenKey] = useState<string | null>(null);
+  // 피드백을 묻는 조건: 경로 내역에 한 번 들어와 봤다. 단, 경로 상세를 펼쳐 둔 동안에는 묻지 않는다.
+  useEffect(() => markVisited("history"), []);
+  useFeedbackBlock(openKey !== null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<{ key: string; message: string } | null>(null);
   // 목록을 왼쪽으로 밀면 삭제 버튼이 나온다. swiped: 열려 있는 줄, drag: 끌고 있는 중의 위치

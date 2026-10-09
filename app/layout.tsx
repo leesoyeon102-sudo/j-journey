@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AmplitudeInit from "@/components/AmplitudeInit";
+import FeedbackPrompt from "@/components/FeedbackPrompt";
 import LeaveConfirm from "@/components/LeaveConfirm";
 import TabBar from "@/components/TabBar";
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <TabBar />
           <LeaveConfirm />
+          <FeedbackPrompt />
         </div>
       </body>
     </html>

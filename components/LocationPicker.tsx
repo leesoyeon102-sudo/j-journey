@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useFeedbackBlock } from "@/lib/feedbackGate";
 import { useEffect, useState } from "react";
 import { reverseGeocode, searchAddress, type GeoResult } from "@/lib/api";
 
@@ -68,6 +69,8 @@ export default function LocationPicker({
   onSelect,
   onClose,
 }: Props) {
+  // 위치를 고르는 동안에는 피드백 얼럿을 띄우지 않는다.
+  useFeedbackBlock(true);
   const [phase, setPhase] = useState<Phase>(autoLocate ? "locating" : "choose");
   const [found, setFound] = useState<PickedLocation | null>(null);
   const [denied, setDenied] = useState<string | null>(null);
