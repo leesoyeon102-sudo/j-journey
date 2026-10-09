@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 
 // Contra 스타일: 모든 버튼은 24px 필(rounded-button). 채움 버튼은 Charcoal 하나뿐이다.
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-button border border-transparent bg-clip-padding text-body-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ink focus-visible:ring-3 focus-visible:ring-ink/15 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-button border border-transparent bg-clip-padding text-body-sm font-semibold whitespace-nowrap transition-all outline-none select-none focus-visible:border-ink focus-visible:ring-3 focus-visible:ring-ink/15 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

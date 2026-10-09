@@ -61,13 +61,13 @@ typography:
   label:
     fontFamily: GT Standard M
     fontSize: 14px
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1.43
     letterSpacing: -0.14px
   label-lg:
     fontFamily: GT Standard M
     fontSize: 15px
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1.43
     letterSpacing: -0.15px
   caption:
@@ -247,8 +247,8 @@ components:
 - **display (58px):** 랜딩·디자인 시스템 페이지 같은 큰 머리말 전용. 앱 화면 안에서는 쓰지 않는다.
 - **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목.
 - **body-lg (16px) / body (14px):** 본문. 앱 기본은 14px.
-- **label (14px, 500):** 버튼과 입력 라벨.
-- **label-lg (15px, 500):** 경로 내역 상세의 "이 경로로 다시 안내받기" 버튼.
+- **label (14px, 600):** 버튼과 입력 라벨. 버튼 글자는 SemiBold(600)이다.
+- **label-lg (15px, 600):** 경로 내역 상세의 "이 경로로 다시 안내받기" 버튼.
 - **caption (12px, 500):** 배지, 시각 보조 설명.
 - **caption-lg (13px, 500):** "자주 이용한 경로" 같은 accent 배지.
 

@@ -66,7 +66,7 @@ export default function TabBar() {
                   }
                 }}
                 className={`flex h-14 flex-col items-center justify-center gap-1 text-caption ${
-                  active ? "font-medium text-on-surface" : "font-normal text-muted-foreground"
+                  active ? "font-semibold text-on-surface" : "font-normal text-muted-foreground"
                 }`}
               >
                 {/* 비활성 아이콘은 글자보다 한 단계 연한 inactive 색 */}
