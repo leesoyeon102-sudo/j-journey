@@ -47,11 +47,21 @@ export function useTrips() {
   return useSyncExternalStore(subscribe, read, () => EMPTY);
 }
 
+/**
+ * 기록 id. crypto.randomUUID는 HTTPS(또는 localhost)에서만 있어서, 폰에서 http://<IP>:3000 으로 열면
+ * 없다. 그때는 시각과 난수로 만든다.
+ */
+function newId(): string {
+  const c = globalThis.crypto;
+  if (c && typeof c.randomUUID === "function") return c.randomUUID();
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 /** 새 안내를 저장한다. 같은 경로의 기록 없는 안내는 대체한다. */
 export function addTrip(plan: Plan): Trip {
   const routeKey = routeKeyOf(plan);
   const trip: Trip = {
-    id: crypto.randomUUID(),
+    id: newId(),
     routeKey,
     createdAt: Date.now(),
     status: "planned",

@@ -55,6 +55,9 @@ export default function Planner() {
   // 계산된 안들(추천 + 대안)과 지금 보고 있는 안
   const [plans, setPlans] = useState<Plan[]>(() => peekPendingResult()?.plans ?? []);
   const [page, setPage] = useState(0);
+  // 안마다 길이가 달라도 화면에 보이는 안의 높이만큼만 스크롤되도록, 보이는 안의 높이를 재서 슬라이더 높이로 쓴다.
+  const articles = useRef<(HTMLElement | null)[]>([]);
+  const [sliderHeight, setSliderHeight] = useState<number | undefined>(undefined);
   const slider = useRef<HTMLDivElement>(null);
   // 마우스로 끌어서 넘길 때의 시작 좌표. 터치는 브라우저 스크롤 스냅이 알아서 처리한다.
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
@@ -100,6 +103,17 @@ export default function Planner() {
 
   // 버튼을 눌러 계산한 결과만 보여준다. 다른 탭에 다녀오면 입력 화면부터 시작한다.
   const current = editing || !activeId ? undefined : trips.find((t) => t.id === activeId);
+
+  // 보이는 안의 높이를 슬라이더 높이로 맞춘다. (다른 안이 더 길어도 아래에 빈 화면이 생기지 않게)
+  useEffect(() => {
+    const el = articles.current[page];
+    if (!el) return;
+    const update = () => setSliderHeight(el.offsetHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [page, current?.id, plans]);
   // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
   useFeedbackBlock(Boolean(current));
 
@@ -222,7 +236,8 @@ export default function Planner() {
 
     return (
       <main className="fade-in">
-        <nav className="flex items-center gap-1 px-2 pt-10">
+        {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
+        <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
           <Button
             type="button"
             variant="ghost"
@@ -286,10 +301,17 @@ export default function Planner() {
             // 끌고 난 직후에는 버튼이 눌리지 않게 막는다.
             if (justDragged.current) e.stopPropagation();
           }}
-          className="flex snap-x snap-mandatory items-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory items-start overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{ height: sliderHeight }}
         >
           {shown.map((plan, i) => (
-            <article key={i} className="w-full shrink-0 snap-center">
+            <article
+              key={i}
+              ref={(el) => {
+                articles.current[i] = el;
+              }}
+              className="w-full shrink-0 snap-center"
+            >
               <PlanView plan={plan} />
               {/* 출처 문구 아래 30px에 붙여 둔다. 안마다 높이가 달라도 간격이 유지된다. */}
               <section className="px-5 pb-6 pt-8">
