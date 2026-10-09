@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -44,10 +45,10 @@ export default function TimeSheet({ label, value, onChange }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-14 w-full flex-col justify-center rounded-xl bg-soft px-4 text-left"
+        className="flex min-h-16 w-full flex-col justify-center rounded-input bg-muted px-4 py-3 text-left"
       >
-        <span className="text-[11px] text-sub">{label}</span>
-        <span className="text-[16px] font-medium tabular-nums">{display(a, h, m)}</span>
+        <span className="text-caption text-muted-foreground">{label}</span>
+        <span className="text-body-lg font-medium tabular-nums">{display(a, h, m)}</span>
       </button>
       {open && (
         <Sheet
@@ -92,14 +93,14 @@ function Sheet({
       className="fixed inset-0 z-[60] mx-auto flex w-[390px] max-w-full items-center justify-center px-6"
       role="presentation"
     >
-      <div className="fade-backdrop absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="fade-backdrop absolute inset-0 bg-on-surface/40" onClick={onClose} />
       <div
         role="alertdialog"
         aria-modal="true"
         aria-label={`${label} 선택`}
-        className="alert-in relative w-full rounded-2xl bg-white p-5 shadow-xl"
+        className="alert-in relative w-full rounded-nav bg-surface p-5"
       >
-        <h2 className="text-center text-[17px] font-semibold">{label}</h2>
+        <h2 className="text-center text-subheading font-medium">{label}</h2>
 
         <div
           className="relative mt-3 grid grid-cols-[0.8fr_1fr_1fr] gap-1"
@@ -107,32 +108,21 @@ function Sheet({
         >
           {/* 선택 줄: 가운데 한 칸 */}
           <div
-            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-xl bg-soft"
+            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-input bg-muted"
             style={{ height: ITEM }}
           />
           <Wheel label="오전 오후" items={AMPM} selected={ampm} onSelect={setAmpm} />
           <Wheel label="시" items={HOURS} selected={hourIdx} onSelect={setHourIdx} />
           <Wheel label="분" items={MINUTES} selected={minute} onSelect={setMinute} />
-          {/* 위·아래로 갈수록 흐려지는 막 */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-16 bg-gradient-to-b from-white to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-t from-white to-transparent" />
         </div>
 
         <div className="mt-4 grid grid-cols-[1fr_2fr] gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-12 rounded-xl bg-soft text-[15px] text-ink/80 active:opacity-80"
-          >
+          <Button type="button" variant="secondary" size="lg" onClick={onClose}>
             취소
-          </button>
-          <button
-            type="button"
-            onClick={() => onConfirm(join(ampm, hourIdx, minute))}
-            className="h-12 rounded-xl bg-ink text-[15px] font-medium text-white active:opacity-80"
-          >
+          </Button>
+          <Button type="button" size="lg" onClick={() => onConfirm(join(ampm, hourIdx, minute))}>
             {display(ampm, hourIdx, minute)} 설정
-          </button>
+          </Button>
         </div>
       </div>
     </div>,
@@ -224,7 +214,7 @@ function Wheel({
             aria-selected={on}
             onClick={() => goTo(i)}
             className={`flex w-full snap-center items-center justify-center tabular-nums [scroll-snap-stop:always] ${
-              on ? "text-[20px] font-semibold text-ink" : "text-[18px] text-sub"
+              on ? "text-subheading font-medium text-on-surface" : "text-subheading text-muted-foreground"
             }`}
             style={{ height: ITEM }}
           >

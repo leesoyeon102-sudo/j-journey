@@ -27,6 +27,14 @@ lib/
   storage.ts          localStorage 저장 (useSyncExternalStore)
 ```
 
+## 디자인 시스템 (shadcn/ui)
+
+- `npx shadcn@latest init`으로 초기화했고(`components.json`, radix-nova), `button · input · card · badge · dialog`를 `components/ui/`에 추가했습니다.
+- 색·글자 크기·둥글기·그림자는 Contra 스타일 레퍼런스를 `app/globals.css`의 `@theme`에 옮겼습니다. 컴포넌트는 `rounded-button`(24px), `rounded-card`(4px), `rounded-input`(10px), `rounded-tag`(32px), `rounded-nav`(16px) 같은 이름으로 씁니다.
+- 기존 앱 화면이 바뀌지 않도록 Tailwind 기본 `rounded-*`·간격 눈금은 건드리지 않았고, 앱의 강조 파랑은 shadcn의 `accent`와 겹쳐서 `brand`로 이름을 바꿨습니다.
+- `/design-system` 에서 컴포넌트를 variant·상태별로 한 화면에 볼 수 있습니다.
+- 라이트 모드만 씁니다(다크 모드 변수는 제거). GT Standard 글꼴은 유료라 없으면 기존 한글 폰트로 대체됩니다.
+
 ## 참고
 
 - 출발지·도착지를 현재 위치(브라우저 위치 허용) 또는 주소 검색으로 고르고 도착 시각만 입력하면 "몇 시에 출발해야 하는지"를 알려줍니다. 마지막으로 고른 출발지는 기본값으로 기억합니다. 도보 시간은 실제 보행 경로 API로, 열차 시간은 노선 데이터로 계산합니다.

@@ -1,17 +1,125 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-ink: #111111;
+  /* ── DESIGN.md 역할 토큰 (값의 원본). 팔레트 이름(ink, mist …)과 shadcn 변수는 아래에서 이 값을 가리킨다. ── */
+  --color-primary: #222834;
+  --color-on-primary: #ffffff;
+  --color-primary-hover: #373f51;
+  --color-toast: #646971; /* primary 70%를 흰 바탕에 올린 색, 불투명도 100% */
+  --color-surface: #ffffff;
+  --color-on-surface: #14171f;
+  --color-muted: #f5f6f9;
+  --color-muted-subtle: #fafbfd;
+  --color-muted-foreground: #677084;
+  --color-placeholder: #9ba2b0;
+  --color-inactive: #c9ced8;
+  --color-border: #e5e7eb;
+  --color-border-subtle: #eef0f4;
+  /* DESIGN.md의 accent(파랑). shadcn의 accent(호버 배경)와 겹쳐 코드에서는 brand, 값은 --color-accent-brand */
+  --color-accent-brand: #2f5bff;
+  --color-accent-subtle: #eaefff; /* accent 10%를 흰 배경에 올린 색 */
+  --color-danger: #ff5a5e;
+  --color-danger-subtle: #ffefef;
+  --color-on-danger: #45192f;
+}
+
+@theme {
+  /* ── Contra 스타일 레퍼런스 색상 ─────────────────────────── */
+  --color-ink: var(--color-on-surface); /* 본문·제목·아이콘 */
+  --color-paper: var(--color-surface); /* 기본 캔버스·카드 */
+  --color-mist: var(--color-muted); /* 보조 면·입력 배경·태그 */
+  --color-hairline: var(--color-border); /* 테두리·구분선 */
+  --color-slate: var(--color-muted-foreground); /* 보조 텍스트 */
+  --color-fog: var(--color-placeholder); /* placeholder·비활성 */
+  --color-graphite: var(--color-primary-hover); /* 어두운 구분선·링크 */
+  --color-charcoal: var(--color-primary); /* 유일한 채움 버튼 색 */
+  --color-deep-ink: #050505;
+  --color-pearl: #d0d4dc;
+  /* 카드 채움 전용 강조색 (글자·아이콘·테두리에는 쓰지 않는다) */
+  --color-iris: #6a57e3;
+  --color-lilac: #ddd8ff;
+  --color-orchid: #cd74dd;
+  --color-wine: var(--color-on-danger);
+  --color-coral: var(--color-danger);
+  --color-lime: #f0fb96;
+  --color-hero-wash: #9ddef9;
+
+  /* ── 기존 앱에서 쓰는 색 (모바일 화면) ───────────────────── */
   --color-sub: #8b8b8b;
   --color-line: #ececec;
   --color-soft: #f6f6f6;
-  --color-accent: #2f5bff;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+  /* 출발 시각 등 강조 파랑. shadcn의 accent(호버 배경)와 이름이 겹쳐 brand로 분리했다. */
+  --color-brand: var(--color-accent-brand);
+
+  /* ── 글꼴: GT Standard는 유료라 설치돼 있지 않으면 기존 한글 폰트로 대체된다 ── */
+  --font-gt-standard-m: "GT Standard M", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
     "Noto Sans KR", "Segoe UI", sans-serif;
+  --font-gt-standard-l: "GT Standard L", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+    "Noto Sans KR", "Segoe UI", sans-serif;
+  --font-sans: var(--font-gt-standard-m);
+  --font-heading: var(--font-gt-standard-l);
+
+  /* ── 글자 크기 (text-caption, text-body-sm, text-body-lg, text-subheading, text-heading-sm, text-display) ── */
+  --text-caption: 12px;
+  --text-caption--line-height: 1.4;
+  --text-caption--letter-spacing: 0px;
+  --text-caption-lg: 13px;
+  --text-caption-lg--line-height: 1.4;
+  --text-caption-lg--letter-spacing: 0px;
+  --text-label-lg: 15px;
+  --text-label-lg--line-height: 1.43;
+  --text-label-lg--letter-spacing: -0.15px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 1.43;
+  --text-body-sm--letter-spacing: -0.14px;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--letter-spacing: -0.16px;
+  --text-subheading: 19px;
+  --text-subheading--line-height: 1.33;
+  --text-subheading--letter-spacing: -0.19px;
+  --text-heading-sm: 23px;
+  --text-heading-sm--line-height: 1.39;
+  --text-heading-sm--letter-spacing: -0.23px;
+  /* DESIGN.md 이름. 크기는 위 *-sm/lg와 같다. */
+  --text-heading: 23px;
+  --text-heading--line-height: 1.39;
+  --text-heading--letter-spacing: -0.23px;
+  --text-body: 14px;
+  --text-body--line-height: 1.43;
+  --text-body--letter-spacing: -0.14px;
+  --text-label: 14px;
+  --text-label--line-height: 1.43;
+  --text-label--letter-spacing: -0.14px;
+  --text-time: 34px;
+  --text-time--line-height: 1.2;
+  --text-time--letter-spacing: -0.34px;
+  --text-display: 58px;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.58px;
+
+  /* ── 둥근 정도: 기본 rounded-* 눈금은 그대로 두고 용도별 이름만 추가 ── */
+  --radius-card: 4px;
+  --radius-chip: 8px;
+  --radius-toast: 10px;
+  --radius-input: 10px;
+  --radius-nav: 16px;
+  --radius-button: 24px;
+  --radius-tag: 32px;
+  --radius-pill: 40px;
+
+  /* ── 그림자 ── */
+  --shadow-button: rgba(34, 40, 52, 0.05) 0px 4px 10px 0px, rgba(34, 40, 52, 0.04) -2px 18px 18px 0px;
+  --shadow-tab: rgb(19, 24, 25) 0px 1px 3px 0px inset;
+  --shadow-nav: rgba(0, 0, 0, 0.05) 0px 10px 20px 0px;
 }
 
 html {
-  background: #f1f1f1;
+  background: var(--color-muted);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -19,6 +127,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   letter-spacing: -0.01em;
+  background: transparent; /* 앱 바깥의 연한 회색(html 배경)을 그대로 보이게 */
 }
 
 /* 모바일 390px 기준 앱 화면 */
@@ -27,7 +136,7 @@ body {
   width: 390px;
   max-width: 100%;
   min-height: 100dvh;
-  background: #fff;
+  background: var(--color-surface);
   position: relative;
 }
 
@@ -50,7 +159,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   animation: fade-in 0.25s ease-out both;
 }
 
-
 @keyframes backdrop-in {
   from {
     opacity: 0;
@@ -59,7 +167,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     opacity: 1;
   }
 }
-
 
 .fade-backdrop {
   animation: backdrop-in 0.2s ease-out both;
@@ -78,4 +185,103 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .alert-in {
   animation: alert-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@theme inline {
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--color-on-primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+}
+
+/* shadcn 의미 색을 Contra 팔레트에 연결한다. (라이트 전용 — 다크 모드는 쓰지 않는다) */
+:root {
+  /* shadcn 변수 ← DESIGN.md 역할 (대응표)
+     --background, --card, --popover      ← surface
+     --foreground, --card-foreground …     ← on-surface
+     --primary / --primary-foreground      ← primary / on-primary
+     --secondary, --muted, --accent        ← muted
+     --muted-foreground                    ← muted-foreground
+     --destructive                         ← danger
+     --border, --input                     ← border
+     --ring                                ← on-surface */
+  --background: var(--color-surface);
+  --foreground: var(--color-on-surface);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-on-surface);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-on-surface);
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-on-primary);
+  --secondary: var(--color-muted);
+  --secondary-foreground: var(--color-on-surface);
+  --muted: var(--color-muted);
+  --muted-foreground: var(--color-muted-foreground);
+  --accent: var(--color-muted);
+  --accent-foreground: var(--color-on-surface);
+  --destructive: var(--color-danger);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-on-surface);
+  --chart-1: var(--color-iris);
+  --chart-2: var(--color-orchid);
+  --chart-3: var(--color-coral);
+  --chart-4: var(--color-wine);
+  --chart-5: var(--color-lime);
+  --radius: 0.625rem;
+  --sidebar: var(--color-muted);
+  --sidebar-foreground: var(--color-on-surface);
+  --sidebar-primary: var(--color-primary);
+  --sidebar-primary-foreground: var(--color-on-primary);
+  --sidebar-accent: var(--color-surface);
+  --sidebar-accent-foreground: var(--color-on-surface);
+  --sidebar-border: var(--color-border);
+  --sidebar-ring: var(--color-on-surface);
+
+  /* 참고용 토큰(Tailwind 유틸리티로는 쓰이지 않음): 간격은 4px 단위 */
+  --gradient-hero-wash: linear-gradient(90deg, rgb(205, 243, 253), rgb(157, 222, 249) 42.88%, rgb(151, 157, 241) 94.62%);
+  --space-unit: 4px;
+  --page-max-width: 1200px;
+  --section-gap: 64px;
+  --card-padding: 12px;
+  --chip-padding: 6px;
+  --toast-offset: 10px;
+  --element-gap: 8px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Tailwind v4는 버튼 커서가 기본값이라 눈에 보이는 클릭 가능 표시를 되살린다. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }

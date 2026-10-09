@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { reverseGeocode, searchAddress, type GeoResult } from "@/lib/api";
 
@@ -125,109 +127,100 @@ export default function LocationPicker({
   }
 
   return (
-    <div className="fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col overflow-y-auto bg-white">
+    <div className="fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col overflow-y-auto bg-surface">
       <div className="flex items-center justify-between px-5 pt-10">
-        <h2 className="text-[22px] font-semibold tracking-tight">{title}</h2>
+        <h2 className="text-heading font-medium">{title}</h2>
         {onClose && (
-          <button onClick={onClose} className="h-11 px-1 text-sm text-sub">
+          <Button variant="ghost" onClick={onClose} className="text-muted-foreground">
             닫기
-          </button>
+          </Button>
         )}
       </div>
-      {description && <p className="px-5 pt-1 text-sm leading-relaxed text-sub">{description}</p>}
+      {description && <p className="px-5 pt-1 text-body text-muted-foreground">{description}</p>}
 
       {phase === "locating" && (
-        <p className="px-5 pt-12 text-center text-sm text-ink/70">
+        <p className="px-5 pt-12 text-center text-body text-muted-foreground">
           위치 허용 창에서 &lsquo;허용&rsquo;을 눌러 주세요…
         </p>
       )}
 
       {phase === "confirm" && found && (
         <div className="px-5 pt-8">
-          <p className="text-[11px] text-sub">현재 위치</p>
-          <p className="mt-1 text-[17px] font-medium leading-snug">{found.address || "현재 위치"}</p>
-          <p className="mt-4 text-sm text-ink/70">{confirmQuestion}</p>
-          <button
-            onClick={() => onSelect(found)}
-            className="mt-3 h-14 w-full rounded-xl bg-ink text-[16px] font-medium text-white active:opacity-80"
-          >
+          <p className="text-caption text-muted-foreground">현재 위치</p>
+          <p className="mt-1 text-subheading font-medium">{found.address || "현재 위치"}</p>
+          <p className="mt-4 text-body text-muted-foreground">{confirmQuestion}</p>
+          <Button size="lg" onClick={() => onSelect(found)} className="mt-3 w-full">
             {confirmLabel}
-          </button>
-          <button onClick={() => setPhase("choose")} className="mt-1 h-11 w-full text-sm text-sub">
+          </Button>
+          <Button variant="ghost" size="lg" onClick={() => setPhase("choose")} className="mt-1 w-full text-muted-foreground">
             아니에요, 주소로 검색할게요
-          </button>
+          </Button>
         </div>
       )}
 
       {(phase === "choose" || phase === "denied") && (
         <div className="px-5 pt-6">
           {denied && phase === "denied" && (
-            <p role="alert" className="mb-4 rounded-xl bg-soft px-4 py-3 text-sm text-ink/80">
+            <p role="alert" className="mb-4 rounded-card bg-muted px-4 py-3 text-body text-on-surface">
               {denied}
             </p>
           )}
           {homeChip && (
             <div className="mb-3 flex items-center gap-3">
-              <button
-                onClick={homeChip.onPick}
-                className="inline-flex h-10 min-w-0 max-w-full items-center gap-2 rounded-full border border-line bg-white px-4 text-sm font-medium active:bg-soft"
-              >
+              <Button variant="outline" onClick={homeChip.onPick} className="min-w-0 max-w-full">
                 <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z" />
                 </svg>
                 <span className="shrink-0">집</span>
-                <span className="truncate text-xs font-normal text-sub">{homeChip.address}</span>
-              </button>
-              <button onClick={homeChip.onEdit} className="h-10 shrink-0 text-xs text-sub">
+                <span className="truncate text-caption font-normal text-muted-foreground">{homeChip.address}</span>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={homeChip.onEdit} className="shrink-0 text-muted-foreground">
                 변경
-              </button>
+              </Button>
             </div>
           )}
-          <button
+          <Button
+            size="lg"
             onClick={() => {
               setPhase("locating");
               void locate();
             }}
-            className="h-14 w-full rounded-xl bg-ink text-[16px] font-medium text-white active:opacity-80"
+            className="w-full"
           >
             {locateLabel}
-          </button>
+          </Button>
 
-          <p className="mb-2 mt-7 text-xs text-sub">또는 주소·건물 이름으로 검색</p>
+          <p className="mb-2 mt-7 text-caption text-muted-foreground">또는 주소·건물 이름으로 검색</p>
           <form onSubmit={search} className="flex gap-2">
-            <input
+            <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="예: 경복궁역, 천호대로 995, 집 근처 병원"
-              className="h-12 min-w-0 flex-1 rounded-xl bg-soft px-4 text-[16px] outline-none placeholder:text-sub"
+              className="flex-1"
             />
-            <button
-              type="submit"
-              disabled={searching}
-              className="h-12 rounded-xl border border-line px-4 text-sm disabled:opacity-50"
-            >
+            <Button type="submit" variant="outline" size="lg" disabled={searching} className="h-11">
               {searching ? "검색 중" : "검색"}
-            </button>
+            </Button>
           </form>
 
           {searchError && (
-            <p className="mt-4 text-sm text-red-500">검색에 실패했어요. 잠시 후 다시 시도해 주세요.</p>
+            <p className="mt-4 text-body text-on-danger">검색에 실패했어요. 잠시 후 다시 시도해 주세요.</p>
           )}
           {results && results.length === 0 && (
-            <p className="mt-6 text-center text-sm text-sub">검색 결과가 없어요</p>
+            <p className="mt-6 text-center text-body text-muted-foreground">검색 결과가 없어요</p>
           )}
           {results && results.length > 0 && (
-            <ul className="mt-2 divide-y divide-line">
+            <ul className="mt-2 divide-y divide-border">
               {results.map((r, i) => (
                 <li key={i}>
                   <button
                     onClick={() =>
                       onSelect({ name: r.name, address: r.address, lat: r.lat, lng: r.lng })
                     }
-                    className="w-full py-3 text-left active:bg-soft"
+                    className="w-full py-3 text-left active:bg-muted"
                   >
-                    <p className="text-[15px] font-medium">{r.name}</p>
-                    <p className="mt-0.5 text-xs text-sub">{r.address}</p>
+                    <p className="text-body font-medium">{r.name}</p>
+                    <p className="mt-1 text-caption text-muted-foreground">{r.address}</p>
                   </button>
                 </li>
               ))}

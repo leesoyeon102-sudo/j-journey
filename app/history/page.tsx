@@ -1,15 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
+import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
 import { requestPlans } from "@/lib/api";
 import { nextOccurrence } from "@/lib/dates";
 import { setPendingResult } from "@/lib/pending";
 import { addTrip, removeRoute, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
+
+/** 밀었을 때 오른쪽에 드러나는 삭제 버튼의 너비(px) */
+const DELETE_W = 80;
 
 export default function HistoryPage() {
   const trips = useTrips();
@@ -18,6 +23,46 @@ export default function HistoryPage() {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<{ key: string; message: string } | null>(null);
+  // 목록을 왼쪽으로 밀면 삭제 버튼이 나온다. swiped: 열려 있는 줄, drag: 끌고 있는 중의 위치
+  const [swiped, setSwiped] = useState<string | null>(null);
+  const [drag, setDrag] = useState<{ key: string; x: number } | null>(null);
+  const gesture = useRef<{ key: string; x: number; y: number; base: number; last: number; mode: "h" | "v" | null } | null>(null);
+  const justSwiped = useRef(false);
+  // 삭제 같은 동작 뒤에 잠깐 보이는 안내
+  const [toast, setToast] = useState<string | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const onSwipeStart = (key: string, e: React.PointerEvent) => {
+    gesture.current = { key, x: e.clientX, y: e.clientY, base: swiped === key ? -DELETE_W : 0, last: swiped === key ? -DELETE_W : 0, mode: null };
+  };
+  const onSwipeMove = (key: string, e: React.PointerEvent<HTMLDivElement>) => {
+    const g = gesture.current;
+    if (!g || g.key !== key) return;
+    const dx = e.clientX - g.x;
+    const dy = e.clientY - g.y;
+    if (g.mode === null) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      g.mode = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+      if (g.mode === "h") e.currentTarget.setPointerCapture(e.pointerId);
+    }
+    if (g.mode === "v") return;
+    g.last = Math.max(-DELETE_W, Math.min(0, g.base + dx));
+    setDrag({ key, x: g.last });
+  };
+  const onSwipeEnd = (key: string) => {
+    const g = gesture.current;
+    gesture.current = null;
+    if (g?.mode !== "h") return;
+    setSwiped(g.last < -DELETE_W / 2 ? key : null);
+    setDrag(null);
+    // 밀고 난 직후에 따라오는 click은 무시한다.
+    justSwiped.current = true;
+    setTimeout(() => (justSwiped.current = false), 0);
+  };
 
   /** 같은 도착지·약속 시각으로 다시 계산해 홈의 출발 안내 화면으로 바로 보낸다. */
   async function replan(r: RouteSummary) {
@@ -62,92 +107,100 @@ export default function HistoryPage() {
       <Header title="경로 내역" sub={routes.length ? `안내받은 경로 ${routes.length}개` : undefined} />
 
       {routes.length === 0 ? (
-        <p className="px-5 py-24 text-center text-sm leading-relaxed text-sub">
+        <p className="px-5 py-24 text-center text-body text-muted-foreground">
           아직 안내받은 경로가 없어요.
           <br />
           홈에서 약속 시각을 입력해 보세요.
         </p>
       ) : (
-        <ul className="divide-y divide-line border-y border-line">
+        <ul className="divide-y divide-border border-y border-border">
           {routes.map((r) => {
             const open = openKey === r.key;
             const { plan } = r.latest;
             return (
               <li key={r.key}>
+                <div className="relative overflow-hidden">
+                  <div className="absolute inset-y-0 right-0" style={{ width: DELETE_W }}>
+                    <Button
+                      variant="danger"
+                      tabIndex={swiped === r.key ? 0 : -1}
+                      aria-label={`${r.origin}에서 ${r.destination}까지 경로 삭제`}
+                      onClick={() => {
+                        removeRoute(r.key);
+                        setSwiped(null);
+                        setOpenKey(null);
+                        setToast("경로가 삭제되었습니다.");
+                      }}
+                      className="h-full w-full rounded-none"
+                    >
+                      삭제
+                    </Button>
+                  </div>
+                  <div
+                    onPointerDown={(e) => onSwipeStart(r.key, e)}
+                    onPointerMove={(e) => onSwipeMove(r.key, e)}
+                    onPointerUp={() => onSwipeEnd(r.key)}
+                    onPointerCancel={() => onSwipeEnd(r.key)}
+                    onClickCapture={(e) => {
+                      if (justSwiped.current) e.stopPropagation();
+                    }}
+                    className="relative touch-pan-y bg-surface select-none"
+                    style={{
+                      transform: `translateX(${drag?.key === r.key ? drag.x : swiped === r.key ? -DELETE_W : 0}px)`,
+                      transition: drag?.key === r.key ? "none" : "transform 0.2s ease-out",
+                    }}
+                  >
                 <button
-                  onClick={() => setOpenKey(open ? null : r.key)}
+                  onClick={() => {
+                    // 삭제 버튼이 열려 있으면 먼저 닫는다.
+                    if (swiped === r.key) return setSwiped(null);
+                    setOpenKey(open ? null : r.key);
+                  }}
                   aria-expanded={open}
-                  className="w-full px-5 py-5 text-left active:bg-soft"
+                  className="w-full px-5 py-5 text-left active:bg-muted"
                 >
+                  {r.usageCount >= 2 && (
+                    // 2회 이상 이용한 경로만 "자주 이용한 경로"로 표시한다.
+                    <p className="mb-1 text-caption-lg font-medium text-brand">자주 이용한 경로 · {r.usageCount}회</p>
+                  )}
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[16px] font-medium">
-                      {r.destination}
+                    <p className="text-body-lg font-medium">
+                      {r.origin} → {r.destination}
                     </p>
                     <span className="flex shrink-0 gap-1">
                       {r.lines.map((l, i) => (
                         <span
                           key={i}
                           title={l.name}
-                          className="size-2.5 rounded-full"
+                          className="size-3 rounded-pill"
                           style={{ backgroundColor: l.color }}
                         />
                       ))}
                     </span>
                   </div>
-                  <p className="mt-1.5 text-sm text-ink/80">
-                    {r.usageCount > 0
-                      ? `이 경로를 ${r.usageCount}번 이용했어요`
-                      : "아직 이용 기록이 없어요"}
-                  </p>
-                  <p className="mt-0.5 text-xs text-sub">
-                    {r.lines.length ? r.lines.map((l) => l.name).join(" → ") : "도보"} ·{" "}
-                    {r.transfers === 0 ? "환승 없음" : `환승 ${r.transfers}번`} · 마지막{" "}
-                    {fmtDate(r.lastUsedAt)}
+                  <p className="mt-2 text-caption text-muted-foreground">
+                    {r.transfers === 0 ? "환승 없음" : `환승 ${r.transfers}번`} · 검색일 {fmtDate(r.lastUsedAt)}
                   </p>
                 </button>
+                  </div>
+                </div>
 
                 {open && (
-                  <div className="fade-in bg-soft/60 px-5 pb-5 pt-4">
-                    <p className="mb-4 text-xs text-sub">
+                  <div className="fade-in bg-muted-subtle px-5 pb-5 pt-4">
+                    <p className="mb-4 text-caption text-muted-foreground">
                       마지막 안내 · {fmt(plan.leaveAt)} 출발 · {fmt(plan.arriveBy)} 약속
                     </p>
                     <Timeline plan={plan} />
 
-                    <ul className="mt-5 space-y-1 text-xs text-sub">
-                      {r.trips.slice(0, 5).map((t) => (
-                        <li key={t.id}>
-                          {fmtDate(t.createdAt)} ·{" "}
-                          {t.status === "ontime"
-                            ? "제시간 도착"
-                            : t.status === "late"
-                              ? "늦게 도착"
-                              : "도착 기록 없음"}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="mt-5 flex gap-2">
-                      <button
-                        onClick={() => replan(r)}
-                        disabled={busyKey !== null}
-                        className="flex h-11 flex-1 items-center justify-center rounded-xl bg-ink text-sm font-medium text-white disabled:opacity-60"
-                      >
-                        {busyKey === r.key ? "계산 중…" : "이 경로로 다시 안내받기"}
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm("이 경로의 기록을 모두 삭제할까요?")) {
-                            removeRoute(r.key);
-                            setOpenKey(null);
-                          }
-                        }}
-                        className="h-11 px-4 text-sm text-sub"
-                      >
-                        삭제
-                      </button>
-                    </div>
+                    <Button
+                      onClick={() => replan(r)}
+                      disabled={busyKey !== null}
+                      className="mt-5 h-11 w-full text-label-lg"
+                    >
+                      {busyKey === r.key ? "계산 중…" : "이 경로로 다시 안내받기"}
+                    </Button>
                     {error?.key === r.key && (
-                      <p role="alert" className="mt-3 text-sm text-red-500">
+                      <p role="alert" className="mt-3 text-body text-on-danger">
                         {error.message}
                       </p>
                     )}
@@ -158,6 +211,7 @@ export default function HistoryPage() {
           })}
         </ul>
       )}
+      {toast && <Toast message={toast} />}
     </main>
   );
 }

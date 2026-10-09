@@ -13,7 +13,13 @@ export default function RoadmapPage() {
 
   return (
     <main className="fade-in">
-      <Header title="나의 로드맵" sub="지금까지 다닌 길이 지도 위에 쌓여요" />
+      <Header title="나의 로드맵" sub={
+          <>
+            지금까지 다닌 길이 지도 위에 쌓이고
+            <br />
+            자주 이용한 길일수록 겹쳐서 색이 진해져요.
+          </>
+        } />
 
       <dl className="grid grid-cols-3 gap-3 px-5 pb-5">
         <Stat label="다녀온 경로" value={`${map.routeCount}개`} />
@@ -24,7 +30,7 @@ export default function RoadmapPage() {
       <div className="relative">
         <RoadmapMap roadmap={map} home={home ?? undefined} />
         {empty && (
-          <p className="absolute inset-x-0 bottom-6 text-center text-xs text-sub">
+          <p className="absolute inset-x-0 bottom-6 text-center text-caption text-muted-foreground">
             도착 기록을 남기면 이곳에 선이 그려져요
           </p>
         )}
@@ -35,9 +41,9 @@ export default function RoadmapPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-soft px-3 py-3">
-      <dt className="text-[11px] text-sub">{label}</dt>
-      <dd className="mt-1 text-[17px] font-semibold tabular-nums">{value}</dd>
+    <div className="rounded-card bg-muted px-3 py-3">
+      <dt className="text-caption text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-subheading font-medium tabular-nums">{value}</dd>
     </div>
   );
 }

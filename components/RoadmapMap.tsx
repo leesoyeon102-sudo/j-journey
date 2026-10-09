@@ -55,7 +55,7 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
       aria-label="지금까지 이용한 구간을 표시한 노선도"
     >
       {/* 바탕 노선망 */}
-      <g stroke="#e6e6e6" strokeWidth={1.2} strokeLinecap="round">
+      <g stroke="var(--color-border)" strokeWidth={1.2} strokeLinecap="round">
         {LINES.flatMap((l) =>
           l.edges.map(([a, b]) => {
             const [x1, y1] = pos(a);
@@ -68,7 +68,7 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
       {/* 내가 다닌 길: 탈 때마다 한 줄씩 반투명하게 얹어서, 겹치면 겹친 대로 진해 보인다. */}
       <g
         fill="none"
-        stroke="var(--color-accent)"
+        stroke="var(--color-primary)"
         strokeWidth={4}
         strokeOpacity={0.28}
         strokeLinecap="round"
@@ -84,26 +84,26 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
 
       {/* 방문한 역 */}
       {visited.map((n) => (
-        <circle key={n} cx={pos(n)[0]} cy={pos(n)[1]} r={2.5} fill="#fff" stroke="var(--color-accent)" strokeWidth={1.5} />
+        <circle key={n} cx={pos(n)[0]} cy={pos(n)[1]} r={2.5} fill="var(--color-surface)" stroke="var(--color-primary)" strokeWidth={1.5} />
       ))}
       {labels &&
         visited.map((n) => (
-          <text key={`t-${n}`} x={pos(n)[0] + 6} y={pos(n)[1] - 5} fontSize={9} fill="#555">
+          <text key={`t-${n}`} x={pos(n)[0] + 6} y={pos(n)[1] - 5} fontSize={9} fill="var(--color-muted-foreground)">
             {n}
           </text>
         ))}
-      {/* 내 집 위치: 빨간 동그라미와 검정 "집" 글자 */}
+      {/* 내 집 위치: danger 동그라미와 on-surface "집" 글자 */}
       {homeAt && (
         <g>
-          <circle cx={homeAt[0]} cy={homeAt[1]} r={6} fill="#ef4444" stroke="#fff" strokeWidth={2} />
+          <circle cx={homeAt[0]} cy={homeAt[1]} r={6} fill="var(--color-danger)" stroke="var(--color-surface)" strokeWidth={2} />
           <text
             x={homeAt[0]}
             y={homeAt[1] - 12}
             textAnchor="middle"
             fontSize={12}
-            fontWeight={700}
-            fill="#111"
-            stroke="#fff"
+            fontWeight={500}
+            fill="var(--color-on-surface)"
+            stroke="var(--color-surface)"
             strokeWidth={3}
             paintOrder="stroke"
           >

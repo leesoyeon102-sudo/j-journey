@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import AlertPanel from "@/components/AlertPanel";
 import { useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import LocationPicker from "./LocationPicker";
@@ -55,11 +57,8 @@ export default function Planner() {
   // 마우스로 끌어서 넘길 때의 시작 좌표. 터치는 브라우저 스크롤 스냅이 알아서 처리한다.
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
   const justDragged = useRef(false);
-  // "제시간에 도착했어요" 기록 후 홈으로 돌아가는 타이머
-  const homeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => {
-    if (homeTimer.current) clearTimeout(homeTimer.current);
-  }, []);
+  // 도착 버튼을 누른 뒤 띄우는 얼럿. 제시간이면 확인을 누를 때 홈으로 돌아간다.
+  const [arrivedAlert, setArrivedAlert] = useState<"ontime" | "late" | null>(null);
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
   const [picker, setPicker] = useState<"origin" | "destination" | "home" | null>(null);
@@ -190,20 +189,26 @@ export default function Planner() {
     };
     const arrive = (plan: Plan, onTime: boolean) => {
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
-      if (!onTime) return;
-      // 기록 확인 문구를 잠깐 보여 준 뒤 홈(입력 화면)으로 돌아간다.
-      homeTimer.current = setTimeout(() => {
+      setArrivedAlert(onTime ? "ontime" : "late");
+    };
+    const closeArrivedAlert = () => {
+      const wasOnTime = arrivedAlert === "ontime";
+      setArrivedAlert(null);
+      // 제시간 도착을 기록했으면 홈(입력 화면)으로 돌아간다.
+      if (wasOnTime) {
         setEditing(true);
         setActiveId(null);
         setPlans([]);
-      }, 2000);
+      }
     };
 
     return (
       <main className="fade-in">
         <nav className="flex items-center gap-1 px-2 pt-10">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-lg"
             aria-label="뒤로가기 (입력 화면으로)"
             onClick={() =>
               requestLeave(() => {
@@ -212,22 +217,21 @@ export default function Planner() {
                 setPlans([]);
               })
             }
-            className="flex size-11 items-center justify-center rounded-full text-ink active:bg-soft"
           >
             <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 5-7 7 7 7" />
             </svg>
-          </button>
-          <h1 className="text-[17px] font-semibold tracking-tight">출발 안내</h1>
+          </Button>
+          <h1 className="text-subheading font-medium">출발 안내</h1>
         </nav>
         <div className="h-4" />
 
         {multi && (
           <div className="flex items-center justify-between px-5 pb-3">
-            <p className="text-sm font-medium">
+            <p className="text-body font-medium">
               {page === 0 ? "추천 경로" : `${page + 1}안`}
               {page > 0 && (
-                <span className="ml-2 text-xs font-normal text-sub">
+                <span className="ml-2 text-caption font-normal text-muted-foreground">
                   추천보다 {plans[0].leaveAt - active.leaveAt}분 일찍 나가야 해요
                 </span>
               )}
@@ -243,8 +247,8 @@ export default function Planner() {
                   className="flex size-6 items-center justify-center"
                 >
                   <span
-                    className={`block rounded-full transition-all ${
-                      i === page ? "h-2 w-5 bg-ink" : "size-2 bg-line"
+                    className={`block rounded-pill transition-all ${
+                      i === page ? "h-2 w-5 bg-primary" : "size-2 bg-border"
                     }`}
                   />
                 </button>
@@ -270,24 +274,15 @@ export default function Planner() {
             <article key={i} className="w-full shrink-0 snap-center">
               <PlanView plan={plan} />
               {/* 출처 문구 아래 30px에 붙여 둔다. 안마다 높이가 달라도 간격이 유지된다. */}
-              <section className="px-5 pb-6 pt-[30px]">
-                {done ? (
-                  <div className="rounded-xl bg-soft px-4 py-4 text-center text-sm">
-                    {current.status === "ontime"
-                      ? "제시간에 도착했어요. 기록했어요 ✓ 잠시 후 홈으로 이동해요"
-                      : "늦은 도착으로 기록했어요"}
-                  </div>
-                ) : (
+              <section className="px-5 pb-6 pt-8">
+                {!done && (
                   <div className="space-y-2">
-                    <button
-                      onClick={() => arrive(plan, true)}
-                      className="h-14 w-full rounded-xl bg-ink text-[16px] font-medium text-white active:opacity-80"
-                    >
+                    <Button size="lg" onClick={() => arrive(plan, true)} className="w-full">
                       제시간에 도착했어요
-                    </button>
-                    <button onClick={() => arrive(plan, false)} className="h-11 w-full text-sm text-sub">
+                    </Button>
+                    <Button variant="ghost" size="lg" onClick={() => arrive(plan, false)} className="w-full text-muted-foreground">
                       늦었어요
-                    </button>
+                    </Button>
                   </div>
                 )}
               </section>
@@ -295,6 +290,19 @@ export default function Planner() {
           ))}
         </div>
 
+        {arrivedAlert && (
+          <AlertPanel
+            title={arrivedAlert === "ontime" ? "제시간에 도착했어요" : "늦은 도착으로 기록했어요"}
+            description={
+              arrivedAlert === "ontime" ? "도착을 기록했어요. 확인을 누르면 홈으로 돌아가요." : "도착을 기록했어요."
+            }
+            onClose={closeArrivedAlert}
+          >
+            <Button size="lg" autoFocus onClick={closeArrivedAlert}>
+              확인
+            </Button>
+          </AlertPanel>
+        )}
       </main>
     );
   }
@@ -379,31 +387,31 @@ export default function Planner() {
         <button
           type="button"
           onClick={() => setPicker("origin")}
-          className="flex min-h-16 w-full flex-col justify-center rounded-xl bg-soft px-4 py-2.5 text-left"
+          className="flex min-h-16 w-full flex-col justify-center rounded-input bg-muted px-4 py-3 text-left"
         >
-          <span className="text-[11px] text-sub">출발지</span>
-          <span className="text-[16px] font-medium">{form.origin?.name || "장소 선택"}</span>
+          <span className="text-caption text-muted-foreground">출발지</span>
+          <span className="text-body-lg font-medium">{form.origin?.name || "장소 선택"}</span>
           {form.origin?.area && (
-            <span className="mt-0.5 truncate text-xs text-sub">{form.origin.area}</span>
+            <span className="mt-1 truncate text-caption text-muted-foreground">{form.origin.area}</span>
           )}
         </button>
 
         <button
           type="button"
           onClick={() => setPicker("destination")}
-          className="flex min-h-16 w-full flex-col justify-center rounded-xl bg-soft px-4 py-2.5 text-left"
+          className="flex min-h-16 w-full flex-col justify-center rounded-input bg-muted px-4 py-3 text-left"
         >
-          <span className="text-[11px] text-sub">도착지</span>
-          <span className="text-[16px] font-medium">{form.destination?.name || "장소 선택"}</span>
+          <span className="text-caption text-muted-foreground">도착지</span>
+          <span className="text-body-lg font-medium">{form.destination?.name || "장소 선택"}</span>
           {form.destination?.area && (
-            <span className="mt-0.5 truncate text-xs text-sub">{form.destination.area}</span>
+            <span className="mt-1 truncate text-caption text-muted-foreground">{form.destination.area}</span>
           )}
         </button>
 
         <TimeSheet label="약속 시각" value={form.time} onChange={(v) => set("time", v)} />
 
         <div className="flex h-12 items-center justify-between px-1">
-          <span id="tomorrow-label" className="text-sm text-ink/80">
+          <span id="tomorrow-label" className="text-body text-on-surface">
             내일 약속이에요
           </span>
           <button
@@ -412,31 +420,27 @@ export default function Planner() {
             aria-checked={form.tomorrow}
             aria-labelledby="tomorrow-label"
             onClick={() => set("tomorrow", !form.tomorrow)}
-            className={`relative h-7 w-12 rounded-full transition-colors ${
-              form.tomorrow ? "bg-ink" : "bg-line"
+            className={`relative h-8 w-14 rounded-pill transition-colors ${
+              form.tomorrow ? "bg-primary" : "bg-border"
             }`}
           >
             <span
-              className={`absolute left-0.5 top-0.5 size-6 rounded-full bg-white shadow transition-transform ${
-                form.tomorrow ? "translate-x-5" : ""
+              className={`absolute left-1 top-1 size-6 rounded-pill bg-surface transition-transform ${
+                form.tomorrow ? "translate-x-6" : ""
               }`}
             />
           </button>
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-500">
+          <p role="alert" className="text-body text-on-danger">
             {error}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-3 h-14 w-full rounded-xl bg-ink text-[16px] font-medium text-white active:opacity-80 disabled:opacity-60"
-        >
+        <Button type="submit" size="lg" disabled={loading} className="mt-3 w-full text-body-lg">
           {loading ? "실제 시간표 확인 중…" : "나갈 시각 알아보기"}
-        </button>
+        </Button>
       </form>
     </main>
   );
@@ -449,14 +453,14 @@ function PlanView({ plan }: { plan: Plan }) {
   return (
     <>
       <section className="px-5 pb-8">
-        <p className="text-sm text-sub">
+        <p className="text-body text-muted-foreground">
           {fmt(plan.arriveBy)} 약속 · 총 {plan.arriveAt - plan.leaveAt}분 걸려요
         </p>
-        <p className="mt-1 text-[44px] font-semibold leading-none tracking-tight">
-          <span className="text-accent">{fmt(plan.leaveAt)}</span>
-          <span className="ml-2 text-lg font-medium text-ink">에 출발하세요</span>
+        <p className="mt-1 text-time font-medium">
+          <span className="text-brand">{fmt(plan.leaveAt)}</span>
+          <span className="ml-2 text-subheading font-medium text-on-surface">에 출발하세요</span>
         </p>
-        <p className="mt-3 text-sm text-ink/70">
+        <p className="mt-3 text-body text-muted-foreground">
           {walkOnly
             ? "걸어서 이동"
             : plan.transfers === 0
@@ -464,10 +468,10 @@ function PlanView({ plan }: { plan: Plan }) {
               : `환승 ${plan.transfers}번`}{" "}
           · 약속 {plan.arriveBy - plan.arriveAt}분 전 도착
         </p>
-        {walkOnly && <p className="mt-1 text-xs text-sub">지하철 없이 걸어서 가는 방법이에요</p>}
+        {walkOnly && <p className="mt-1 text-caption text-muted-foreground">지하철 없이 걸어서 가는 방법이에요</p>}
       </section>
 
-      <div className="mx-5 border-t border-line" />
+      <div className="mx-5 border-t border-border" />
 
       <section className="px-5 pt-7">
         <Timeline plan={plan} />
@@ -491,14 +495,14 @@ function SourceNote({ plan }: { plan: Plan }) {
   return (
     <>
       {notes.length > 0 && (
-        <div className="mt-6 space-y-0.5 text-[11px] leading-relaxed text-sub">
+        <div className="mt-6 space-y-1 text-caption text-muted-foreground">
           {notes.map((n) => (
             <p key={n}>{n}</p>
           ))}
         </div>
       )}
       {hasBus && (
-        <p className="mt-4 rounded-lg bg-soft px-3 py-2.5 text-[12px] leading-relaxed text-ink/70">
+        <p className="mt-4 rounded-card bg-muted px-3 py-3 text-caption text-muted-foreground">
           {plan.busEstimated
             ? "버스 도착 정보가 없거나 약속이 2시간 이상 남은 경우, 배차 간격을 기준으로 안내해요. 약속 1~2시간 전에 다시 확인하면 좀 더 명확하게 알려드려요."
             : "버스 시각은 지금 버스 도착 정보를 바탕으로 예상하여 실제와 몇 분 차이가 있을 수 있어요."}

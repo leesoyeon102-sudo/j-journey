@@ -103,42 +103,39 @@ export default function Timeline({ plan }: { plan: Plan }) {
     <ol className="relative">
       {steps.map((s, i) => (
         <li key={i} className="relative flex gap-3 pb-6 last:pb-0">
-          <div className="w-[52px] shrink-0">
+          <div className="w-14 shrink-0">
             {s.color ? (
-              // 열차 탑승 시각: 호선 색 글자 + 같은 색 10% 배경의 태그
+              // 탑승 시각: 노선 색 글자 + 같은 색 10% 배경의 태그
               <time
-                className="inline-block rounded-md px-1.5 py-0.5 text-[13px] font-semibold tabular-nums"
+                className="inline-block rounded-chip px-2 py-1 text-body font-medium tabular-nums"
                 style={{ color: s.color, backgroundColor: `${s.color}1A` }}
               >
                 {fmt(s.time)}
               </time>
             ) : (
-              <time className="inline-block py-0.5 text-[13px] tabular-nums text-sub">
+              <time className="inline-block py-1 text-body tabular-nums text-muted-foreground">
                 {fmt(s.time)}
               </time>
             )}
           </div>
           <div className="relative flex flex-col items-center">
             <span
-              className="z-10 mt-1.5 size-2.5 shrink-0 rounded-full border-2 bg-white"
-              style={{
-                borderColor: s.color ?? (s.strong ? "var(--color-accent)" : "#cfcfcf"),
-                backgroundColor: s.strong ? "var(--color-accent)" : "#fff",
-              }}
+              className={`z-10 mt-2 size-3 shrink-0 rounded-pill border-2 ${
+                s.strong ? "border-primary bg-primary" : "border-muted-foreground bg-surface"
+              }`}
+              style={s.color ? { borderColor: s.color } : undefined}
             />
             {i < steps.length - 1 && (
               <span
-                className="absolute top-4 h-[calc(100%+0.75rem)] w-px"
-                style={{ backgroundColor: steps[i].color ?? "var(--color-line)" }}
+                className="absolute top-4 h-[calc(100%+0.75rem)] w-px bg-border"
+                style={steps[i].color ? { backgroundColor: steps[i].color } : undefined}
               />
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className={`text-[15px] ${s.strong ? "font-semibold" : "font-medium"}`}>
-              {s.title}
-            </p>
-            {s.detail && <p className="mt-0.5 text-[13px] text-ink/70">{s.detail}</p>}
-            {s.note && <p className="mt-0.5 text-xs text-sub">{s.note}</p>}
+            <p className="text-body font-medium">{s.title}</p>
+            {s.detail && <p className="mt-1 text-body text-muted-foreground">{s.detail}</p>}
+            {s.note && <p className="mt-1 text-caption text-muted-foreground">{s.note}</p>}
           </div>
         </li>
       ))}

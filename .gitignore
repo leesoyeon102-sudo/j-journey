@@ -42,3 +42,6 @@ next-env.d.ts
 
 # 열차 시간표 캐시
 .cache/
+
+*storybook.log
+storybook-static
