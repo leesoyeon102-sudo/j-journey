@@ -234,7 +234,7 @@ export default function Planner() {
       setEditing(true);
       setActiveId(null);
       setPlans([]);
-      // 도착을 기록한 적이 있고 아직 피드백을 물은 적이 없으면, 홈에 들어오고 3.5초 뒤에 한 번 묻는다.
+      // 도착을 기록한 적이 있고 아직 피드백을 물은 적이 없으면, 홈에 들어오고 2초 뒤에 한 번 묻는다.
       // 실제로 띄울 때 "물었다"고 기록하므로, 그 전에 다른 화면으로 가면 다음 기회에 다시 묻는다.
       if (trips.some((t) => t.status !== "planned") && !hasAskedFeedback()) {
         feedbackTimer.current = setTimeout(() => {
@@ -501,7 +501,7 @@ export default function Planner() {
 }
 
 /** 홈으로 돌아온 뒤 피드백 창이 뜨기까지 기다리는 시간 */
-const FEEDBACK_DELAY_MS = 3500;
+const FEEDBACK_DELAY_MS = 2000;
 
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 
