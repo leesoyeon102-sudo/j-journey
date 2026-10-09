@@ -2,13 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
+import FeedbackAlert from "@/components/FeedbackAlert";
+import Toast from "@/components/Toast";
 import { useEffect, useRef, useState } from "react";
+import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
 import LocationPicker from "./LocationPicker";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
+import { hasAskedFeedback, markFeedbackAsked, submitFeedback } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { clearPendingResult, peekPendingResult } from "@/lib/pending";
 import type { Place } from "@/lib/places";
@@ -57,21 +61,49 @@ export default function Planner() {
   // 마우스로 끌어서 넘길 때의 시작 좌표. 터치는 브라우저 스크롤 스냅이 알아서 처리한다.
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
   const justDragged = useRef(false);
-  // 도착 버튼을 누른 뒤 띄우는 얼럿. 제시간이면 확인을 누를 때 홈으로 돌아간다.
-  const [arrivedAlert, setArrivedAlert] = useState<"ontime" | "late" | null>(null);
+  // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
+  const [arrivedAlert, setArrivedAlert] = useState(false);
+  // 첫 도착 기록 뒤 홈으로 돌아왔을 때 한 번만 띄우는 별점·의견 창과, 보낸 뒤의 안내
+  // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
+  const arrivalTracked = useRef<string | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  // 홈에 들어오고 잠깐 지난 뒤에 띄우기 위한 타이머. 다른 화면으로 가면 취소한다.
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+    },
+    [],
+  );
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(t);
+  }, [toast]);
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
   const [picker, setPicker] = useState<"origin" | "destination" | "home" | null>(null);
+  // 출발지·도착지 선택 화면에서 집 주소를 고치러 들어왔다면, 끝난 뒤 그 화면으로 돌려보낸다.
+  // (처음 집 주소를 등록할 때는 비어 있어서 홈으로 간다.)
+  const [returnTo, setReturnTo] = useState<"origin" | "destination" | null>(null);
   const needHome = home === null;
   const showHomePicker = needHome || picker === "home";
+  const leaveHomePicker = () => {
+    setPicker(returnTo);
+    setReturnTo(null);
+  };
 
   /** 출발지·도착지 선택 화면에서 "현재 위치" 버튼 위에 놓는 집 칩 */
-  const homeChip = (apply: (place: Place) => void) =>
+  const homeChip = (from: "origin" | "destination", apply: (place: Place) => void) =>
     home
       ? {
           address: home.area,
           onPick: () => apply(home),
-          onEdit: () => setPicker("home"),
+          onEdit: () => {
+            setReturnTo(from);
+            setPicker("home");
+          },
         }
       : undefined;
 
@@ -188,17 +220,27 @@ export default function Planner() {
       goTo(Math.max(0, Math.min(shown.length - 1, to)));
     };
     const arrive = (plan: Plan, onTime: boolean) => {
+      // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
+      if (current.status === "planned" && arrivalTracked.current !== current.id) {
+        arrivalTracked.current = current.id;
+        amplitude.track("Arrival Recorded", { on_time: onTime });
+      }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
-      setArrivedAlert(onTime ? "ontime" : "late");
+      setArrivedAlert(true);
     };
     const closeArrivedAlert = () => {
-      const wasOnTime = arrivedAlert === "ontime";
-      setArrivedAlert(null);
-      // 제시간 도착을 기록했으면 홈(입력 화면)으로 돌아간다.
-      if (wasOnTime) {
-        setEditing(true);
-        setActiveId(null);
-        setPlans([]);
+      setArrivedAlert(false);
+      // 홈(입력 화면)으로 돌아간다.
+      setEditing(true);
+      setActiveId(null);
+      setPlans([]);
+      // 도착을 기록한 적이 있고 아직 피드백을 물은 적이 없으면, 홈에 들어오고 3.5초 뒤에 한 번 묻는다.
+      // 실제로 띄울 때 "물었다"고 기록하므로, 그 전에 다른 화면으로 가면 다음 기회에 다시 묻는다.
+      if (trips.some((t) => t.status !== "planned") && !hasAskedFeedback()) {
+        feedbackTimer.current = setTimeout(() => {
+          markFeedbackAsked();
+          setFeedbackOpen(true);
+        }, FEEDBACK_DELAY_MS);
       }
     };
 
@@ -292,10 +334,8 @@ export default function Planner() {
 
         {arrivedAlert && (
           <AlertPanel
-            title={arrivedAlert === "ontime" ? "제시간에 도착했어요" : "늦은 도착으로 기록했어요"}
-            description={
-              arrivedAlert === "ontime" ? "도착을 기록했어요. 확인을 누르면 홈으로 돌아가요." : "도착을 기록했어요."
-            }
+            title="로드맵 기록 완료"
+            description="확인을 누르면 홈으로 돌아가요."
             onClose={closeArrivedAlert}
           >
             <Button size="lg" autoFocus onClick={closeArrivedAlert}>
@@ -310,6 +350,18 @@ export default function Planner() {
   return (
     <main className="fade-in">
       <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." />
+
+      {feedbackOpen && (
+        <FeedbackAlert
+          onClose={() => setFeedbackOpen(false)}
+          onSubmit={(rating, comment) => {
+            submitFeedback(rating, comment);
+            setFeedbackOpen(false);
+            setToast("의견을 보냈어요. 고맙습니다!");
+          }}
+        />
+      )}
+      {toast && <Toast message={toast} />}
 
       {showHomePicker && (
         <LocationPicker
@@ -330,10 +382,12 @@ export default function Planner() {
           confirmQuestion="여기가 집이 맞나요?"
           confirmLabel="네, 집으로 등록할게요"
           onSelect={(p) => {
+            // 처음 등록할 때만 센다. (집 주소 변경은 해당하지 않는다)
+            if (needHome) amplitude.track("Home Address Registered", { method: p.source ?? "search" });
             saveHome({ name: "집", area: p.address || p.name, lat: p.lat, lng: p.lng });
-            setPicker(null);
+            leaveHomePicker();
           }}
-          onClose={needHome ? undefined : () => setPicker(null)}
+          onClose={needHome ? undefined : leaveHomePicker}
         />
       )}
 
@@ -342,7 +396,7 @@ export default function Planner() {
           title="출발지 선택"
           description="출발할 곳을 현재 위치나 주소로 찾아 보세요."
           near={form.destination ?? undefined}
-          homeChip={homeChip((place) => {
+          homeChip={homeChip("origin", (place) => {
             set("origin", place);
             saveLastOrigin(place);
             setPicker(null);
@@ -364,7 +418,7 @@ export default function Planner() {
         <LocationPicker
           title="도착지 선택"
           near={form.origin ?? undefined}
-          homeChip={homeChip((place) => {
+          homeChip={homeChip("destination", (place) => {
             set("destination", place);
             saveLastDestination(place);
             setPicker(null);
@@ -445,6 +499,9 @@ export default function Planner() {
     </main>
   );
 }
+
+/** 홈으로 돌아온 뒤 피드백 창이 뜨기까지 기다리는 시간 */
+const FEEDBACK_DELAY_MS = 3500;
 
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 

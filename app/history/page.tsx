@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
+import * as amplitude from "@amplitude/analytics-browser";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
@@ -28,6 +29,8 @@ export default function HistoryPage() {
   const [drag, setDrag] = useState<{ key: string; x: number } | null>(null);
   const gesture = useRef<{ key: string; x: number; y: number; base: number; last: number; mode: "h" | "v" | null } | null>(null);
   const justSwiped = useRef(false);
+  // 다시 안내받기 계산이 진행 중인지. 빠르게 두 번 눌러도 한 번만 처리한다.
+  const replanning = useRef(false);
   // 삭제 같은 동작 뒤에 잠깐 보이는 안내
   const [toast, setToast] = useState<string | null>(null);
   useEffect(() => {
@@ -66,6 +69,7 @@ export default function HistoryPage() {
 
   /** 같은 도착지·약속 시각으로 다시 계산해 홈의 출발 안내 화면으로 바로 보낸다. */
   async function replan(r: RouteSummary) {
+    if (replanning.current) return;
     const { plan } = r.latest;
     const origin = plan.originCoord
       ? { name: plan.origin, area: "", ...plan.originCoord }
@@ -79,6 +83,7 @@ export default function HistoryPage() {
       return;
     }
     setError(null);
+    replanning.current = true;
     setBusyKey(r.key);
     try {
       const { date } = nextOccurrence(plan.arriveBy);
@@ -94,10 +99,13 @@ export default function HistoryPage() {
         return;
       }
       setPendingResult({ tripId: addTrip(result.plan).id, plans: result.plans });
+      // 다시 안내받기가 실제로 이뤄졌을 때(경로 계산 성공 뒤) 한 번만 센다.
+      amplitude.track("Route Reused");
       router.push("/");
     } catch {
       setError({ key: r.key, message: "경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요." });
     } finally {
+      replanning.current = false;
       setBusyKey(null);
     }
   }

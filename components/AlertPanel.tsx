@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 interface Props {
   title: string;
   description: React.ReactNode;
+  /** 설명 아래에 놓는 내용(입력란 등). 없으면 설명 바로 아래에 버튼이 온다. */
+  content?: React.ReactNode;
   /** 바깥 영역 누르기, Esc */
   onClose: () => void;
   /** 버튼들. 같은 너비로 한 줄에 나란히 놓인다. */
@@ -13,7 +15,7 @@ interface Props {
 }
 
 /** 화면 가운데에 뜨는 확인 얼럿. 출발 안내 화면을 나갈 때와 도착을 기록할 때 같이 쓴다. */
-export default function AlertPanel({ title, description, onClose, children }: Props) {
+export default function AlertPanel({ title, description, content, onClose, children }: Props) {
   const id = useId();
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export default function AlertPanel({ title, description, onClose, children }: Pr
         <p id={`${id}-desc`} className="mt-2 text-body text-muted-foreground">
           {description}
         </p>
+        {content && <div className="mt-4">{content}</div>}
         <div className="mt-6 grid grid-flow-col auto-cols-fr gap-2">{children}</div>
       </div>
     </div>,

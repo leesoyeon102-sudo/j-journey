@@ -10,6 +10,8 @@ export interface PickedLocation {
   address: string;
   lat: number;
   lng: number;
+  /** 어떻게 골랐는지: 현재 위치 버튼 / 주소 검색 결과 (집 주소 등록 분석용) */
+  source?: "current_location" | "search";
 }
 
 interface Props {
@@ -149,7 +151,7 @@ export default function LocationPicker({
           <p className="text-caption text-muted-foreground">현재 위치</p>
           <p className="mt-1 text-subheading font-medium">{found.address || "현재 위치"}</p>
           <p className="mt-4 text-body text-muted-foreground">{confirmQuestion}</p>
-          <Button size="lg" onClick={() => onSelect(found)} className="mt-3 w-full">
+          <Button size="lg" onClick={() => onSelect({ ...found, source: "current_location" })} className="mt-3 w-full">
             {confirmLabel}
           </Button>
           <Button variant="ghost" size="lg" onClick={() => setPhase("choose")} className="mt-1 w-full text-muted-foreground">
@@ -215,7 +217,7 @@ export default function LocationPicker({
                 <li key={i}>
                   <button
                     onClick={() =>
-                      onSelect({ name: r.name, address: r.address, lat: r.lat, lng: r.lng })
+                      onSelect({ name: r.name, address: r.address, lat: r.lat, lng: r.lng, source: "search" })
                     }
                     className="w-full py-3 text-left active:bg-muted"
                   >

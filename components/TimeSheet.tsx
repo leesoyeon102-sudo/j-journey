@@ -180,9 +180,48 @@ function Wheel({
   const goTo = (i: number) =>
     ref.current?.scrollTo({ top: Math.min(items.length - 1, Math.max(0, i)) * ITEM, behavior: "smooth" });
 
+  // 마우스로 끌어서 돌리기. 터치와 휠은 브라우저 스크롤이 처리한다.
+  const drag = useRef<{ y: number; top: number; moved: boolean } | null>(null);
+  const justDragged = useRef(false);
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el || e.pointerType !== "mouse" || e.button !== 0) return;
+    drag.current = { y: e.clientY, top: el.scrollTop, moved: false };
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    const d = drag.current;
+    if (!el || !d) return;
+    const dy = e.clientY - d.y;
+    if (!d.moved && Math.abs(dy) < 4) return;
+    if (!d.moved) {
+      d.moved = true;
+      el.setPointerCapture(e.pointerId);
+      el.style.scrollSnapType = "none"; // 끄는 동안은 스냅이 위치를 되돌리지 않게
+    }
+    el.scrollTop = d.top - dy;
+  };
+  const onPointerEnd = () => {
+    const el = ref.current;
+    const d = drag.current;
+    drag.current = null;
+    if (!el || !d?.moved) return;
+    el.style.scrollSnapType = "";
+    justDragged.current = true; // 곧 이어지는 click(칸 선택)은 무시한다
+    setTimeout(() => (justDragged.current = false), 0);
+    goTo(Math.round(el.scrollTop / ITEM));
+  };
+
   return (
     <div
       ref={ref}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerEnd}
+      onPointerCancel={onPointerEnd}
+      onClickCapture={(e) => {
+        if (justDragged.current) e.stopPropagation();
+      }}
       role="listbox"
       aria-label={label}
       tabIndex={0}

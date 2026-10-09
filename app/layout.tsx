@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import AmplitudeInit from "@/components/AmplitudeInit";
 import LeaveConfirm from "@/components/LeaveConfirm";
 import TabBar from "@/components/TabBar";
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body>
+        <AmplitudeInit />
         <div className="app-shell pb-20">
           {children}
           <TabBar />

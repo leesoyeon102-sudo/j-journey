@@ -40,3 +40,18 @@ export const OneAction: Story = {
     children: <Button size="lg">확인</Button>,
   },
 }
+
+// 설명 아래에 입력란 같은 내용을 놓을 때
+export const WithContent: Story = {
+  args: {
+    title: "의견을 남겨 주세요",
+    description: "서비스가 어땠는지 알려 주세요.",
+    content: <div className="h-24 rounded-input bg-muted" />,
+    children: (
+      <>
+        <Button variant="secondary" size="lg">나중에</Button>
+        <Button size="lg">보내기</Button>
+      </>
+    ),
+  },
+}
