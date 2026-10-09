@@ -456,7 +456,14 @@ export default function Planner() {
           </p>
         )}
 
-        <Button type="submit" size="lg" disabled={loading} className="mt-3 w-full text-body-lg">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={loading}
+          // 버튼을 누를 때마다 한 번. 계산 중에는 버튼이 비활성이라 중복으로 눌리지 않는다.
+          onClick={() => amplitude.track("Route Search Clicked")}
+          className="mt-3 w-full text-body-lg"
+        >
           {loading ? "실제 시간표 확인 중…" : "나갈 시각 알아보기"}
         </Button>
       </form>
