@@ -19,7 +19,11 @@ const arrived = (t: Trip) => t.status !== "planned";
 /** 경로 내역: 출발·도착·노선이 같은 안내를 묶는다. */
 export function groupRoutes(trips: Trip[]): RouteSummary[] {
   const map = new Map<string, Trip[]>();
-  for (const t of trips) map.set(t.routeKey, [...(map.get(t.routeKey) ?? []), t]);
+  // 지운 경로(hidden)는 내역에서 빼고, 로드맵(buildRoadmap)에는 그대로 센다.
+  for (const t of trips) {
+    if (t.hidden) continue;
+    map.set(t.routeKey, [...(map.get(t.routeKey) ?? []), t]);
+  }
 
   return [...map.entries()]
     .map(([key, list]) => {

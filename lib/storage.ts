@@ -125,6 +125,14 @@ export const saveLastOrigin = originStore.save;
 export const useLastDestination = destinationStore.use;
 export const saveLastDestination = destinationStore.save;
 
+/**
+ * 경로 내역에서 경로를 지운다. 도착을 기록한 안내는 로드맵에 남도록 지우지 않고 숨기기만 하고,
+ * 도착 기록이 없는 안내는 그대로 지운다.
+ */
 export function removeRoute(routeKey: string) {
-  write(read().filter((t) => t.routeKey !== routeKey));
+  write(
+    read()
+      .filter((t) => t.routeKey !== routeKey || t.status !== "planned")
+      .map((t) => (t.routeKey === routeKey ? { ...t, hidden: true } : t)),
+  );
 }

@@ -130,4 +130,6 @@ export interface Trip {
   arrivedAt?: number;
   status: TripStatus;
   plan: Plan;
+  /** 경로 내역에서 삭제한 기록. 내역에는 안 보이지만 로드맵에는 계속 쌓인다. */
+  hidden?: boolean;
 }
