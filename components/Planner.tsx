@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
 import LocationPicker from "./LocationPicker";
@@ -42,7 +42,7 @@ const ARRIVE_EARLY_MIN = 5;
 const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false };
 
 // 약속 시각·내일 토글은 다른 탭에 다녀와도 유지한다. (화면이 다시 만들어져도 남도록 모듈에 둔다. 새로고침하면 초기화)
-let draft: Partial<Pick<Form, "time" | "tomorrow">> = {};
+const draft: Partial<Pick<Form, "time" | "tomorrow">> = {};
 
 export default function Planner() {
   const trips = useTrips();
@@ -50,7 +50,7 @@ export default function Planner() {
   const savedOrigin = useLastOrigin();
   const savedDestination = useLastDestination();
 
-  const [edit, setEdit] = useState<Partial<Form>>(draft);
+  const [edit, setEdit] = useState<Partial<Form>>(() => ({ ...draft }));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   // 경로 내역에서 다시 안내받아 넘어온 경우 그 결과를 바로 보여준다.
@@ -60,7 +60,6 @@ export default function Planner() {
   const [page, setPage] = useState(0);
   // 안마다 길이가 달라도 화면에 보이는 안의 높이만큼만 스크롤되도록, 보이는 안의 높이를 재서 슬라이더 높이로 쓴다.
   const articles = useRef<(HTMLElement | null)[]>([]);
-  const [sliderHeight, setSliderHeight] = useState<number | undefined>(undefined);
   const slider = useRef<HTMLDivElement>(null);
   // 마우스로 끌어서 넘길 때의 시작 좌표. 터치는 브라우저 스크롤 스냅이 알아서 처리한다.
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
@@ -103,7 +102,7 @@ export default function Planner() {
     ...edit,
   };
   const set = <K extends keyof Form>(k: K, v: Form[K]) => {
-    if (k === "time" || k === "tomorrow") draft = { ...draft, [k]: v };
+    if (k === "time" || k === "tomorrow") Object.assign(draft, { [k]: v });
     setEdit((e) => ({ ...e, [k]: v }));
   };
 
@@ -114,7 +113,10 @@ export default function Planner() {
   useEffect(() => {
     const el = articles.current[page];
     if (!el) return;
-    const update = () => setSliderHeight(el.offsetHeight);
+    // 스와이프 중에는 onScroll이 높이를 직접 조절하므로, 멈춰 있을 때만 맞춘다.
+    const update = () => {
+      if (slider.current) slider.current.style.height = `${el.offsetHeight}px`;
+    };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
@@ -186,7 +188,17 @@ export default function Planner() {
 
     const onScroll = () => {
       const el = slider.current;
-      if (el) setPage(Math.round(el.scrollLeft / el.clientWidth));
+      if (!el) return;
+      const pos = el.scrollLeft / el.clientWidth;
+      setPage(Math.round(pos));
+      // 넘기는 동안 높이를 두 안 사이에서 스크롤 위치에 맞춰 이어서 바꾼다. (가운데에서 한 번에 뛰지 않게)
+      const i = Math.max(0, Math.floor(pos));
+      const a = articles.current[i];
+      const b = articles.current[i + 1];
+      if (a && b) {
+        const t = Math.min(1, pos - i);
+        el.style.height = `${a.offsetHeight + (b.offsetHeight - a.offsetHeight) * t}px`;
+      }
     };
     const goTo = (i: number) =>
       slider.current?.scrollTo({ left: i * slider.current.clientWidth, behavior: "smooth" });
@@ -308,7 +320,6 @@ export default function Planner() {
             if (justDragged.current) e.stopPropagation();
           }}
           className="flex snap-x snap-mandatory items-start overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          style={{ height: sliderHeight }}
         >
           {shown.map((plan, i) => (
             <article
@@ -501,7 +512,7 @@ export default function Planner() {
 
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 
-function PlanView({ plan }: { plan: Plan }) {
+const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
   const walkOnly = !plan.legs.some((l) => l.type === "ride" || l.type === "bus");
   return (
     <>
@@ -532,7 +543,7 @@ function PlanView({ plan }: { plan: Plan }) {
       </section>
     </>
   );
-}
+});
 
 /** 경로 아래에 작게 적는 출처·기준 안내 */
 function SourceNote({ plan }: { plan: Plan }) {
