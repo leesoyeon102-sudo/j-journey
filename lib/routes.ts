@@ -7,8 +7,13 @@ export interface RouteSummary {
   destination: string;
   lines: { id: string; name: string; color: string }[];
   transfers: number;
-  /** 도착 기록을 남긴 횟수 */
+  /** 도착 기록을 남긴 횟수 (이 노선 조합만) */
   usageCount: number;
+  /**
+   * 같은 출발지·도착지로 도착 기록을 남긴 횟수. 재안내로 추천 노선이 바뀌어 다른 줄로 나뉘어도
+   * "자주 이용한 경로" 표시가 사라지지 않도록, 이 값으로 판단한다.
+   */
+  pairUsageCount: number;
   lastUsedAt: number;
   trips: Trip[];
   latest: Trip;
@@ -23,6 +28,13 @@ export function groupRoutes(trips: Trip[]): RouteSummary[] {
   for (const t of trips) {
     if (t.hidden) continue;
     map.set(t.routeKey, [...(map.get(t.routeKey) ?? []), t]);
+  }
+
+  const pairKey = (t: Trip) => `${t.plan.origin}>${t.plan.destination}`;
+  const pairUsage = new Map<string, number>();
+  for (const t of trips) {
+    if (t.hidden || !arrived(t)) continue;
+    pairUsage.set(pairKey(t), (pairUsage.get(pairKey(t)) ?? 0) + 1);
   }
 
   return [...map.entries()]
@@ -44,6 +56,7 @@ export function groupRoutes(trips: Trip[]): RouteSummary[] {
         lines: rides,
         transfers: latest.plan.transfers,
         usageCount: used.length,
+        pairUsageCount: pairUsage.get(pairKey(latest)) ?? 0,
         lastUsedAt: used[0]?.arrivedAt ?? latest.createdAt,
         trips: sorted,
         latest,

@@ -172,9 +172,9 @@ export default function HistoryPage() {
                   aria-expanded={open}
                   className="w-full px-5 py-5 text-left active:bg-muted"
                 >
-                  {r.usageCount >= 2 && (
+                  {r.pairUsageCount >= 2 && (
                     // 2회 이상 이용한 경로만 "자주 이용한 경로"로 표시한다.
-                    <p className="mb-1 text-caption-lg font-medium text-brand">자주 이용한 경로 · {r.usageCount}회</p>
+                    <p className="mb-1 text-caption-lg font-medium text-brand">자주 이용한 경로 · {r.pairUsageCount}회</p>
                   )}
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-body-lg font-medium">
