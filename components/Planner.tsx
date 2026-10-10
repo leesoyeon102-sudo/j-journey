@@ -133,6 +133,11 @@ export default function Planner() {
     return () => setLeaveGuard(false);
   }, [showingResult]);
 
+  // 출발 안내와 입력 화면을 오갈 때, 앞 화면에서 내려가 있던 스크롤 위치가 남지 않게 맨 위에서 시작한다.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [showingResult]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const origin = form.origin;
