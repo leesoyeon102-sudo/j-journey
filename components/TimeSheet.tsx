@@ -83,6 +83,15 @@ function Sheet({
   const [ampm, setAmpm] = useState(a0);
   const [hourIdx, setHourIdx] = useState(h0);
   const [minute, setMinute] = useState(m0);
+  const body = useRef<HTMLDivElement>(null);
+
+  // 설정을 누른 순간 휠이 실제로 가리키는 칸을 읽는다. (스크롤 중이라 state가 한 박자 늦어도 어긋나지 않게)
+  const confirm = () => {
+    const [a, h, m] = Array.from(body.current?.querySelectorAll<HTMLElement>('[role="listbox"]') ?? []).map((el, k) =>
+      Math.min([AMPM, HOURS, MINUTES][k].length - 1, Math.max(0, Math.round(el.scrollTop / ITEM))),
+    );
+    onConfirm(join(a ?? ampm, h ?? hourIdx, m ?? minute));
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -106,6 +115,7 @@ function Sheet({
         <h2 className="text-center text-subheading font-medium">{label}</h2>
 
         <div
+          ref={body}
           className="relative mt-3 grid grid-cols-[0.8fr_1fr_1fr] gap-1"
           style={{ height: ITEM * VISIBLE }}
         >
@@ -123,7 +133,7 @@ function Sheet({
           <Button type="button" variant="secondary" size="lg" onClick={onClose}>
             취소
           </Button>
-          <Button type="button" size="lg" onClick={() => onConfirm(join(ampm, hourIdx, minute))}>
+          <Button type="button" size="lg" onClick={confirm}>
             {display(ampm, hourIdx, minute)} 설정
           </Button>
         </div>
@@ -176,7 +186,7 @@ function Wheel({
     frame.current = requestAnimationFrame(() => {
       paint(el);
       const i = Math.min(items.length - 1, Math.max(0, Math.round(el.scrollTop / ITEM)));
-      if (i !== selected) onSelect(i);
+      onSelect(i);
     });
   };
 
@@ -254,7 +264,10 @@ function Wheel({
             type="button"
             role="option"
             aria-selected={on}
-            onClick={() => goTo(i)}
+            onClick={() => {
+              onSelect(i); // 스크롤이 끝나길 기다리지 않고 바로 선택값에 반영
+              goTo(i);
+            }}
             className={`flex w-full snap-center items-center justify-center tabular-nums [scroll-snap-stop:always] ${
               on ? "text-subheading font-medium text-on-surface" : "text-subheading text-muted-foreground"
             }`}

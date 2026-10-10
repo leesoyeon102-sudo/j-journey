@@ -41,13 +41,16 @@ const ARRIVE_EARLY_MIN = 5;
 
 const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false };
 
+// 약속 시각·내일 토글은 다른 탭에 다녀와도 유지한다. (화면이 다시 만들어져도 남도록 모듈에 둔다. 새로고침하면 초기화)
+let draft: Partial<Pick<Form, "time" | "tomorrow">> = {};
+
 export default function Planner() {
   const trips = useTrips();
   const home = useHome();
   const savedOrigin = useLastOrigin();
   const savedDestination = useLastDestination();
 
-  const [edit, setEdit] = useState<Partial<Form>>({});
+  const [edit, setEdit] = useState<Partial<Form>>(draft);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   // 경로 내역에서 다시 안내받아 넘어온 경우 그 결과를 바로 보여준다.
@@ -99,7 +102,10 @@ export default function Planner() {
     ...(savedDestination ? { destination: savedDestination } : {}),
     ...edit,
   };
-  const set = <K extends keyof Form>(k: K, v: Form[K]) => setEdit((e) => ({ ...e, [k]: v }));
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => {
+    if (k === "time" || k === "tomorrow") draft = { ...draft, [k]: v };
+    setEdit((e) => ({ ...e, [k]: v }));
+  };
 
   // 버튼을 눌러 계산한 결과만 보여준다. 다른 탭에 다녀오면 입력 화면부터 시작한다.
   const current = editing || !activeId ? undefined : trips.find((t) => t.id === activeId);
