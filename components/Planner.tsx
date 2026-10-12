@@ -5,6 +5,7 @@ import AlertPanel from "@/components/AlertPanel";
 import { memo, useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
+import KakaoMapLink from "./KakaoMapLink";
 import LocationPicker from "./LocationPicker";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
@@ -583,6 +584,12 @@ const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
       <section className="px-5 pt-[22px]">
         <Timeline plan={plan} />
         <SourceNote plan={plan} />
+        {/* 같은 출발지·도착지로 카카오맵 전체 경로를 열어 비교해 본다. (좌표가 저장된 안내만) */}
+        {plan.originCoord && plan.destCoord && (
+          <div className="mt-6">
+            <KakaoMapLink origin={plan.originCoord} destination={plan.destCoord} />
+          </div>
+        )}
       </section>
     </>
   );
