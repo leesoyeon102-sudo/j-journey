@@ -45,8 +45,6 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
   const pos = (name: string) => at(STATIONS[name]);
   const homeAt = home ? at(home) : null;
 
-  const labels = visited.length <= 14;
-
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
@@ -82,16 +80,10 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
         ))}
       </g>
 
-      {/* 방문한 역 */}
+      {/* 방문한 역: 역 이름은 쓰지 않는다. (방문한 역이 적을 때만 보이면 사람마다 달라 보여서) */}
       {visited.map((n) => (
         <circle key={n} cx={pos(n)[0]} cy={pos(n)[1]} r={2.5} fill="var(--color-surface)" stroke="var(--color-primary)" strokeWidth={1.5} />
       ))}
-      {labels &&
-        visited.map((n) => (
-          <text key={`t-${n}`} x={pos(n)[0] + 6} y={pos(n)[1] - 5} fontSize={9} fill="var(--color-muted-foreground)">
-            {n}
-          </text>
-        ))}
       {/* 내 집 위치: danger 동그라미와 on-surface "집" 글자 */}
       {homeAt && (
         <g>

@@ -306,14 +306,17 @@ export default function Planner() {
 
         {multi && (
           <div className="flex items-center justify-between px-5 pb-3">
-            <p className="text-body font-medium">
-              {page === 0 ? "추천 경로" : `${page + 1}안`}
-              {page > 0 && (
+            {/* 추천 경로(1안)에는 이름을 붙이지 않고, 대안일 때만 알려준다. */}
+            {page > 0 ? (
+              <p className="text-body font-medium">
+                {page + 1}안
                 <span className="ml-2 text-caption font-normal text-muted-foreground">
                   추천보다 {plans[0].leaveAt - active.leaveAt}분 일찍 나가야 해요
                 </span>
-              )}
-            </p>
+              </p>
+            ) : (
+              <span />
+            )}
             <div className="flex" role="tablist" aria-label="경로 안 선택">
               {shown.map((_, i) => (
                 <button
