@@ -569,7 +569,7 @@ const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as
 const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
   return (
     <>
-      <section className="px-5 pb-8">
+      <section className="px-5 pb-[26px]">
         <p className="text-time font-medium">
           <span className="text-brand">{fmt(plan.leaveAt)}</span>
           <span className="ml-1 text-subheading font-medium text-on-surface">에 출발하면</span>
@@ -581,9 +581,9 @@ const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
         <p className="mt-3 text-body text-muted-foreground">약속 {plan.arriveBy - plan.arriveAt}분 전 도착</p>
       </section>
 
-      <div className="mx-5 border-t border-border" />
+      <div className="border-t border-border" />
 
-      <section className="px-5 pt-7">
+      <section className="px-5 pt-[22px]">
         <Timeline plan={plan} />
         <SourceNote plan={plan} />
       </section>
