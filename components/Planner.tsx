@@ -274,7 +274,7 @@ export default function Planner() {
     };
 
     return (
-      <main className="fade-in pb-24">
+      <main className="fade-in pb-[101px]">
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
         <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
           <Button
