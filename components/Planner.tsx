@@ -275,7 +275,7 @@ export default function Planner() {
     };
 
     return (
-      <main className="fade-in pb-[52px]">
+      <main className="fade-in pb-[62px]">
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
         <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
           <Button
@@ -368,7 +368,7 @@ export default function Planner() {
         {/* 하단에 고정: 스크롤과 상관없이 탭바 바로 위에 보인다. 애니메이션(.fade-in) 안에서는 fixed가 화면 기준이 아니라서 body에 직접 붙인다. */}
         {!done &&
           createPortal(
-            <div className="fixed bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom))] left-1/2 z-10 w-[390px] max-w-full -translate-x-1/2 bg-surface px-5 pb-[2px] pt-3">
+            <div className="fixed bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom))] left-1/2 z-10 w-[390px] max-w-full -translate-x-1/2 bg-surface px-5 pb-3 pt-3">
               <TripActionButton
                 departedAt={current.departedAt}
                 durationMin={active.arriveAt - active.leaveAt}
