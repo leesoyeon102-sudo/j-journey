@@ -271,13 +271,17 @@ export default function Planner() {
 
         {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 바로 위에 달라붙는다. */}
         {!done && (
-          <div className="sticky bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom))] z-10 bg-surface px-5 pb-3 pt-5">
-            <TripActionButton
-              departedAt={current.departedAt}
-              durationMin={active.arriveAt - active.leaveAt}
-              onDepart={depart}
-              onArrive={(onTime) => arrive(active, onTime)}
-            />
+          // 뒤 내용이 자연스럽게 묻히도록 위는 투명, 아래는 흰색으로 이어지는 그라데이션. 빈 부분은 클릭이 아래 내용으로 지나간다.
+          <div className="pointer-events-none sticky bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom))] z-10 bg-linear-to-b from-surface/0 to-surface to-30% px-5 pb-3 pt-5">
+            <div className="pointer-events-auto">
+              <TripActionButton
+                departedAt={current.departedAt}
+                durationMin={active.arriveAt - active.leaveAt}
+                onDepart={depart}
+                onArrive={(onTime) => arrive(active, onTime)}
+                notToday={Boolean(active.date && active.date > dateString(0))}
+              />
+            </div>
           </div>
         )}
 

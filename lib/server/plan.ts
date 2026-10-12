@@ -56,6 +56,7 @@ export async function computePlans(
         p.destCoord = destCoord;
         p.originCoord = originCoord;
         p.dayType = dayType;
+        p.date = date;
         if (kakao.walkEstimated) p.walkEstimated = true;
       }
       return { ok: true, plan: kakao.plans[0], plans: kakao.plans, groups: kakao.groups };
@@ -108,7 +109,10 @@ export async function computePlans(
   if (result.ok) {
     const o = { lat: origin.lat, lng: origin.lng };
     const d = { lat: destination.lat, lng: destination.lng };
-    for (const p of result.plans) attachWalkCoords(p, o, d);
+    for (const p of result.plans) {
+      attachWalkCoords(p, o, d);
+      p.date = date;
+    }
   }
   return result;
 }

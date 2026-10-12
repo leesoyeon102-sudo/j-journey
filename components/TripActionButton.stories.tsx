@@ -30,6 +30,16 @@ export const Ready: Story = {
   },
 }
 
+// 내일 약속: 오늘은 출발할 수 없어서 문구가 바뀌고 버튼이 비활성
+export const NotToday: Story = {
+  args: { notToday: true },
+  play: async ({ canvas, args }) => {
+    const button = canvas.getByRole("button", { name: "내일 출발할 수 있어요" })
+    await expect(button).toBeDisabled()
+    await expect(args.onDepart).not.toHaveBeenCalled()
+  },
+}
+
 // 이동 중: 눌러도 아무 일이 없다
 export const Moving: Story = {
   args: { departedAt: Date.now() - 2 * MIN },
