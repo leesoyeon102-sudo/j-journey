@@ -55,7 +55,7 @@ export default function TripProgressCard({ origin, destination, leaveAt, arriveA
 
       <div className="mt-5 space-y-1">
         <Button size="lg" className="w-full" onClick={onDetail}>
-          출발 안내 상세 보기
+          출발 안내 상세
         </Button>
         {/* 위계가 가장 낮은 버튼: 글자만 있는 ghost */}
         <Button variant="ghost" size="lg" className="w-full text-muted-foreground" onClick={onCancel}>

@@ -30,10 +30,10 @@ type Story = StoryObj<typeof meta>
 // 이동 중: 초록 점이 퍼지는 모션, 출발·도착 시각
 export const Moving: Story = {}
 
-// 상세 보기를 누르면 출발 안내 화면으로
+// 상세 버튼을 누르면 출발 안내 화면으로
 export const OpenDetail: Story = {
   play: async ({ canvas, args }) => {
-    await canvas.getByRole("button", { name: "출발 안내 상세 보기" }).click()
+    await canvas.getByRole("button", { name: "출발 안내 상세" }).click()
     await expect(args.onDetail).toHaveBeenCalled()
   },
 }
