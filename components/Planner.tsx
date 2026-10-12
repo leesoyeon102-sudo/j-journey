@@ -604,8 +604,10 @@ function SourceNote({ plan }: { plan: Plan }) {
   const hasRide = plan.legs.some((l) => l.type === "ride");
   const hasBus = plan.legs.some((l) => l.type === "bus");
   if (hasRide) {
-    const day = DAY[plan.dayType ?? "weekday"];
-    notes.push(`${day} 열차 시간표 기준 · 출처 서울교통공사`);
+    // 출처는 서울교통공사 시간표로 실제 열차를 맞춘 구간이 있을 때만 적는다.
+    if (plan.legs.some((l) => l.type === "ride" && l.scheduled)) {
+      notes.push(`${DAY[plan.dayType ?? "weekday"]} 열차 시간표 기준 · 출처 서울교통공사`);
+    }
     if (plan.scheduleEstimated) notes.push("시간표가 없는 노선은 배차 간격으로 예상한 시각이에요");
   }
   if (plan.walkEstimated) notes.push("일부 도보 시간은 직선거리로 추정했어요");
