@@ -244,11 +244,11 @@ components:
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
 - **surface (#FFFFFF) / on-surface (#14171F):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.
 - **inactive (#C9CED8):** 선택되지 않은 탭바 아이콘. placeholder보다 한 단계 연하다.
-- **muted-subtle (#FAFBFD):** 경로 내역에서 펼친 상세 영역처럼 흰 바탕과 살짝만 구분되는 면.
+- **muted-subtle (#FAFBFD):** 안내 내역에서 펼친 상세 영역처럼 흰 바탕과 살짝만 구분되는 면.
 - **muted (#F5F6F9):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#677084), placeholder와 비활성 글자는 `placeholder`(#9BA2B0)를 쓴다.
 - **border (#E5E7EB):** 카드·outline 버튼·입력의 테두리와 구분선.
 - **border-subtle (#EEF0F4):** 탭바 위의 구분선처럼 화면을 가르되 눈에 덜 띄어야 하는 선.
-- **accent (#2F5BFF) / accent-subtle (#EAEFFF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 경로 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
+- **accent (#2F5BFF) / accent-subtle (#EAEFFF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 안내 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
 - **success (#22B35E) / success-subtle (#E9F7EF):** 지금 진행 중이라는 신호. 이동 중 카드의 동그란 점처럼 작은 도형 채움으로만 쓰고(`success-subtle`은 같은 색 10%), 글자색으로는 쓰지 않는다. 흰 바탕에서 대비가 부족하다.
 - **danger (#FF5A5E):** 삭제·오류 같은 위험 신호. 채움으로만 쓰고(`danger-subtle`은 같은 색 10%), 그 위의 글자는 `on-danger`(#45192F, 진한 자주)로 둔다. 코랄색 글자는 대비가 부족하다.
 
@@ -261,7 +261,7 @@ components:
 - **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목.
 - **body-lg (16px) / body (14px):** 본문. 앱 기본은 14px.
 - **label (14px, 600):** 버튼과 입력 라벨. 버튼 글자는 SemiBold(600)이다.
-- **label-lg (15px, 600):** 경로 내역 상세의 "이 경로로 다시 안내받기" 버튼.
+- **label-lg (15px, 600):** 안내 내역 상세의 "이 계획 다시 안내받기" 버튼.
 - **caption (12px, 500):** 배지, 시각 보조 설명.
 - **caption-lg (13px, 500):** "자주 이용한 경로" 같은 accent 배지.
 

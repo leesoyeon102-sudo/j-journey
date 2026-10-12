@@ -18,5 +18,5 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = { args: { message: "경로가 삭제되었습니다." } }
 export const LongMessage: Story = {
-  args: { message: "경로가 삭제되었습니다. 경로 내역에서 더 이상 볼 수 없어요." },
+  args: { message: "경로가 삭제되었습니다. 안내 내역에서 더 이상 볼 수 없어요." },
 }

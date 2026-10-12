@@ -83,6 +83,11 @@ export function recordDeparture(id: string, plan?: Plan) {
   );
 }
 
+/** 기록 하나를 지운다. (이동 중이던 계획을 버릴 때) */
+export function removeTrip(id: string) {
+  write(read().filter((t) => t.id !== id));
+}
+
 /** 출발 취소. 출발 전 상태로 되돌린다. */
 export function cancelDeparture(id: string) {
   write(read().map((t) => (t.id === id && t.status === "planned" ? { ...t, departedAt: undefined } : t)));

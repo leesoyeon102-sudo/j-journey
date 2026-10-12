@@ -13,7 +13,7 @@ export default function LeaveConfirm() {
       title="출발 안내 화면을 나갈까요?"
       description={
         <>
-          이 안내는 <b className="font-medium text-on-surface">경로 내역</b>에서 다시 확인할 수 있어요.
+          이 안내는 <b className="font-medium text-on-surface">안내 내역</b>에서 다시 확인할 수 있어요.
         </>
       }
       onClose={cancelLeave}

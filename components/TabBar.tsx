@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { isLeaveGuardActive, requestLeave } from "@/lib/leaveGuard";
 
-// 홈·경로 내역은 채운(fill) 아이콘이고 선택 여부는 색으로만 구분한다. (비활성 muted-foreground, 활성 on-surface)
+// 홈·안내 내역은 채운(fill) 아이콘이고 선택 여부는 색으로만 구분한다. (비활성 muted-foreground, 활성 on-surface)
 const HOME =
   "M6 21H18A3 3 0 0 0 21 18V10.33A1.5 1.5 0 0 0 20.43 9.15L13.5 3.59A2.4 2.4 0 0 0 10.5 3.59L3.57 9.15A1.5 1.5 0 0 0 3 10.33V18A3 3 0 0 0 6 21Z M11 19v-4a1 1 0 0 1 2 0v4z";
 const LIST =
@@ -41,7 +41,7 @@ const strokeIcon = (d: string) =>
 
 const TABS: Tab[] = [
   { href: "/", label: "홈", icon: filledIcon(HOME) },
-  { href: "/history", label: "경로 내역", icon: filledIcon(LIST) },
+  { href: "/history", label: "안내 내역", icon: filledIcon(LIST) },
   { href: "/roadmap", label: "로드맵", icon: strokeIcon("M5 18c3-9 5 0 7-6s4-4 7-6M5 18h.01M19 6h.01") },
 ];
 

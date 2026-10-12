@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import { useRouter } from "next/navigation";
+import AlertPanel from "@/components/AlertPanel";
 import Header from "@/components/Header";
 import { markVisited } from "@/lib/feedback";
 import { useFeedbackBlock } from "@/lib/feedbackGate";
@@ -13,7 +14,7 @@ import { groupRoutes, type RouteSummary } from "@/lib/routes";
 import { requestPlans } from "@/lib/api";
 import { nextOccurrence } from "@/lib/dates";
 import { setPendingResult } from "@/lib/pending";
-import { addTrip, removeRoute, useTrips } from "@/lib/storage";
+import { addTrip, removeRoute, removeTrip, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
 
 /** 밀었을 때 오른쪽에 드러나는 삭제 버튼의 너비(px) */
@@ -22,6 +23,9 @@ const DELETE_W = 80;
 export default function HistoryPage() {
   const trips = useTrips();
   const routes = groupRoutes(trips);
+  // 출발해서 이동 중인 계획. 다른 계획을 다시 안내받으면 이 계획은 사라진다.
+  const moving = trips.find((t) => t.departedAt && t.status === "planned");
+  const [confirmRoute, setConfirmRoute] = useState<RouteSummary | null>(null);
   const router = useRouter();
   const [openKey, setOpenKey] = useState<string | null>(null);
   // 피드백을 묻는 조건: 경로 내역에 한 번 들어와 봤다. 단, 경로 상세를 펼쳐 둔 동안에는 묻지 않는다.
@@ -117,7 +121,7 @@ export default function HistoryPage() {
 
   return (
     <main className="fade-in">
-      <Header title="경로 내역" sub={routes.length ? `안내받은 경로 ${routes.length}개` : undefined} />
+      <Header title="안내 내역" sub={routes.length ? `안내받은 경로 ${routes.length}개` : undefined} />
 
       {routes.length === 0 ? (
         <p className="px-5 py-24 text-center text-body text-muted-foreground">
@@ -206,11 +210,11 @@ export default function HistoryPage() {
                     <Timeline plan={plan} />
 
                     <Button
-                      onClick={() => replan(r)}
+                      onClick={() => (moving ? setConfirmRoute(r) : replan(r))}
                       disabled={busyKey !== null}
                       className="mt-5 h-11 w-full text-label-lg"
                     >
-                      {busyKey === r.key ? "계산 중…" : "이 경로로 다시 안내받기"}
+                      {busyKey === r.key ? "계산 중…" : "이 계획 다시 안내받기"}
                     </Button>
                     {error?.key === r.key && (
                       <p role="alert" className="mt-3 text-body text-on-danger">
@@ -223,6 +227,29 @@ export default function HistoryPage() {
             );
           })}
         </ul>
+      )}
+      {confirmRoute && (
+        <AlertPanel
+          title="이 계획을 다시 안내받을까요?"
+          description="앞에서 출발한 계획은 사라져요."
+          onClose={() => setConfirmRoute(null)}
+        >
+          <Button variant="secondary" size="lg" onClick={() => setConfirmRoute(null)}>
+            취소
+          </Button>
+          <Button
+            size="lg"
+            autoFocus
+            onClick={() => {
+              const r = confirmRoute;
+              setConfirmRoute(null);
+              if (moving) removeTrip(moving.id);
+              replan(r);
+            }}
+          >
+            다시 안내받기
+          </Button>
+        </AlertPanel>
       )}
       {toast && <Toast message={toast} />}
     </main>
