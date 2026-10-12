@@ -31,7 +31,7 @@ interface Props {
   onArrive: (onTime: boolean) => void;
 }
 
-/** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중(두근두근) → 도착했어요 */
+/** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요 */
 export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive }: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   if (phase === "moving") {
     // 눌러도 아무 일이 없지만, 흐려 보이지 않게 disabled 대신 aria-disabled로 둔다.
     return (
-      <Button size="lg" className="heartbeat w-full cursor-default" aria-disabled="true" aria-live="polite">
+      <Button size="lg" className="w-full cursor-default" aria-disabled="true" aria-live="polite">
         이 계획대로 이동중
       </Button>
     );

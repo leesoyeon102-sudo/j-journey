@@ -30,7 +30,7 @@ export const Ready: Story = {
   },
 }
 
-// 이동 중: 두근두근 움직이고, 눌러도 아무 일이 없다
+// 이동 중: 눌러도 아무 일이 없다
 export const Moving: Story = {
   args: { departedAt: Date.now() - 2 * MIN },
   play: async ({ canvas, args }) => {

@@ -9,6 +9,7 @@ import LocationPicker from "./LocationPicker";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
+import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
 import { useFeedbackBlock } from "@/lib/feedbackGate";
@@ -19,6 +20,7 @@ import {
   addTrip,
   recordArrival,
   recordDeparture,
+  cancelDeparture,
   saveHome,
   saveLastDestination,
   saveLastOrigin,
@@ -110,6 +112,9 @@ export default function Planner() {
 
   // 버튼을 눌러 계산한 결과만 보여준다. 다른 탭에 다녀오면 입력 화면부터 시작한다.
   const current = editing || !activeId ? undefined : trips.find((t) => t.id === activeId);
+
+  // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
+  const moving = trips.find((t) => t.departedAt && t.status === "planned");
 
   // 보이는 안의 높이를 슬라이더 높이로 맞춘다. (다른 안이 더 길어도 아래에 빈 화면이 생기지 않게)
   useEffect(() => {
@@ -265,7 +270,7 @@ export default function Planner() {
     };
 
     return (
-      <main className="fade-in pb-24">
+      <main className={`fade-in ${departed ? "pb-40" : "pb-24"}`}>
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
         <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
           <Button
@@ -355,6 +360,18 @@ export default function Planner() {
               onDepart={depart}
               onArrive={(onTime) => arrive(active, onTime)}
             />
+            {/* 위계가 가장 낮은 버튼: 출발한 뒤에만 보인다. */}
+            {departed && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="lg"
+                className="mt-1 w-full text-muted-foreground"
+                onClick={() => cancelDeparture(current.id)}
+              >
+                출발 취소
+              </Button>
+            )}
           </div>
         )}
 
@@ -369,6 +386,29 @@ export default function Planner() {
             </Button>
           </AlertPanel>
         )}
+      </main>
+    );
+  }
+
+  if (moving && !showHomePicker) {
+    return (
+      <main className="fade-in">
+        <Header title="J의 외출" sub="지금 이동 중이에요." />
+        <div className="px-5 pb-8">
+          <TripProgressCard
+            origin={moving.plan.origin}
+            destination={moving.plan.destination}
+            leaveAt={moving.plan.leaveAt}
+            arriveAt={moving.plan.arriveAt}
+            onDetail={() => {
+              setPlans([]);
+              setPage(0);
+              setActiveId(moving.id);
+              setEditing(false);
+            }}
+            onCancel={() => cancelDeparture(moving.id)}
+          />
+        </div>
       </main>
     );
   }

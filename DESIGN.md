@@ -21,6 +21,8 @@ colors:
   danger: "#FF5A5E"
   danger-subtle: "#FFEFEF"
   on-danger: "#45192F"
+  success: "#22B35E"
+  success-subtle: "#E9F7EF"
 typography:
   display:
     fontFamily: GT Standard L
@@ -209,6 +211,16 @@ components:
     rounded: "{rounded.input}"
     height: 44px
     padding: 16px
+  trip-progress-card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body}"
+    rounded: "{rounded.nav}"
+    padding: 20px
+  live-dot:
+    backgroundColor: "{colors.success}"
+    rounded: "{rounded.pill}"
+    size: 12px
   dialog:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
@@ -237,6 +249,7 @@ components:
 - **border (#E5E7EB):** 카드·outline 버튼·입력의 테두리와 구분선.
 - **border-subtle (#EEF0F4):** 탭바 위의 구분선처럼 화면을 가르되 눈에 덜 띄어야 하는 선.
 - **accent (#2F5BFF) / accent-subtle (#EAEFFF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 경로 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
+- **success (#22B35E) / success-subtle (#E9F7EF):** 지금 진행 중이라는 신호. 이동 중 카드의 동그란 점처럼 작은 도형 채움으로만 쓰고(`success-subtle`은 같은 색 10%), 글자색으로는 쓰지 않는다. 흰 바탕에서 대비가 부족하다.
 - **danger (#FF5A5E):** 삭제·오류 같은 위험 신호. 채움으로만 쓰고(`danger-subtle`은 같은 색 10%), 그 위의 글자는 `on-danger`(#45192F, 진한 자주)로 둔다. 코랄색 글자는 대비가 부족하다.
 
 ## Typography

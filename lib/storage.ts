@@ -83,6 +83,11 @@ export function recordDeparture(id: string, plan?: Plan) {
   );
 }
 
+/** 출발 취소. 출발 전 상태로 되돌린다. */
+export function cancelDeparture(id: string) {
+  write(read().map((t) => (t.id === id && t.status === "planned" ? { ...t, departedAt: undefined } : t)));
+}
+
 /** 도착 기록. 추천이 아닌 안을 따라간 경우 `plan`으로 기록된 경로를 바꾼다. */
 export function recordArrival(id: string, onTime: boolean, plan?: Plan) {
   write(
