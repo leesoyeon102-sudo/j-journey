@@ -33,6 +33,9 @@ export interface WalkLeg {
   kind: "home" | "transfer" | "dest" | "direct";
   from: string;
   to: string;
+  /** 걷기 시작·끝 지점의 좌표. 있으면 카카오맵 도보 길찾기로 이어 준다. */
+  fromCoord?: { lat: number; lng: number };
+  toCoord?: { lat: number; lng: number };
   /** 하루 0시 기준 분 */
   start: number;
   end: number;
@@ -116,9 +119,16 @@ export interface Plan {
   transfers: number;
 }
 
+/** 출발 안내 화면의 칩 필터에 쓰는 묶음: 추천(하나), 지하철 우선·버스 우선(각각 여러 안) */
+export interface PlanGroups {
+  recommended: Plan;
+  subway: Plan[];
+  bus: Plan[];
+}
+
 export type PlanResult =
-  /** plans[0]이 추천 경로, 뒤는 대안(2안) */
-  | { ok: true; plan: Plan; plans: Plan[] }
+  /** plans[0]이 추천 경로, 뒤는 대안 */
+  | { ok: true; plan: Plan; plans: Plan[]; groups: PlanGroups }
   | { ok: false; message: string };
 
 export type TripStatus = "planned" | "ontime" | "late";

@@ -211,6 +211,16 @@ components:
     rounded: "{rounded.input}"
     height: 44px
     padding: 16px
+  filter-chip:
+    backgroundColor: "{colors.muted}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: 36px
+    padding: 16px
+  filter-chip-selected:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
   trip-progress-card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"

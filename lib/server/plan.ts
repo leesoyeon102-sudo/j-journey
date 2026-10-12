@@ -1,5 +1,6 @@
 import { nearestStations, type Place } from "../places";
 import { planTrip } from "../planner";
+import { attachWalkCoords } from "../walkCoords";
 import { STATIONS } from "../stations";
 import type { PlanResult } from "../types";
 import { busPlans } from "./busPlan";
@@ -57,7 +58,7 @@ export async function computePlans(
         p.dayType = dayType;
         if (kakao.walkEstimated) p.walkEstimated = true;
       }
-      return { ok: true, plan: kakao.plans[0], plans: kakao.plans };
+      return { ok: true, plan: kakao.plans[0], plans: kakao.plans, groups: kakao.groups };
     }
   }
 
@@ -78,7 +79,7 @@ export async function computePlans(
   const now = nowKst();
   const originStations = o.map((s, i) => ({ ...s, walkMin: minutes[0][i] }));
   const destStations = d.map((s, j) => ({ ...s, walkMin: minutes[1][o.length + j] }));
-  return planTrip({
+  const result = await planTrip({
     origin,
     destination,
     arriveBy,
@@ -104,4 +105,10 @@ export async function computePlans(
         loadTimetable: (stops) => loadTimetable(stops, dayType),
       }),
   });
+  if (result.ok) {
+    const o = { lat: origin.lat, lng: origin.lng };
+    const d = { lat: destination.lat, lng: destination.lng };
+    for (const p of result.plans) attachWalkCoords(p, o, d);
+  }
+  return result;
 }

@@ -1,5 +1,6 @@
 import type { NearStation, Place } from "./places";
 import { LINES, STATIONS, linesOf } from "./stations";
+import { groupPlans } from "./planGroups";
 import type { Timetable } from "./timetable";
 import type { Leg, Line, LineId, Plan, PlanResult, RideLeg } from "./types";
 
@@ -291,7 +292,7 @@ export async function planTrip(input: PlanInput): Promise<PlanResult> {
       p.dayType = input.dayType;
       if (input.walkEstimated) p.walkEstimated = true;
     }
-    return { ok: true, plan: plans[0], plans };
+    return { ok: true, plan: plans[0], plans, groups: groupPlans(plans) };
   }
   return {
     ok: false,

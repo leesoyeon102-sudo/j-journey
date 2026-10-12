@@ -5,8 +5,8 @@ import AlertPanel from "@/components/AlertPanel";
 import { memo, useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
-import KakaoMapLink from "./KakaoMapLink";
 import LocationPicker from "./LocationPicker";
+import PlanFilter, { type PlanTab } from "./PlanFilter";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
@@ -31,7 +31,8 @@ import {
   useLastOrigin,
   useTrips,
 } from "@/lib/storage";
-import type { Plan } from "@/lib/types";
+import { groupPlans } from "@/lib/planGroups";
+import type { Plan, PlanGroups } from "@/lib/types";
 import { fmt, parseTime } from "@/lib/time";
 
 interface Form {
@@ -61,8 +62,12 @@ export default function Planner() {
   const [loading, setLoading] = useState(false);
   // 경로 내역에서 다시 안내받아 넘어온 경우 그 결과를 바로 보여준다.
   const [activeId, setActiveId] = useState<string | null>(() => peekPendingResult()?.tripId ?? null);
-  // 계산된 안들(추천 + 대안)과 지금 보고 있는 안
-  const [plans, setPlans] = useState<Plan[]>(() => peekPendingResult()?.plans ?? []);
+  // 계산된 안들: 추천(하나), 지하철 우선·버스 우선(각각 여러 안). 지금 고른 칩과, 그 칩에서 보고 있는 안.
+  const [groups, setGroups] = useState<PlanGroups | null>(() => {
+    const p = peekPendingResult();
+    return p ? (p.groups ?? (p.plans.length ? groupPlans(p.plans) : null)) : null;
+  });
+  const [tab, setTab] = useState<PlanTab>("recommended");
   const [page, setPage] = useState(0);
   // 안마다 길이가 달라도 화면에 보이는 안의 높이만큼만 스크롤되도록, 보이는 안의 높이를 재서 슬라이더 높이로 쓴다.
   const articles = useRef<(HTMLElement | null)[]>([]);
@@ -130,7 +135,7 @@ export default function Planner() {
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [page, current?.id, plans]);
+  }, [page, current?.id, tab, groups]);
   // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
   useFeedbackBlock(Boolean(current));
 
@@ -184,7 +189,8 @@ export default function Planner() {
         setError(result.message);
         return;
       }
-      setPlans(result.plans);
+      setGroups(result.groups ?? groupPlans(result.plans));
+      setTab("recommended");
       setPage(0);
       // 추천 안을 우선 저장하고, 다른 안으로 도착 기록을 남기면 그 안으로 바꾼다.
       setActiveId(addTrip(result.plan).id);
@@ -200,9 +206,16 @@ export default function Planner() {
     const done = current.status !== "planned";
     // 출발하거나 기록을 남긴 뒤에는 따라간 안 하나만 보여준다.
     const departed = Boolean(current.departedAt);
-    const shown = done || departed || plans.length === 0 ? [current.plan] : plans;
+    // 출발 전에는 고른 칩의 안들을 보여주고(추천은 하나), 칩에 해당하는 경로가 없으면 지금 안 하나만 보여준다.
+    const choices = !done && !departed && groups ? (tab === "recommended" ? [groups.recommended] : groups[tab]) : [];
+    const filtering = choices.length > 0;
+    const shown = filtering ? choices : [current.plan];
     const active = shown[Math.min(page, shown.length - 1)];
-    const multi = shown.length > 1;
+    const changeTab = (t: PlanTab) => {
+      setTab(t);
+      setPage(0);
+      slider.current?.scrollTo({ left: 0 });
+    };
 
     const onScroll = () => {
       const el = slider.current;
@@ -271,7 +284,7 @@ export default function Planner() {
       // 홈(입력 화면)으로 돌아간다.
       setEditing(true);
       setActiveId(null);
-      setPlans([]);
+      setGroups(null);
     };
 
     return (
@@ -287,7 +300,7 @@ export default function Planner() {
               requestLeave(() => {
                 setEditing(true);
                 setActiveId(null);
-                setPlans([]);
+                setGroups(null);
               })
             }
           >
@@ -305,38 +318,15 @@ export default function Planner() {
         </nav>
         <div className="h-4" />
 
-        {multi && (
-          <div className="flex items-center justify-between px-5 pb-3">
-            {/* 추천 경로(1안)에는 이름을 붙이지 않고, 대안일 때만 알려준다. */}
-            {page > 0 ? (
-              <p className="text-body font-medium">
-                {page + 1}안
-                <span className="ml-2 text-caption font-normal text-muted-foreground">
-                  추천보다 {plans[0].leaveAt - active.leaveAt}분 일찍 나가야 해요
-                </span>
-              </p>
-            ) : (
-              <span />
-            )}
-            <div className="flex" role="tablist" aria-label="경로 안 선택">
-              {shown.map((_, i) => (
-                <button
-                  key={i}
-                  role="tab"
-                  aria-selected={i === page}
-                  aria-label={i === 0 ? "추천 경로" : `${i + 1}안`}
-                  onClick={() => goTo(i)}
-                  className="flex size-6 items-center justify-center"
-                >
-                  <span
-                    className={`block rounded-pill transition-all ${
-                      i === page ? "h-2 w-5 bg-primary" : "size-2 bg-border"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* 칩 필터: 추천 / 지하철 우선 / 버스 우선. 출발하기 전에만 보인다. */}
+        {filtering && groups && (
+          <PlanFilter
+            value={tab}
+            onChange={changeTab}
+            unavailable={{ subway: groups.subway.length === 0, bus: groups.bus.length === 0 }}
+            count={shown.length}
+            page={Math.min(page, shown.length - 1)}
+          />
         )}
 
         <div
@@ -360,7 +350,7 @@ export default function Planner() {
               }}
               className="w-full shrink-0 snap-center"
             >
-              <PlanView plan={plan} />
+              <PlanView plan={plan} delta={filtering && groups && plan !== groups.recommended ? groups.recommended.leaveAt - plan.leaveAt : 0} />
             </article>
           ))}
         </div>
@@ -403,7 +393,7 @@ export default function Planner() {
             leaveAt={moving.plan.leaveAt}
             arriveAt={moving.plan.arriveAt}
             onDetail={() => {
-              setPlans([]);
+              setGroups(null);
               setPage(0);
               setActiveId(moving.id);
               setEditing(false);
@@ -564,10 +554,16 @@ export default function Planner() {
 
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 
-const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
+const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta?: number }) {
   return (
     <>
       <section className="px-5 pb-[26px]">
+        {/* 추천이 아닌 안에서만: 추천과 출발 시각이 얼마나 다른지 */}
+        {delta !== 0 && (
+          <p className="mb-2 text-caption text-muted-foreground">
+            {delta > 0 ? `추천보다 ${delta}분 일찍 나가야 해요` : `추천보다 ${-delta}분 늦게 나가도 돼요`}
+          </p>
+        )}
         <p className="text-time font-medium">
           <span className="text-brand">{fmt(plan.leaveAt)}</span>
           <span className="ml-1 text-subheading font-medium text-on-surface">에 출발하면</span>
@@ -584,15 +580,6 @@ const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
       <section className="px-5 pt-[22px]">
         <Timeline plan={plan} />
         <SourceNote plan={plan} />
-        {/* 같은 출발지·도착지로 카카오맵 전체 경로를 열어 비교해 본다. (좌표가 저장된 안내만) */}
-        {plan.originCoord && plan.destCoord && (
-          <div className="mt-6">
-            <KakaoMapLink
-              origin={{ name: plan.origin, ...plan.originCoord }}
-              destination={{ name: plan.destination, ...plan.destCoord }}
-            />
-          </div>
-        )}
       </section>
     </>
   );

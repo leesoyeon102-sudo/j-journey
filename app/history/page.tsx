@@ -107,7 +107,7 @@ export default function HistoryPage() {
         setError({ key: r.key, message: result.message });
         return;
       }
-      setPendingResult({ tripId: addTrip(result.plan).id, plans: result.plans });
+      setPendingResult({ tripId: addTrip(result.plan).id, plans: result.plans, groups: result.groups });
       // 다시 안내받기가 실제로 이뤄졌을 때(경로 계산 성공 뒤) 한 번만 센다.
       amplitude.track("Route Reused");
       router.push("/");

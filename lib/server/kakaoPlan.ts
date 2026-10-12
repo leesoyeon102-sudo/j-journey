@@ -3,7 +3,8 @@ import type { Place } from "../places";
 import { directionLabel, FIRST_TRAIN, latestDeparture, PLATFORM, type Ride } from "../planner";
 import { LINES, STATIONS } from "../stations";
 import type { Timetable } from "../timetable";
-import type { BusLeg, Leg, Line, Plan, RideLeg, WalkLeg } from "../types";
+import { planMode } from "../planGroups";
+import type { BusLeg, Leg, Line, Plan, PlanGroups, RideLeg, WalkLeg } from "../types";
 import { busColor, headwayAt, loadBus, type BusData, type BusRoute, type DayType } from "./bus";
 import { fetchArrival } from "./busArrival";
 import { walkMatrix } from "./walk";
@@ -18,13 +19,9 @@ const STOP_BUFFER = 3;
 /** 이 시간(분) 안에 탈 버스까지만 현재 도착 정보로 예상한다. */
 const REALTIME_HORIZON = 120;
 /** 카카오가 준 경로 중 앞에서 이만큼까지만 시각을 계산해 본다. */
-const MAX_ROUTES = 8;
-/** 시간표를 미리 받아 둘 경로 수 */
-const TIMETABLE_ROUTES = 6;
-/** 보여줄 안의 개수(추천 + 대안) */
-const MAX_PLANS = 2;
-/** 추천보다 이만큼 이상 일찍 나가야 하는 대안은 보여주지 않는다 */
-const MAX_ALT_GAP = 40;
+const MAX_ROUTES = 15;
+/** 칩(지하철 우선·버스 우선) 하나에 보여줄 안의 개수 */
+const GROUP_SIZE = 3;
 /** 카카오 경로의 버스 정류장을 우리 버스 데이터의 정류장과 같다고 볼 최대 거리(m) */
 const STOP_MATCH_M = 150;
 /** 우리 지하철 노선도에 없는 노선의 표시 색 (placeholder 토큰 값) */
@@ -213,7 +210,7 @@ function matchBus(data: BusData | null, step: KStep): BusMatch | null {
 // ─── 시각 계산 ───────────────────────────────────────────────
 
 type Seg =
-  | { kind: "walk"; from: string; to: string; min: number }
+  | { kind: "walk"; from: string; to: string; min: number; fromCoord?: LatLng; toCoord?: LatLng }
   | {
       kind: "ride";
       line: string;
@@ -287,7 +284,7 @@ async function buildPlan(
     // 카카오가 환승 도보를 따로 주지 않고 수단끼리 바로 이어 주면, 1분짜리 환승 도보를 끼워 넣는다.
     const after = steps[i + 1];
     if (s.type !== "WALKING" && after && after.type !== "WALKING") {
-      segs.unshift({ kind: "walk", from: endName(s), to: startName(after), min: 1 });
+      segs.unshift({ kind: "walk", from: endName(s), to: startName(after), min: 1, fromCoord: s.last, toCoord: after.first });
       need -= 1;
     }
 
@@ -295,7 +292,14 @@ async function buildPlan(
       const prev = steps[i - 1];
       const next = steps[i + 1];
       const min = Math.max(1, Math.round(s.sec / 60));
-      segs.unshift({ kind: "walk", from: prev ? endName(prev) : "", to: next ? startName(next) : "", min });
+      segs.unshift({
+        kind: "walk",
+        from: prev ? endName(prev) : "",
+        to: next ? startName(next) : "",
+        min,
+        fromCoord: s.first ?? prev?.last,
+        toCoord: s.last ?? next?.first,
+      });
       need -= min;
       continue;
     }
@@ -352,20 +356,30 @@ async function buildPlan(
   const lastName = lastSeg.kind === "ride" ? lastSeg.stations[lastSeg.stations.length - 1] : lastSeg.kind === "bus" ? lastSeg.to : "";
 
   const legs: Leg[] = [];
-  const walk = (kind: WalkLeg["kind"], from: string, to: string, start: number, min: number): WalkLeg => ({
+  const walk = (
+    kind: WalkLeg["kind"],
+    from: string,
+    to: string,
+    start: number,
+    min: number,
+    fromCoord?: LatLng,
+    toCoord?: LatLng,
+  ): WalkLeg => ({
     type: "walk",
     kind,
     from,
     to,
+    ...(fromCoord ? { fromCoord: { lat: fromCoord.lat, lng: fromCoord.lng } } : {}),
+    ...(toCoord ? { toCoord: { lat: toCoord.lat, lng: toCoord.lng } } : {}),
     start,
     end: start + min,
   });
-  legs.push(walk("home", ctx.origin.name, firstName, leaveAt, walkStart));
+  legs.push(walk("home", ctx.origin.name, firstName, leaveAt, walkStart, ctx.origin, steps[0].first));
   let cursor = leaveAt + walkStart;
 
   for (const g of segs) {
     if (g.kind === "walk") {
-      legs.push(walk("transfer", g.from, g.to, cursor, g.min));
+      legs.push(walk("transfer", g.from, g.to, cursor, g.min, g.fromCoord, g.toCoord));
       cursor += g.min;
     } else if (g.kind === "ride") {
       const leg: RideLeg = {
@@ -405,7 +419,7 @@ async function buildPlan(
       cursor = g.end;
     }
   }
-  legs.push(walk("dest", lastName, ctx.destination.name, cursor, walkEnd));
+  legs.push(walk("dest", lastName, ctx.destination.name, cursor, walkEnd, steps[steps.length - 1].last, ctx.destination));
 
   const firstVehicle = vehicles[0];
   const lastVehicle = vehicles[vehicles.length - 1];
@@ -456,6 +470,12 @@ async function scheduleBus(
     stopCount: Math.max(1, s.stops.length - 1),
   };
 
+  // 심야버스는 밤(23시~5시 30분)에만 다닌다. 우리 버스 데이터에 첫차·막차가 없어도 이 시간대가 아니면 건너뛴다.
+  if (/심야/.test(vehicle?.name ?? "")) {
+    const t = ((Math.floor(latestBoard) % 1440) + 1440) % 1440;
+    if (t < 23 * 60 && t >= 5 * 60 + 30) return null;
+  }
+
   const m = matchBus(data, s);
   if (!m) {
     // 우리 버스 데이터에 없는 노선: 같은 구간을 지나는 버스가 여러 대면 더 자주 오는 것으로 본다.
@@ -491,7 +511,9 @@ async function scheduleBus(
 // ─── 바깥에서 부르는 함수 ─────────────────────────────────────
 
 /** 카카오 경로를 앞에서부터 따라가 안을 만든다. 하나도 못 만들거나 카카오 호출이 실패하면 null */
-export async function kakaoPlans(ctx: KakaoPlanContext): Promise<{ plans: Plan[]; walkEstimated: boolean } | null> {
+export async function kakaoPlans(
+  ctx: KakaoPlanContext,
+): Promise<{ plans: Plan[]; groups: PlanGroups; walkEstimated: boolean } | null> {
   const routes = await fetchKakaoRoutes(ctx.origin, ctx.destination);
   if (!routes?.length) return null;
 
@@ -518,7 +540,7 @@ export async function kakaoPlans(ctx: KakaoPlanContext): Promise<{ plans: Plan[]
 
   // 지하철 구간에 쓸 열차 시간표
   const stops: { line: string; station: string }[] = [];
-  for (const steps of cands.slice(0, TIMETABLE_ROUTES)) {
+  for (const steps of cands) {
     for (const s of steps) {
       if (s.type !== "SUBWAY") continue;
       const info = subwayInfo(s);
@@ -529,18 +551,28 @@ export async function kakaoPlans(ctx: KakaoPlanContext): Promise<{ plans: Plan[]
   }
   const tt = ctx.loadTimetable && stops.length ? await ctx.loadTimetable(stops).catch(() => undefined) : undefined;
 
-  const plans: Plan[] = [];
+  // 카카오 목록 순서대로 시각을 계산한다. 첫 번째로 만들어진 안이 추천이고,
+  // 지하철 위주·버스 위주 안은 각각 앞에서부터 GROUP_SIZE개까지 모은다. (둘 다 차면 멈춘다)
+  let recommended: Plan | null = null;
+  const subway: Plan[] = [];
+  const bus: Plan[] = [];
   const seen = new Set<string>();
-  for (let k = 0; k < cands.length && plans.length < MAX_PLANS; k++) {
+  for (let k = 0; k < cands.length; k++) {
+    if (recommended && subway.length >= GROUP_SIZE && bus.length >= GROUP_SIZE) break;
     const plan = await buildPlan(cands[k], ctx, wm[0][2 * k], wm[1][2 * k + 1], data, tt).catch(() => null);
     if (!plan) continue;
     const sig = plan.legs
       .map((l) => (l.type === "ride" ? `${l.lineName}:${l.from}>${l.to}` : l.type === "bus" ? `bus${l.routeName}:${l.from}>${l.to}` : ""))
       .join("|");
     if (seen.has(sig)) continue;
-    if (plans.length > 0 && plans[0].leaveAt - plan.leaveAt > MAX_ALT_GAP) continue;
     seen.add(sig);
-    plans.push(plan);
+    recommended ??= plan;
+    const mode = planMode(plan);
+    const list = mode === "subway" ? subway : mode === "bus" ? bus : null;
+    if (list && list.length < GROUP_SIZE) list.push(plan);
   }
-  return plans.length ? { plans, walkEstimated: estimated } : null;
+  if (!recommended) return null;
+
+  const plans = [recommended, ...[...subway, ...bus].filter((p) => p !== recommended)];
+  return { plans, groups: { recommended, subway, bus }, walkEstimated: estimated };
 }
