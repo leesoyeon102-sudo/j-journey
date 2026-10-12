@@ -56,6 +56,6 @@ export const WithIcon: Story = {
 // Storybook에는 :hover / :focus-visible를 강제로 켜는 기능이 없어서,
 // 컴포넌트가 해당 상태에서 쓰는 클래스를 그대로 붙여 보여준다.
 export const Hover: Story = { args: { className: "bg-graphite" } }
-export const Focus: Story = { args: { className: "border-ink ring-3 ring-ink/15" } }
+export const Focus: Story = { args: { className: "border-ink" } }
 export const Disabled: Story = { args: { disabled: true } }
 export const Invalid: Story = { args: { "aria-invalid": true } }

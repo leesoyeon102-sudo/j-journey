@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 
 // Contra 스타일: 모든 버튼은 24px 필(rounded-button). 채움 버튼은 Charcoal 하나뿐이다.
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-button border border-transparent bg-clip-padding text-body-sm font-semibold whitespace-nowrap transition-all outline-none select-none focus-visible:border-ink focus-visible:ring-3 focus-visible:ring-ink/15 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-button border border-transparent bg-clip-padding text-body-sm font-semibold whitespace-nowrap transition-all outline-none select-none focus-visible:border-ink active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -18,10 +18,10 @@ const buttonVariants = cva(
         ghost: "text-ink hover:bg-mist aria-expanded:bg-mist",
         // 코랄은 채움으로만 쓰고 글자는 와인(진한 자주)으로 둔다.
         destructive:
-          "bg-coral/10 text-wine hover:bg-coral/20 focus-visible:border-coral focus-visible:ring-coral/25",
+          "bg-coral/10 text-wine hover:bg-coral/20 focus-visible:border-coral",
         // 경로 삭제처럼 되돌릴 수 없는 동작: danger 채움 + 흰 글자
         danger:
-          "bg-danger text-on-primary hover:bg-danger/90 focus-visible:border-danger focus-visible:ring-danger/25",
+          "bg-danger text-on-primary hover:bg-danger/90 focus-visible:border-danger",
         link: "rounded-none text-ink underline-offset-4 hover:underline",
       },
       size: {

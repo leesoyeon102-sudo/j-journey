@@ -115,7 +115,6 @@
   --radius-pill: 40px;
 
   /* ── 그림자 ── */
-  --shadow-button: rgba(34, 40, 52, 0.05) 0px 4px 10px 0px, rgba(34, 40, 52, 0.04) -2px 18px 18px 0px;
   --shadow-tab: rgb(19, 24, 25) 0px 1px 3px 0px inset;
   --shadow-nav: rgba(0, 0, 0, 0.05) 0px 10px 20px 0px;
 }

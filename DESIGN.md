@@ -281,7 +281,7 @@ components:
 
 `components/ui`의 shadcn 컴포넌트를 그대로 쓴다.
 
-- **Button:** variant는 default(primary), outline, secondary, ghost, destructive(danger-subtle), danger(danger 채움 + 흰 글자, 경로 삭제처럼 되돌릴 수 없는 동작), link. 높이는 기본 36px, 큰 것(lg) 52px. 포커스는 `on-surface` 테두리와 옅은 링으로 표시한다.
+- **Button:** variant는 default(primary), outline, secondary, ghost, destructive(danger-subtle), danger(danger 채움 + 흰 글자, 경로 삭제처럼 되돌릴 수 없는 동작), link. 높이는 기본 36px, 큰 것(lg) 52px. 포커스는 `on-surface` 테두리로만 표시한다. 링·그림자는 쓰지 않는다.
 - **Badge:** 24px 높이의 알약. 기본은 primary 채움, 보조는 muted, 강조(accent)는 accent-subtle 배경에 accent 글자.
 - **Card:** surface 배경, 1px border, 4px 반경. 제목은 heading 글꼴, 설명은 `muted-foreground`.
 - **Input:** 44px 높이, muted 배경, border 테두리. 포커스 시 테두리가 `on-surface`로 진해지고, 오류(`aria-invalid`)면 danger 테두리가 된다.
