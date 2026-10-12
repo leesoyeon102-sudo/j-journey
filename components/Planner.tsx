@@ -587,7 +587,10 @@ const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
         {/* 같은 출발지·도착지로 카카오맵 전체 경로를 열어 비교해 본다. (좌표가 저장된 안내만) */}
         {plan.originCoord && plan.destCoord && (
           <div className="mt-6">
-            <KakaoMapLink origin={plan.originCoord} destination={plan.destCoord} />
+            <KakaoMapLink
+              origin={{ name: plan.origin, ...plan.originCoord }}
+              destination={{ name: plan.destination, ...plan.destCoord }}
+            />
           </div>
         )}
       </section>
