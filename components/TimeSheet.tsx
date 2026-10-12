@@ -194,12 +194,12 @@ function Wheel({
     ref.current?.scrollTo({ top: Math.min(items.length - 1, Math.max(0, i)) * ITEM, behavior: "smooth" });
 
   // 마우스로 끌어서 돌리기. 터치와 휠은 브라우저 스크롤이 처리한다.
-  const drag = useRef<{ y: number; top: number; moved: boolean } | null>(null);
+  const drag = useRef<{ y: number; top: number; moved: boolean; t: number; v: number; lastY: number } | null>(null);
   const justDragged = useRef(false);
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el || e.pointerType !== "mouse" || e.button !== 0) return;
-    drag.current = { y: e.clientY, top: el.scrollTop, moved: false };
+    drag.current = { y: e.clientY, top: el.scrollTop, moved: false, t: e.timeStamp, v: 0, lastY: e.clientY };
   };
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -213,6 +213,11 @@ function Wheel({
       el.style.scrollSnapType = "none"; // 끄는 동안은 스냅이 위치를 되돌리지 않게
     }
     el.scrollTop = d.top - dy;
+    // 놓을 때 이어서 굴러가도록 손가락(포인터)의 최근 속도(px/ms)를 기억한다.
+    const dt = e.timeStamp - d.t;
+    if (dt > 0) d.v = d.v * 0.5 + ((d.lastY - e.clientY) / dt) * 0.5;
+    d.t = e.timeStamp;
+    d.lastY = e.clientY;
   };
   const onPointerEnd = () => {
     const el = ref.current;
@@ -222,7 +227,9 @@ function Wheel({
     el.style.scrollSnapType = "";
     justDragged.current = true; // 곧 이어지는 click(칸 선택)은 무시한다
     setTimeout(() => (justDragged.current = false), 0);
-    goTo(Math.round(el.scrollTop / ITEM));
+    // 놓은 속도만큼 더 굴러가다 가까운 칸에 멈춘다. (터치는 브라우저 관성 스크롤이 처리)
+    const fling = Math.abs(d.v) > 0.05 ? d.v * 400 : 0;
+    goTo(Math.round((el.scrollTop + fling) / ITEM));
   };
 
   return (
@@ -268,7 +275,7 @@ function Wheel({
               onSelect(i); // 스크롤이 끝나길 기다리지 않고 바로 선택값에 반영
               goTo(i);
             }}
-            className={`flex w-full snap-center items-center justify-center tabular-nums [scroll-snap-stop:always] ${
+            className={`flex w-full snap-center items-center justify-center tabular-nums ${
               on ? "text-subheading font-medium text-on-surface" : "text-subheading text-muted-foreground"
             }`}
             style={{ height: ITEM }}
