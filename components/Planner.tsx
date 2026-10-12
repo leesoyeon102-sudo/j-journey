@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
 import { memo, useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
-import BufferStepper from "./BufferStepper";
 import Header from "./Header";
 import LocationPicker from "./LocationPicker";
 import TimeSheet from "./TimeSheet";
@@ -40,14 +39,15 @@ interface Form {
   time: string;
   /** 기본은 오늘, 내일 약속이면 토글을 켠다 */
   tomorrow: boolean;
-  /** 약속 시각보다 이만큼(분) 일찍 도착하도록 계산한다. */
-  buffer: number;
 }
 
-const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false, buffer: 5 };
+/** 약속 시각보다 이만큼 일찍 도착하도록 계산한다. (유저 설정 없음) */
+const ARRIVE_EARLY_MIN = 5;
+
+const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false };
 
 // 약속 시각·내일 토글은 다른 탭에 다녀와도 유지한다. (화면이 다시 만들어져도 남도록 모듈에 둔다. 새로고침하면 초기화)
-const draft: Partial<Pick<Form, "time" | "tomorrow" | "buffer">> = {};
+const draft: Partial<Pick<Form, "time" | "tomorrow">> = {};
 
 export default function Planner() {
   const trips = useTrips();
@@ -107,7 +107,7 @@ export default function Planner() {
     ...edit,
   };
   const set = <K extends keyof Form>(k: K, v: Form[K]) => {
-    if (k === "time" || k === "tomorrow" || k === "buffer") Object.assign(draft, { [k]: v });
+    if (k === "time" || k === "tomorrow") Object.assign(draft, { [k]: v });
     setEdit((e) => ({ ...e, [k]: v }));
   };
 
@@ -176,7 +176,7 @@ export default function Planner() {
         origin: { name: origin.name, area: origin.area, lat: origin.lat, lng: origin.lng },
         destination: { name, area, lat, lng },
         arriveBy,
-        buffer: form.buffer,
+        buffer: ARRIVE_EARLY_MIN,
         date,
       });
       if (!result.ok) {
@@ -514,8 +514,6 @@ export default function Planner() {
         </button>
 
         <TimeSheet label="약속 시각" value={form.time} onChange={(v) => set("time", v)} />
-
-        <BufferStepper value={form.buffer} onChange={(v) => set("buffer", v)} />
 
         <div className="flex h-12 items-center justify-between px-1">
           <span id="tomorrow-label" className="text-body text-on-surface">
