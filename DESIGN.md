@@ -256,7 +256,7 @@ components:
 
 제목류는 GT Standard L, 본문류는 GT Standard M이다. 유료 글꼴이라 없으면 Pretendard, Apple SD Gothic Neo, Noto Sans KR 순으로 대체된다. 글자 간격은 크기에 비례해 약간 좁게(-0.01em 안팎) 둔다.
 
-- **time (34px):** 출발 시각 전용. 화면에서 가장 크게 읽혀야 하는 숫자 하나에만 쓴다.
+- **time (34px):** 출발 시각 전용. 화면에서 가장 크게 읽혀야 하는 숫자에만 쓴다. 홈의 이동 중 카드에서는 도착 시각도 같은 크기로 쓰되, 파랑은 출발 시각에만 준다.
 - **display (58px):** 랜딩·디자인 시스템 페이지 같은 큰 머리말 전용. 앱 화면 안에서는 쓰지 않는다.
 - **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목.
 - **body-lg (16px) / body (14px):** 본문. 앱 기본은 14px.

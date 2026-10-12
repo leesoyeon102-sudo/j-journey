@@ -26,27 +26,32 @@ export default function TripProgressCard({ origin, destination, leaveAt, arriveA
         <span className="text-label font-semibold">이동중</span>
       </div>
 
-      <dl className="mt-4 space-y-3">
-        <div>
-          <dt className="text-caption text-muted-foreground">출발지</dt>
-          <dd className="text-body-lg font-medium">{origin}</dd>
-        </div>
-        <div>
-          <dt className="text-caption text-muted-foreground">도착지</dt>
-          <dd className="text-body-lg font-medium">{destination}</dd>
-        </div>
-      </dl>
-
-      <div className="mt-4 grid grid-cols-2 gap-2 border-t border-border pt-4">
+      {/* 가장 크게 읽혀야 하는 것: 출발·도착 시각. 출발은 파랑, 도착은 본문색. */}
+      <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-end gap-2">
         <div>
           <p className="text-caption text-muted-foreground">출발</p>
-          <p className="text-subheading font-medium tabular-nums">{fmt(leaveAt)}</p>
+          <p className="text-time font-medium tabular-nums text-brand">{fmt(leaveAt)}</p>
         </div>
+        <svg viewBox="0 0 24 24" className="mb-2 size-5 text-inactive" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
         <div>
           <p className="text-caption text-muted-foreground">도착</p>
-          <p className="text-subheading font-medium tabular-nums">{fmt(arriveAt)}</p>
+          <p className="text-time font-medium tabular-nums">{fmt(arriveAt)}</p>
         </div>
       </div>
+
+      {/* 장소는 한 단계 낮춰 보조 정보로 */}
+      <dl className="mt-5 space-y-2 border-t border-border pt-4">
+        <div className="flex gap-3">
+          <dt className="w-12 shrink-0 text-caption text-muted-foreground">출발지</dt>
+          <dd className="min-w-0 text-body">{origin}</dd>
+        </div>
+        <div className="flex gap-3">
+          <dt className="w-12 shrink-0 text-caption text-muted-foreground">도착지</dt>
+          <dd className="min-w-0 text-body">{destination}</dd>
+        </div>
+      </dl>
 
       <div className="mt-5 space-y-1">
         <Button size="lg" className="w-full" onClick={onDetail}>
