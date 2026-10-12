@@ -13,7 +13,6 @@ const meta = {
     leaveAt: 14 * 60 + 14,
     arriveAt: 14 * 60 + 51,
     onDetail: fn(),
-    onCancel: fn(),
   },
   decorators: [
     (Story) => (
@@ -35,14 +34,6 @@ export const OpenDetail: Story = {
   play: async ({ canvas, args }) => {
     await canvas.getByRole("button", { name: "출발 안내 상세" }).click()
     await expect(args.onDetail).toHaveBeenCalled()
-  },
-}
-
-// 출발 취소: 가장 낮은 위계의 글자 버튼
-export const CancelDeparture: Story = {
-  play: async ({ canvas, args }) => {
-    await canvas.getByRole("button", { name: "출발 취소" }).click()
-    await expect(args.onCancel).toHaveBeenCalled()
   },
 }
 

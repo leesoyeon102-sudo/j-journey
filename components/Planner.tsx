@@ -9,6 +9,7 @@ import LocationPicker from "./LocationPicker";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
+import TripMenu from "./TripMenu";
 import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
@@ -273,7 +274,7 @@ export default function Planner() {
     };
 
     return (
-      <main className={`fade-in ${departed ? "pb-40" : "pb-24"}`}>
+      <main className="fade-in pb-24">
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
         <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
           <Button
@@ -294,6 +295,12 @@ export default function Planner() {
             </svg>
           </Button>
           <h1 className="text-subheading font-medium">출발 안내</h1>
+          {/* 출발한 뒤에만: 맨 오른쪽 점 세 개 메뉴 */}
+          {departed && !done && (
+            <div className="ml-auto">
+              <TripMenu onCancelDeparture={() => cancelDeparture(current.id)} />
+            </div>
+          )}
         </nav>
         <div className="h-4" />
 
@@ -363,18 +370,6 @@ export default function Planner() {
               onDepart={depart}
               onArrive={(onTime) => arrive(active, onTime)}
             />
-            {/* 위계가 가장 낮은 버튼: 출발한 뒤에만 보인다. */}
-            {departed && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="lg"
-                className="mt-1 w-full text-muted-foreground"
-                onClick={() => cancelDeparture(current.id)}
-              >
-                출발 취소
-              </Button>
-            )}
           </div>
         )}
 
@@ -409,7 +404,6 @@ export default function Planner() {
               setActiveId(moving.id);
               setEditing(false);
             }}
-            onCancel={() => cancelDeparture(moving.id)}
           />
         </div>
       </main>

@@ -10,11 +10,10 @@ interface Props {
   leaveAt: number;
   arriveAt: number;
   onDetail: () => void;
-  onCancel: () => void;
 }
 
 /** 홈 화면: 출발한 뒤 이동 중인 안내를 보여 주는 카드 */
-export default function TripProgressCard({ origin, destination, leaveAt, arriveAt, onDetail, onCancel }: Props) {
+export default function TripProgressCard({ origin, destination, leaveAt, arriveAt, onDetail }: Props) {
   return (
     <section className="rounded-nav border border-border-subtle bg-surface p-5 shadow-nav" aria-label="이동 중인 경로">
       <div className="flex items-center gap-2">
@@ -53,15 +52,9 @@ export default function TripProgressCard({ origin, destination, leaveAt, arriveA
         </div>
       </dl>
 
-      <div className="mt-5 space-y-1">
-        <Button size="lg" className="w-full" onClick={onDetail}>
-          출발 안내 상세
-        </Button>
-        {/* 위계가 가장 낮은 버튼: 글자만 있는 ghost */}
-        <Button variant="ghost" size="lg" className="w-full text-muted-foreground" onClick={onCancel}>
-          출발 취소
-        </Button>
-      </div>
+      <Button size="lg" className="mt-5 w-full" onClick={onDetail}>
+        출발 안내 상세
+      </Button>
     </section>
   );
 }
