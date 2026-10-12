@@ -16,7 +16,7 @@ interface Props {
 /** 홈 화면: 출발한 뒤 이동 중인 안내를 보여 주는 카드 */
 export default function TripProgressCard({ origin, destination, leaveAt, arriveAt, onDetail, onCancel }: Props) {
   return (
-    <section className="rounded-nav border border-border bg-surface p-5 shadow-nav" aria-label="이동 중인 경로">
+    <section className="rounded-nav border border-border-subtle bg-surface p-5 shadow-nav" aria-label="이동 중인 경로">
       <div className="flex items-center gap-2">
         {/* 초록 점이 퍼지는 모션으로 지금 진행 중임을 알린다. */}
         <span className="relative flex size-3" aria-hidden="true">
