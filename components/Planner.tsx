@@ -124,18 +124,29 @@ export default function Planner() {
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
 
   // 보이는 안의 높이를 슬라이더 높이로 맞춘다. (다른 안이 더 길어도 아래에 빈 화면이 생기지 않게)
+  // 넘기는 중에는 높이를 건드리지 않는다. (스크롤 도중 배치가 바뀌면 모바일에서 스냅이 중간에 걸린다.)
+  const swiping = useRef(false);
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const settleHeight = () => {
+    swiping.current = false;
+    const el = slider.current;
+    if (!el) return;
+    el.style.transition = ""; // 멈춘 뒤에 줄어드는 건 부드럽게
+    const a = articles.current[Math.round(el.scrollLeft / el.clientWidth)];
+    if (a) el.style.height = `${a.offsetHeight}px`;
+  };
   useEffect(() => {
     const el = articles.current[page];
     if (!el) return;
-    // 스와이프 중에는 onScroll이 높이를 직접 조절하므로, 멈춰 있을 때만 맞춘다.
     const update = () => {
-      if (slider.current) slider.current.style.height = `${el.offsetHeight}px`;
+      if (!swiping.current) settleHeight();
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
   }, [page, current?.id, tab, groups]);
+  useEffect(() => () => clearTimeout(settleTimer.current), []);
   // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
   useFeedbackBlock(Boolean(current));
 
@@ -220,16 +231,18 @@ export default function Planner() {
     const onScroll = () => {
       const el = slider.current;
       if (!el) return;
-      const pos = el.scrollLeft / el.clientWidth;
-      setPage(Math.round(pos));
-      // 넘기는 동안 높이를 두 안 사이에서 스크롤 위치에 맞춰 이어서 바꾼다. (가운데에서 한 번에 뛰지 않게)
-      const i = Math.max(0, Math.floor(pos));
-      const a = articles.current[i];
-      const b = articles.current[i + 1];
-      if (a && b) {
-        const t = Math.min(1, pos - i);
-        el.style.height = `${a.offsetHeight + (b.offsetHeight - a.offsetHeight) * t}px`;
+      setPage(Math.round(el.scrollLeft / el.clientWidth));
+      if (!swiping.current) {
+        // 넘기기 시작할 때 한 번만: 가장 긴 안의 높이로 고정해 두고, 멈춘 뒤에 보이는 안의 높이로 맞춘다.
+        swiping.current = true;
+        const tallest = Math.max(...articles.current.slice(0, shown.length).map((a) => a?.offsetHeight ?? 0));
+        if (tallest > 0) {
+          el.style.transition = "none"; // 넘기는 중에는 배치가 여러 프레임에 걸쳐 바뀌지 않게 한 번에
+          el.style.height = `${tallest}px`;
+        }
       }
+      clearTimeout(settleTimer.current);
+      settleTimer.current = setTimeout(settleHeight, 120);
     };
     const goTo = (i: number) =>
       slider.current?.scrollTo({ left: i * slider.current.clientWidth, behavior: "smooth" });
@@ -340,7 +353,7 @@ export default function Planner() {
             // 끌고 난 직후에는 버튼이 눌리지 않게 막는다.
             if (justDragged.current) e.stopPropagation();
           }}
-          className="flex snap-x snap-mandatory items-start overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory items-start overflow-x-auto overflow-y-hidden overscroll-x-contain transition-[height] duration-200 ease-out [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {shown.map((plan, i) => (
             <article
@@ -348,7 +361,7 @@ export default function Planner() {
               ref={(el) => {
                 articles.current[i] = el;
               }}
-              className="w-full shrink-0 snap-center"
+              className="w-full shrink-0 snap-center [scroll-snap-stop:always]"
             >
               <PlanView plan={plan} delta={filtering && groups && plan !== groups.recommended ? groups.recommended.leaveAt - plan.leaveAt : 0} />
             </article>
