@@ -1,5 +1,5 @@
 import type { Trip } from "./types";
-import { distanceKm } from "./stations";
+import { distanceKm, STATIONS } from "./stations";
 
 export interface RouteSummary {
   key: string;
@@ -86,10 +86,12 @@ export function buildRoadmap(trips: Trip[]): Roadmap {
     routes.add(t.routeKey);
     for (const leg of t.plan.legs) {
       if (leg.type !== "ride") continue;
-      paths.push(leg.stations);
-      leg.stations.forEach((s, i) => {
+      // 카카오 경로의 역 중 우리 노선도에 없는 역은 지도에 그릴 수 없어 뺀다.
+      const known = leg.stations.filter((s) => STATIONS[s]);
+      paths.push(known);
+      known.forEach((s, i) => {
         stations.add(s);
-        if (i > 0) km += distanceKm(leg.stations[i - 1], s);
+        if (i > 0) km += distanceKm(known[i - 1], s);
       });
     }
   }

@@ -3,6 +3,7 @@ import { planTrip } from "../planner";
 import { STATIONS } from "../stations";
 import type { PlanResult } from "../types";
 import { busPlans } from "./busPlan";
+import { kakaoPlans } from "./kakaoPlan";
 import { loadTimetable, type DayType } from "./seoul";
 import { walkMatrix } from "./walk";
 
@@ -33,6 +34,33 @@ export async function computePlans(
   buffer: number,
   date: string,
 ): Promise<PlanResult> {
+  // 카카오맵 경로(어떤 수단을 어떤 순서로 타는지)를 먼저 따라가 본다. 실패하거나 결과가 없으면 아래 기존 계산으로 대신한다.
+  {
+    const dayType = dayTypeOf(date);
+    const now = nowKst();
+    const kakao = await kakaoPlans({
+      origin,
+      destination,
+      arriveBy,
+      buffer,
+      dayType,
+      isToday: date === now.date,
+      nowMin: now.minute,
+      loadTimetable: (stops) => loadTimetable(stops, dayType),
+    }).catch(() => null);
+    if (kakao) {
+      const destCoord = { lat: destination.lat, lng: destination.lng };
+      const originCoord = { lat: origin.lat, lng: origin.lng };
+      for (const p of kakao.plans) {
+        p.destCoord = destCoord;
+        p.originCoord = originCoord;
+        p.dayType = dayType;
+        if (kakao.walkEstimated) p.walkEstimated = true;
+      }
+      return { ok: true, plan: kakao.plans[0], plans: kakao.plans };
+    }
+  }
+
   const o = nearestStations(origin, CANDIDATES);
   const d = nearestStations(destination, CANDIDATES);
 

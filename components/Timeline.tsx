@@ -77,7 +77,12 @@ function toSteps(plan: Plan): Step[] {
         steps.push({
           time: b.end,
           title: `${b.to} 정류장 하차`,
-          detail: `${after?.type === "ride" ? after.from : ""}${after?.type === "ride" ? "역" : ""}까지 도보 ${next.end - next.start}분`,
+          detail:
+            after?.type === "ride"
+              ? `${after.from}역까지 도보 ${next.end - next.start}분`
+              : after?.type === "bus"
+                ? `${after.from} 정류장까지 도보 ${next.end - next.start}분`
+                : `도보 ${next.end - next.start}분`,
         });
       } else if (next?.type === "walk" && next.kind === "dest") {
         steps.push({
