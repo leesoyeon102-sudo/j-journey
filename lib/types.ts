@@ -127,6 +127,8 @@ export interface Trip {
   id: string;
   routeKey: string;
   createdAt: number;
+  /** "출발했어요"를 누른 시각. 도착을 기록하기 전까지 이동 중으로 본다. */
+  departedAt?: number;
   arrivedAt?: number;
   status: TripStatus;
   plan: Plan;

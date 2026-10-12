@@ -72,6 +72,17 @@ export function addTrip(plan: Plan): Trip {
   return trip;
 }
 
+/** 출발 기록. 추천이 아닌 안을 따라 출발했다면 `plan`으로 기록된 경로를 바꾼다. */
+export function recordDeparture(id: string, plan?: Plan) {
+  write(
+    read().map((t) =>
+      t.id === id && !t.departedAt
+        ? { ...t, ...(plan ? { plan, routeKey: routeKeyOf(plan) } : {}), departedAt: Date.now() }
+        : t,
+    ),
+  );
+}
+
 /** 도착 기록. 추천이 아닌 안을 따라간 경우 `plan`으로 기록된 경로를 바꾼다. */
 export function recordArrival(id: string, onTime: boolean, plan?: Plan) {
   write(

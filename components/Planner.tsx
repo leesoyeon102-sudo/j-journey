@@ -8,6 +8,7 @@ import Header from "./Header";
 import LocationPicker from "./LocationPicker";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
+import TripActionButton from "./TripActionButton";
 import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
 import { useFeedbackBlock } from "@/lib/feedbackGate";
@@ -17,6 +18,7 @@ import type { Place } from "@/lib/places";
 import {
   addTrip,
   recordArrival,
+  recordDeparture,
   saveHome,
   saveLastDestination,
   saveLastOrigin,
@@ -186,8 +188,9 @@ export default function Planner() {
 
   if (current) {
     const done = current.status !== "planned";
-    // 기록을 남긴 뒤에는 따라간 안 하나만 보여준다.
-    const shown = done || plans.length === 0 ? [current.plan] : plans;
+    // 출발하거나 기록을 남긴 뒤에는 따라간 안 하나만 보여준다.
+    const departed = Boolean(current.departedAt);
+    const shown = done || departed || plans.length === 0 ? [current.plan] : plans;
     const active = shown[Math.min(page, shown.length - 1)];
     const multi = shown.length > 1;
 
@@ -240,6 +243,10 @@ export default function Planner() {
       const to = Math.abs(dx) > 50 ? from + (dx < 0 ? 1 : -1) : from;
       goTo(Math.max(0, Math.min(shown.length - 1, to)));
     };
+    const depart = () => {
+      recordDeparture(current.id, active === current.plan ? undefined : active);
+      setPage(0);
+    };
     const arrive = (plan: Plan, onTime: boolean) => {
       // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
       if (current.status === "planned" && arrivalTracked.current !== current.id) {
@@ -258,7 +265,7 @@ export default function Planner() {
     };
 
     return (
-      <main className="fade-in">
+      <main className="fade-in pb-24">
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
         <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
           <Button
@@ -335,22 +342,21 @@ export default function Planner() {
               className="w-full shrink-0 snap-center"
             >
               <PlanView plan={plan} />
-              {/* 출처 문구 아래 30px에 붙여 둔다. 안마다 높이가 달라도 간격이 유지된다. */}
-              <section className="px-5 pb-6 pt-8">
-                {!done && (
-                  <div className="space-y-2">
-                    <Button size="lg" onClick={() => arrive(plan, true)} className="w-full">
-                      제시간에 도착했어요
-                    </Button>
-                    <Button variant="ghost" size="lg" onClick={() => arrive(plan, false)} className="w-full text-muted-foreground">
-                      늦었어요
-                    </Button>
-                  </div>
-                )}
-              </section>
             </article>
           ))}
         </div>
+
+        {/* 하단에 고정: 스크롤과 상관없이 탭바 바로 위에 보인다. */}
+        {!done && (
+          <div className="fixed bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom))] left-1/2 z-10 w-[390px] max-w-full -translate-x-1/2 bg-surface px-5 pb-3 pt-3">
+            <TripActionButton
+              departedAt={current.departedAt}
+              durationMin={active.arriveAt - active.leaveAt}
+              onDepart={depart}
+              onArrive={(onTime) => arrive(active, onTime)}
+            />
+          </div>
+        )}
 
         {arrivedAlert && (
           <AlertPanel
