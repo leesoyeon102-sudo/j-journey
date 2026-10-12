@@ -25,6 +25,8 @@ function toSteps(plan: Plan): Step[] {
     nextHop?.type === "bus" ? `${name} 정류장` : nextHop?.type === "ride" ? `${name}역` : name;
   /** 걷는 구간의 카카오맵 길찾기 정보. 좌표가 없거나 거의 제자리면 붙이지 않는다. */
   const walkLink = (w: WalkLeg, before?: Leg, after?: Leg): Step["walk"] => {
+    // 지하철끼리 갈아타는 이동은 역 안에서 걷는 거라 카카오맵 도보 길찾기를 붙이지 않는다. (밖에서 걷는 구간만)
+    if (w.kind === "transfer" && before?.type === "ride" && after?.type === "ride") return undefined;
     if (!w.fromCoord || !w.toCoord || meters(w.fromCoord, w.toCoord) < MIN_WALK_LINK_M) return undefined;
     const label = (name: string, hop?: Leg) =>
       hop?.type === "bus" ? `${name} 정류장` : hop?.type === "ride" ? `${name}역` : name;
