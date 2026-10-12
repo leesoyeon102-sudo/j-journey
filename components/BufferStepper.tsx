@@ -11,22 +11,19 @@ interface Props {
   step?: number;
 }
 
-/** 여유 시간 카드. 마이너스·플러스 버튼으로 약속 시각보다 얼마나 일찍 도착할지 정한다. */
+/** 여유 시간 줄. "내일 약속이에요"처럼 카드 없이 한 줄로 놓고, 마이너스·플러스 버튼으로 약속 시각보다 얼마나 일찍 도착할지 정한다. */
 export default function BufferStepper({ value, onChange, min = 0, max = 60, step = 5 }: Props) {
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
   return (
-    <div className="flex min-h-16 w-full items-center justify-between rounded-input bg-muted px-4 py-3">
-      <div>
-        <span className="block text-caption text-muted-foreground">여유 시간</span>
-        <span className="block text-body-lg font-medium tabular-nums" aria-live="polite">
-          {value === 0 ? "여유 없이" : `${value}분 일찍 도착`}
-        </span>
-      </div>
+    <div className="flex h-12 items-center justify-between px-1">
+      <span className="text-body text-on-surface tabular-nums" aria-live="polite">
+        {value === 0 ? "여유 없이 도착해요" : `${value}분 일찍 도착해요`}
+      </span>
       <div className="flex items-center gap-2">
         <Button
           type="button"
           variant="outline"
-          size="icon-lg"
+          size="icon-sm"
           aria-label="여유 시간 줄이기"
           disabled={value <= min}
           onClick={() => onChange(clamp(value - step))}
@@ -38,7 +35,7 @@ export default function BufferStepper({ value, onChange, min = 0, max = 60, step
         <Button
           type="button"
           variant="outline"
-          size="icon-lg"
+          size="icon-sm"
           aria-label="여유 시간 늘리기"
           disabled={value >= max}
           onClick={() => onChange(clamp(value + step))}

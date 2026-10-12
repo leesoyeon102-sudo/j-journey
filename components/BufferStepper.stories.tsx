@@ -29,9 +29,9 @@ export const Default: Story = {
   },
   play: async ({ canvas }) => {
     await canvas.getByRole("button", { name: "여유 시간 늘리기" }).click()
-    await expect(canvas.getByText("10분 일찍 도착")).toBeVisible()
+    await expect(canvas.getByText("10분 일찍 도착해요")).toBeVisible()
     await canvas.getByRole("button", { name: "여유 시간 줄이기" }).click()
-    await expect(canvas.getByText("5분 일찍 도착")).toBeVisible()
+    await expect(canvas.getByText("5분 일찍 도착해요")).toBeVisible()
   },
 }
 
@@ -39,7 +39,7 @@ export const Default: Story = {
 export const AtMinimum: Story = {
   args: { value: 0 },
   play: async ({ canvas }) => {
-    await expect(canvas.getByText("여유 없이")).toBeVisible()
+    await expect(canvas.getByText("여유 없이 도착해요")).toBeVisible()
     await expect(canvas.getByRole("button", { name: "여유 시간 줄이기" })).toBeDisabled()
   },
 }
