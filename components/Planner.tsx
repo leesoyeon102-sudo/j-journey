@@ -7,6 +7,7 @@ import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
 import LocationPicker from "./LocationPicker";
 import PlanFilter, { type PlanTab } from "./PlanFilter";
+import PlanSlider from "./PlanSlider";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
@@ -69,12 +70,6 @@ export default function Planner() {
   });
   const [tab, setTab] = useState<PlanTab>("recommended");
   const [page, setPage] = useState(0);
-  // 안마다 길이가 달라도 화면에 보이는 안의 높이만큼만 스크롤되도록, 보이는 안의 높이를 재서 슬라이더 높이로 쓴다.
-  const articles = useRef<(HTMLElement | null)[]>([]);
-  const slider = useRef<HTMLDivElement>(null);
-  // 마우스로 끌어서 넘길 때의 시작 좌표. 터치는 브라우저 스크롤 스냅이 알아서 처리한다.
-  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
-  const justDragged = useRef(false);
   // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
   const [arrivedAlert, setArrivedAlert] = useState(false);
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
@@ -123,30 +118,6 @@ export default function Planner() {
   // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
 
-  // 보이는 안의 높이를 슬라이더 높이로 맞춘다. (다른 안이 더 길어도 아래에 빈 화면이 생기지 않게)
-  // 넘기는 중에는 높이를 건드리지 않는다. (스크롤 도중 배치가 바뀌면 모바일에서 스냅이 중간에 걸린다.)
-  const swiping = useRef(false);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const settleHeight = () => {
-    swiping.current = false;
-    const el = slider.current;
-    if (!el) return;
-    el.style.transition = ""; // 멈춘 뒤에 줄어드는 건 부드럽게
-    const a = articles.current[Math.round(el.scrollLeft / el.clientWidth)];
-    if (a) el.style.height = `${a.offsetHeight}px`;
-  };
-  useEffect(() => {
-    const el = articles.current[page];
-    if (!el) return;
-    const update = () => {
-      if (!swiping.current) settleHeight();
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [page, current?.id, tab, groups]);
-  useEffect(() => () => clearTimeout(settleTimer.current), []);
   // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
   useFeedbackBlock(Boolean(current));
 
@@ -225,60 +196,8 @@ export default function Planner() {
     const changeTab = (t: PlanTab) => {
       setTab(t);
       setPage(0);
-      slider.current?.scrollTo({ left: 0 });
     };
 
-    const onScroll = () => {
-      const el = slider.current;
-      if (!el) return;
-      setPage(Math.round(el.scrollLeft / el.clientWidth));
-      if (!swiping.current) {
-        // 넘기기 시작할 때 한 번만: 가장 긴 안의 높이로 고정해 두고, 멈춘 뒤에 보이는 안의 높이로 맞춘다.
-        swiping.current = true;
-        const tallest = Math.max(...articles.current.slice(0, shown.length).map((a) => a?.offsetHeight ?? 0));
-        if (tallest > 0) {
-          el.style.transition = "none"; // 넘기는 중에는 배치가 여러 프레임에 걸쳐 바뀌지 않게 한 번에
-          el.style.height = `${tallest}px`;
-        }
-      }
-      clearTimeout(settleTimer.current);
-      settleTimer.current = setTimeout(settleHeight, 120);
-    };
-    const goTo = (i: number) =>
-      slider.current?.scrollTo({ left: i * slider.current.clientWidth, behavior: "smooth" });
-    const onDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
-      const el = slider.current;
-      if (!el || e.pointerType !== "mouse" || e.button !== 0) return;
-      drag.current = { x: e.clientX, left: el.scrollLeft, moved: false };
-    };
-    const onDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
-      const el = slider.current;
-      const d = drag.current;
-      if (!el || !d) return;
-      const dx = e.clientX - d.x;
-      if (!d.moved && Math.abs(dx) < 6) return;
-      if (!d.moved) {
-        d.moved = true;
-        el.setPointerCapture(e.pointerId);
-        el.style.scrollSnapType = "none"; // 끄는 동안은 스냅이 위치를 되돌리지 않게
-        el.style.userSelect = "none";
-      }
-      el.scrollLeft = d.left - dx;
-    };
-    const onDragEnd = (e: React.PointerEvent<HTMLDivElement>) => {
-      const el = slider.current;
-      const d = drag.current;
-      drag.current = null;
-      if (!el || !d?.moved) return;
-      el.style.scrollSnapType = "";
-      el.style.userSelect = "";
-      justDragged.current = true; // 곧 이어지는 click을 한 번 무시한다
-      setTimeout(() => (justDragged.current = false), 0);
-      const dx = e.clientX - d.x;
-      const from = Math.round(d.left / el.clientWidth);
-      const to = Math.abs(dx) > 50 ? from + (dx < 0 ? 1 : -1) : from;
-      goTo(Math.max(0, Math.min(shown.length - 1, to)));
-    };
     const depart = () => {
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
@@ -342,31 +261,13 @@ export default function Planner() {
           />
         )}
 
-        <div
-          ref={slider}
-          onScroll={onScroll}
-          onPointerDown={onDragStart}
-          onPointerMove={onDragMove}
-          onPointerUp={onDragEnd}
-          onPointerCancel={onDragEnd}
-          onClickCapture={(e) => {
-            // 끌고 난 직후에는 버튼이 눌리지 않게 막는다.
-            if (justDragged.current) e.stopPropagation();
-          }}
-          className="flex snap-x snap-mandatory items-start overflow-x-auto overflow-y-hidden overscroll-x-contain transition-[height] duration-200 ease-out [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
+        <PlanSlider page={Math.min(page, shown.length - 1)} onPageChange={setPage} resetKey={`${current.id}:${tab}`}>
           {shown.map((plan, i) => (
-            <article
-              key={i}
-              ref={(el) => {
-                articles.current[i] = el;
-              }}
-              className="w-full shrink-0 snap-center [scroll-snap-stop:always]"
-            >
+            <article key={i}>
               <PlanView plan={plan} delta={filtering && groups && plan !== groups.recommended ? groups.recommended.leaveAt - plan.leaveAt : 0} />
             </article>
           ))}
-        </div>
+        </PlanSlider>
 
         {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 바로 위에 달라붙는다. */}
         {!done && (
