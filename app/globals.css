@@ -188,6 +188,31 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   animation: alert-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* 이동 중 점 세 개: 차례로 올라갔다 내려오며 진행 중임을 알린다. */
+@keyframes dot-wave {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+.dot-wave {
+  animation: dot-wave 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot-wave {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

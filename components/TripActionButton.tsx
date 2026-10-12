@@ -52,10 +52,22 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
     );
   }
   if (phase === "moving") {
-    // 눌러도 아무 일이 없지만, 흐려 보이지 않게 disabled 대신 aria-disabled로 둔다.
+    // 눌러도 아무 일이 없지만 흐려 보이지 않게 disabled 대신 aria-disabled로 둔다.
+    // 배경은 비활성(muted)보다 한 단계 어두운 border 색.
     return (
-      <Button size="lg" className="w-full cursor-default" aria-disabled="true" aria-live="polite">
+      <Button
+        size="lg"
+        className="w-full cursor-default bg-border text-on-surface hover:bg-border"
+        aria-disabled="true"
+        aria-live="polite"
+      >
         이 계획대로 이동중
+        {/* 점 세 개가 차례로 움직이는 진행 중 표시 */}
+        <span className="ml-1 inline-flex items-center gap-1" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="dot-wave size-1 rounded-pill bg-current" style={{ animationDelay: `${i * 0.2}s` }} />
+          ))}
+        </span>
       </Button>
     );
   }
