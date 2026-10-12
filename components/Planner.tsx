@@ -567,26 +567,18 @@ export default function Planner() {
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 
 const PlanView = memo(function PlanView({ plan }: { plan: Plan }) {
-  const walkOnly = !plan.legs.some((l) => l.type === "ride" || l.type === "bus");
   return (
     <>
       <section className="px-5 pb-8">
-        <p className="text-body text-muted-foreground">
-          {fmt(plan.arriveBy)} 약속 · 총 {plan.arriveAt - plan.leaveAt}분 걸려요
-        </p>
-        <p className="mt-1 text-time font-medium">
+        <p className="text-time font-medium">
           <span className="text-brand">{fmt(plan.leaveAt)}</span>
-          <span className="ml-2 text-subheading font-medium text-on-surface">에 출발하세요</span>
+          <span className="ml-1 text-subheading font-medium text-on-surface">에 출발하면</span>
         </p>
-        <p className="mt-3 text-body text-muted-foreground">
-          {walkOnly
-            ? "걸어서 이동"
-            : plan.transfers === 0
-              ? "환승 없이"
-              : `환승 ${plan.transfers}번`}{" "}
-          · 약속 {plan.arriveBy - plan.arriveAt}분 전 도착
+        <p className="text-time font-medium">
+          {fmt(plan.arriveAt)}
+          <span className="ml-1 text-subheading font-medium text-on-surface">에 도착해요</span>
         </p>
-        {walkOnly && <p className="mt-1 text-caption text-muted-foreground">지하철 없이 걸어서 가는 방법이에요</p>}
+        <p className="mt-3 text-body text-muted-foreground">약속 {plan.arriveBy - plan.arriveAt}분 전 도착</p>
       </section>
 
       <div className="mx-5 border-t border-border" />
