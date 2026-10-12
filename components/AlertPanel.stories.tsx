@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>
 export const TwoActions: Story = {
   args: {
     title: "출발 안내 화면을 나갈까요?",
-    description: "이 안내는 안내 내역에서 다시 확인할 수 있어요.",
+    description: "안내 내역에서 다시 확인할 수 있어요.",
     children: (
       <>
         <Button variant="secondary" size="lg">취소</Button>
