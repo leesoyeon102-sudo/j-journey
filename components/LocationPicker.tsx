@@ -51,6 +51,10 @@ function readPosition(): Promise<GeolocationPosition> {
 }
 
 function deniedMessage(code: number) {
+  // http://IP 같은 보안 연결(HTTPS)이 아닌 주소에서는 브라우저가 위치 허용 창을 아예 띄우지 않는다.
+  if (typeof window !== "undefined" && !window.isSecureContext) {
+    return "이 주소(http)에서는 브라우저가 위치 허용 창을 띄울 수 없어요. 주소로 검색해 주세요.";
+  }
   return code === 1
     ? "위치 권한이 꺼져 있어요. 주소로 검색하거나, 브라우저 설정에서 위치를 허용해 주세요."
     : "현재 위치를 가져오지 못했어요. 주소로 검색해 주세요.";
