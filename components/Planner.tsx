@@ -199,6 +199,12 @@ export default function Planner() {
     };
 
     const depart = () => {
+      // 장소·주소 이름은 보내지 않는다. 어떤 종류의 안으로 출발했는지만 기록한다.
+      amplitude.track("Departure Recorded", {
+        plan_tab: tab,
+        is_recommended: groups ? active === groups.recommended : true,
+        transfers: active.transfers,
+      });
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
     };
