@@ -132,13 +132,16 @@ export default function Planner() {
   // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
   useFeedbackBlock(Boolean(current));
 
-  // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다.
+  // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다. (이미 출발했으면 이동 중 카드로 돌아올 수 있어 띄우지 않는다.)
   const showingResult = Boolean(current);
+  const guardLeave = showingResult && !current?.departedAt;
   useEffect(() => {
     clearPendingResult();
-    setLeaveGuard(showingResult);
-    return () => setLeaveGuard(false);
   }, [showingResult]);
+  useEffect(() => {
+    setLeaveGuard(guardLeave);
+    return () => setLeaveGuard(false);
+  }, [guardLeave]);
 
   // 출발 안내와 입력 화면을 오갈 때, 앞 화면에서 내려가 있던 스크롤 위치가 남지 않게 맨 위에서 시작한다.
   useEffect(() => {
