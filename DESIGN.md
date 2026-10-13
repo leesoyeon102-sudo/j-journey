@@ -15,7 +15,7 @@ colors:
   toggle-off: "#C9CDD3"
   divider: "#DFE6F0"
   note-fill: "#e6e8eb"
-  ink-soft: "#3C4044"
+  ink-soft: "#484D51"
   secondary-fill: "#E8EBED"
   fill-strong: "#DADDE0"
   muted: "#F6F7F7"
@@ -283,7 +283,7 @@ components:
 
 - **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
 - **note-fill (#E6E8EB):** 출발 안내 맨 아래 안내 박스(버스 시각 안내)의 배경. 파란 기운이 아주 약하게 도는 연한 회색이다. 글자는 `muted-foreground`.
-- **ink-soft (#3C4044):** 검정보다 한 단계 옅은 차콜 글자색. 출발 안내의 "카카오맵" 버튼 글자에 쓴다.
+- **ink-soft (#484D51):** 검정보다 옅은 차콜 글자색(밝기 30%). 출발 안내의 "카카오맵" 버튼 글자에 쓴다.
 - **divider (#DFE6F0):** 출발 안내에서 시각 안내와 타임라인을 가르는 가로선.
 - **tab-icon (#D2D5D9) / tab-label (#838B91):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
 - **disabled-fill (#86878A):** 메인(primary) 버튼이 비활성일 때의 배경. 글자는 흰색 그대로, 투명도는 쓰지 않는다.
