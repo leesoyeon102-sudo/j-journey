@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
 import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
-import { draft, lockOrigin, setReusedSearch } from "@/lib/draft";
+import { draft, lockOrigin } from "@/lib/draft";
 import { removeRoute, removeTrip, saveLastDestination, saveLastOrigin, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
 
@@ -88,7 +88,6 @@ export default function HistoryPage() {
     if (plan.origin !== "현재 위치") lockOrigin();
     saveLastDestination({ name: plan.destination, area: "", ...plan.destCoord });
     Object.assign(draft, { time: fmt(plan.arriveBy), tomorrow: false });
-    setReusedSearch(true);
     // 안내 내역을 다시 쓰기 시작했을 때 한 번만 센다.
     amplitude.track("Route Reused");
     router.push("/");

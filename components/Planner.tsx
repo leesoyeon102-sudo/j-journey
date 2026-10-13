@@ -20,7 +20,7 @@ import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { readCurrentPlace } from "@/lib/currentLocation";
-import { draft, isOriginLocked, isReusedSearch, lockOrigin, setReusedSearch } from "@/lib/draft";
+import { draft, isOriginLocked, lockOrigin } from "@/lib/draft";
 import type { Place } from "@/lib/places";
 import {
   addTrip,
@@ -121,8 +121,6 @@ export default function Planner() {
   };
   const set = <K extends keyof Form>(k: K, v: Form[K]) => {
     if (k === "time" || k === "tomorrow") Object.assign(draft, { [k]: v });
-    // 불러온 값을 직접 고치면 더는 "다시 검색한 계획"이 아니다. (내일 토글은 약속 날짜만 고르는 거라 해당 없음)
-    if (k !== "tomorrow") setReusedSearch(false);
     // 출발지를 직접 고르면 그 값을 지킨다. (현재 위치 자동 입력은 멈춘다)
     if (k === "origin") lockOrigin();
     setEdit((e) => ({ ...e, [k]: v }));
@@ -202,8 +200,7 @@ export default function Planner() {
       setTab("recommended");
       setPage(0);
       // 추천 안을 우선 저장하고, 다른 안으로 도착 기록을 남기면 그 안으로 바꾼다.
-      setActiveId(addTrip(result.plan, { reused: isReusedSearch() }).id);
-      setReusedSearch(false);
+      setActiveId(addTrip(result.plan).id);
       setEditing(false);
     } catch {
       setError("경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요.");
@@ -315,7 +312,7 @@ export default function Planner() {
                 durationMin={active.arriveAt - active.leaveAt}
                 onDepart={depart}
                 onArrive={(onTime) => arrive(active, onTime)}
-                notToday={!current.reused && Boolean(active.date && active.date > dateString(0))}
+                notToday={Boolean(active.date && active.date > dateString(0))}
               />
             </div>
           </div>

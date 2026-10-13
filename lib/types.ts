@@ -146,6 +146,4 @@ export interface Trip {
   plan: Plan;
   /** 경로 내역에서 삭제한 기록. 내역에는 안 보이지만 로드맵에는 계속 쌓인다. */
   hidden?: boolean;
-  /** 안내 내역의 "이 계획 다시 검색하기"로 불러와 검색한 안내. 약속이 내일이어도 바로 출발할 수 있다. */
-  reused?: boolean;
 }
