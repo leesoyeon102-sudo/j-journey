@@ -9,6 +9,8 @@ colors:
   toast: "#646769"
   surface: "#FFFFFF"
   on-surface: "#14171F"
+  tab-icon: "#D2D5D9"
+  tab-label: "#888A8C"
   secondary-fill: "#E8EBED"
   fill-strong: "#DADDE0"
   muted: "#F6F7F7"
@@ -186,7 +188,11 @@ components:
     textColor: "{colors.muted-foreground}"
     typography: "{typography.body}"
   tab-icon-inactive:
-    textColor: "{colors.inactive}"
+    textColor: "{colors.tab-icon}"
+  tab-label-inactive:
+    textColor: "{colors.tab-label}"
+  tab-active:
+    textColor: "{colors.primary}"
   input-placeholder:
     textColor: "{colors.placeholder}"
     typography: "{typography.body}"
@@ -270,6 +276,7 @@ components:
 ## Colors
 
 - **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
+- **tab-icon (#D2D5D9) / tab-label (#888A8C):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
 - **secondary-fill (#E8EBED) / fill-strong (#DADDE0):** secondary-fill은 얼럿 취소 같은 보조(secondary) 버튼의 배경이고, fill-strong은 그 버튼을 누를 때와 "이 계획대로 이동중" 버튼의 배경이다. 글자는 `on-surface`.
 - **toast (#646769):** 토스트 배경. 색상 205°, 채도 2%의 회색을 불투명(100%)하게 고정한 값.
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
@@ -293,7 +300,7 @@ components:
 
 - **time (34px):** 출발 시각 전용. 화면에서 가장 크게 읽혀야 하는 숫자에만 쓴다. 홈의 이동 중 카드에서는 도착 시각도 같은 크기로 쓰되, 파랑은 출발 시각에만 준다.
 - **display (58px):** 랜딩·디자인 시스템 페이지 같은 큰 머리말 전용. 앱 화면 안에서는 쓰지 않는다.
-- **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목.
+- **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목. 홈·안내 내역·로드맵의 화면 제목은 SemiBold(600)이다.
 - **body-lg (16px) / body (14px):** 본문. 앱 기본은 14px.
 - **label (14px, 600):** 버튼과 입력 라벨. 버튼 글자는 SemiBold(600)이다.
 - **label-lg (15px, 600):** 안내 내역 상세의 "이 계획 다시 안내받기" 버튼.
@@ -322,7 +329,7 @@ components:
 - **Input:** 44px 높이, muted 배경, border 테두리. 포커스 시 테두리가 `on-surface`로 진해지고, 오류(`aria-invalid`)면 danger 테두리가 된다.
 - **Dialog·Alert·시각 선택 창:** `glass-strong` 중앙 패널(16px). 뒤 화면은 `on-surface` 15% 오버레이와 약한 블러로 물린다. 닫기 버튼 기본 제공.
 - **Glass card:** 홈의 출발지·도착지·약속 시각 칸, 이동 중 카드, 안내 내역 항목, 로드맵 통계가 쓴다. `glass`(또는 `glass-strong`) + 16px 반경. 코드에서는 `glass`, `glass-strong` 유틸리티로 쓴다.
-- **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `on-surface` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `muted-foreground` 글자에 `inactive` 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
+- **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#888A8C) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
 - **Status bar:** 화면 맨 위 배경색과 같은 색으로 칠한다(`ThemeColor`). 홈·이동 중 홈은 `sky`, 나머지 화면은 `sky-pale`이라 배경이 상태 표시줄까지 끊김 없이 이어진다. 안내 화면의 위쪽 내비게이션도 흰색 대신 `sky-pale` 80% + 블러로 둬서 같은 이음새를 만든다.
 - **Sky backdrop:** 홈과 이동 중 홈의 맨 위에 깔리는 하늘(위 sky → sky-soft → 흰색, 한쪽에 sun 번짐, 흰 뭉게구름 세 점). `SkyBackdrop` 컴포넌트.
 

@@ -74,11 +74,11 @@ export default function TabBar() {
                   }
                 }}
                 className={`relative flex h-12 flex-col items-center justify-center gap-0.5 rounded-input text-caption transition-colors duration-300 ${
-                  active ? "font-semibold text-on-surface" : "font-normal text-muted-foreground"
+                  active ? "font-semibold text-primary" : "font-normal text-tab-label"
                 }`}
               >
                 {/* 비활성 아이콘은 글자보다 한 단계 연한 inactive 색 */}
-                <span className={`flex transition-colors duration-300 ${active ? "" : "text-inactive"}`}>{t.icon(active)}</span>
+                <span className={`flex transition-colors duration-300 ${active ? "" : "text-tab-icon"}`}>{t.icon(active)}</span>
                 {t.label}
               </Link>
             </li>
