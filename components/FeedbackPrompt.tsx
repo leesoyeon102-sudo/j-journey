@@ -6,11 +6,11 @@ import Toast from "@/components/Toast";
 import { hasAskedFeedback, markFeedbackAsked, onArrived, submitFeedback } from "@/lib/feedback";
 
 /** "도착했어요"를 누른 뒤 이 시간이 지나면 피드백 창을 띄운다. */
-const DELAY_MS = 2000;
+const DELAY_MS = 1500;
 
 /**
  * 앱 어디서든 한 번만 별점·의견을 묻는다.
- * 출발 안내에서 "도착했어요"를 누르면 어떤 화면에 있든 2초 뒤에 뜬다.
+ * 출발 안내에서 "도착했어요"를 누르면 어떤 화면에 있든 1.5초 뒤에 뜬다.
  * 보냈든 닫았든 한 번 물었으면 다시 묻지 않는다.
  */
 export default function FeedbackPrompt() {

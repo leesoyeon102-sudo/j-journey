@@ -15,7 +15,7 @@ interface Props {
 
 const LABELS = ["", "별로예요", "아쉬워요", "보통이에요", "좋아요", "아주 좋아요"];
 
-/** 도착했어요를 누른 2초 뒤 한 번 띄우는 별점·의견 얼럿 */
+/** 도착했어요를 누른 1.5초 뒤 한 번 띄우는 별점·의견 얼럿 */
 export default function FeedbackAlert({ onSubmit, onClose }: Props) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
