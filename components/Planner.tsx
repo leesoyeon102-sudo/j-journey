@@ -20,7 +20,7 @@ import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
-import { setTabOverride } from "@/lib/tabOverride";
+import { setHomeAction, setTabOverride } from "@/lib/tabOverride";
 import { clearPendingResult, peekPendingResult } from "@/lib/pending";
 import type { Place } from "@/lib/places";
 import {
@@ -138,6 +138,16 @@ export default function Planner() {
   const keepHistoryTab = Boolean(current && current.id === historyTripId);
   useEffect(() => {
     setTabOverride(keepHistoryTab ? "/history" : null);
+  }, [keepHistoryTab]);
+  useEffect(() => {
+    if (!keepHistoryTab) return;
+    // 이 동안 탭바의 "홈"을 누르면 출발 안내를 닫고 홈 입력 화면으로 간다. (뒤로가기와 같게 확인 창은 없다)
+    setHomeAction(() => {
+      setEditing(true);
+      setActiveId(null);
+      setGroups(null);
+    });
+    return () => setHomeAction(null);
   }, [keepHistoryTab]);
   useEffect(() => () => setTabOverride(null), []);
   useEffect(() => {

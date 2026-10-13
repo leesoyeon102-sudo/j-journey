@@ -20,6 +20,13 @@ export function setTabOverride(href: string | null) {
   listeners.forEach((l) => l());
 }
 
+// 주소는 "/"인데 탭바는 "안내 내역"이 선택된 동안, 탭바의 "홈"을 누르면 실행할 일(출발 안내를 닫고 입력 화면으로).
+let homeAction: (() => void) | null = null;
+export const setHomeAction = (fn: (() => void) | null) => {
+  homeAction = fn;
+};
+export const runHomeAction = () => homeAction?.();
+
 export function useTabOverride() {
   return useSyncExternalStore(
     subscribe,

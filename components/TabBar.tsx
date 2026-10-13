@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { isLeaveGuardActive, requestLeave } from "@/lib/leaveGuard";
-import { useTabOverride } from "@/lib/tabOverride";
+import { runHomeAction, useTabOverride } from "@/lib/tabOverride";
 
 // 홈·안내 내역은 채운(fill) 아이콘이고 선택 여부는 색으로만 구분한다. (비활성 muted-foreground, 활성 on-surface)
 const HOME =
@@ -71,6 +71,12 @@ export default function TabBar() {
                 href={t.href}
                 aria-current={active ? "page" : undefined}
                 onClick={(e) => {
+                  // 경로 내역에서 다시 안내받은 출발 안내가 떠 있을 땐 "홈"이 같은 주소라 이동이 없다. 안내를 닫고 홈 입력 화면으로 보낸다.
+                  if (t.href === "/" && route === "/" && override) {
+                    e.preventDefault();
+                    runHomeAction();
+                    return;
+                  }
                   // 출발 안내 화면에서 다른 탭으로 나가면 확인 창을 먼저 띄운다.
                   if (!active && t.href !== route && isLeaveGuardActive()) {
                     e.preventDefault();
