@@ -23,7 +23,7 @@ interface Props {
 function PlaceRow({ label, place, onClick }: { label: string; place: PlaceView | null; onClick: () => void }) {
   return (
     // 오른쪽 맞바꾸기 버튼과 겹치지 않게 오른쪽을 비워 둔다.
-    <button type="button" onClick={onClick} className="flex min-h-16 w-full flex-col justify-center py-3 pl-4 pr-16 text-left">
+    <button type="button" onClick={onClick} className="flex min-h-16 w-full flex-col justify-center py-4 pl-4 pr-16 text-left">
       <span className="text-caption text-muted-foreground">{label}</span>
       <span className="truncate text-body-lg font-medium">{place?.name || "장소 선택"}</span>
       {place?.area && <span className="mt-1 truncate text-caption text-muted-foreground">{place.area}</span>}

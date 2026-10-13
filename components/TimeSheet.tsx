@@ -47,7 +47,7 @@ export default function TimeSheet({ label, value, onChange, bare = false }: Prop
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex min-h-16 w-full flex-col justify-center px-4 py-3 text-left ${bare ? "" : "glass-strong rounded-nav"}`}
+        className={`flex min-h-16 w-full flex-col justify-center px-4 py-4 text-left ${bare ? "" : "glass-strong rounded-nav"}`}
       >
         <span className="text-caption text-muted-foreground">{label}</span>
         <span className="text-body-lg font-medium tabular-nums">{display(a, h, m)}</span>
