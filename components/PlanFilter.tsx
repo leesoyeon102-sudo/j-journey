@@ -48,7 +48,7 @@ export default function PlanFilter({ value, onChange, unavailable = {}, count, p
           {Array.from({ length: count }, (_, i) => (
             <span
               key={i}
-              className={`block rounded-pill transition-all ${i === page ? "h-2 w-5 bg-primary" : "size-2 bg-border"}`}
+              className={`block rounded-pill transition-all ${i === page ? "h-2 w-5 bg-primary" : "size-2 bg-surface"}`}
             />
           ))}
         </div>
