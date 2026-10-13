@@ -2,6 +2,29 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* G마켓 산스: 공개 CDN(jsDelivr)에서 불러온다. 굵기는 Light·Medium·Bold 세 가지뿐이라
+   본문(400 이하)=Light, 중간(500)=Medium, 굵은 글자(600 이상)=Bold로 묶는다. */
+@font-face {
+  font-family: "GmarketSans";
+  font-weight: 100 400;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff") format("woff");
+}
+
+@font-face {
+  font-family: "GmarketSans";
+  font-weight: 500;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff") format("woff");
+}
+
+@font-face {
+  font-family: "GmarketSans";
+  font-weight: 600 900;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff") format("woff");
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -77,10 +100,10 @@
   /* 출발 시각 등 강조 파랑. shadcn의 accent(호버 배경)와 이름이 겹쳐 brand로 분리했다. */
   --color-brand: var(--color-accent-brand);
 
-  /* ── 글꼴: GT Standard는 유료라 설치돼 있지 않으면 기존 한글 폰트로 대체된다 ── */
-  --font-gt-standard-m: "GT Standard M", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+  /* ── 글꼴: G마켓 산스를 먼저 쓰고, 불러오지 못하면 기존 한글 폰트로 대체된다. 변수 이름(gt-standard)은 예전 이름 그대로 둔다. ── */
+  --font-gt-standard-m: "GmarketSans", "GT Standard M", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
     "Noto Sans KR", "Segoe UI", sans-serif;
-  --font-gt-standard-l: "GT Standard L", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+  --font-gt-standard-l: "GmarketSans", "GT Standard L", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
     "Noto Sans KR", "Segoe UI", sans-serif;
   --font-sans: var(--font-gt-standard-m);
   --font-heading: var(--font-gt-standard-l);

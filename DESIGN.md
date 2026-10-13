@@ -42,60 +42,60 @@ colors:
   glass-border: "#FFFFFFB3"
 typography:
   display:
-    fontFamily: GT Standard L
+    fontFamily: Gmarket Sans
     fontSize: 58px
     fontWeight: 500
     lineHeight: 1.05
     letterSpacing: -0.58px
   heading:
-    fontFamily: GT Standard L
+    fontFamily: Gmarket Sans
     fontSize: 23px
     fontWeight: 500
     lineHeight: 1.39
     letterSpacing: -0.23px
   time:
-    fontFamily: GT Standard L
+    fontFamily: Gmarket Sans
     fontSize: 34px
     fontWeight: 500
     lineHeight: 1.2
     letterSpacing: -0.34px
   subheading:
-    fontFamily: GT Standard L
+    fontFamily: Gmarket Sans
     fontSize: 19px
     fontWeight: 500
     lineHeight: 1.33
     letterSpacing: -0.19px
   body-lg:
-    fontFamily: GT Standard M
+    fontFamily: Gmarket Sans
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: -0.16px
   body:
-    fontFamily: GT Standard M
+    fontFamily: Gmarket Sans
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.43
     letterSpacing: -0.14px
   label:
-    fontFamily: GT Standard M
+    fontFamily: Gmarket Sans
     fontSize: 14px
     fontWeight: 600
     lineHeight: 1.43
     letterSpacing: -0.14px
   label-lg:
-    fontFamily: GT Standard M
+    fontFamily: Gmarket Sans
     fontSize: 15px
     fontWeight: 600
     lineHeight: 1.43
     letterSpacing: -0.15px
   caption:
-    fontFamily: GT Standard M
+    fontFamily: Gmarket Sans
     fontSize: 12px
     fontWeight: 500
     lineHeight: 1.4
   caption-lg:
-    fontFamily: GT Standard M
+    fontFamily: Gmarket Sans
     fontSize: 13px
     fontWeight: 500
     lineHeight: 1.4
@@ -305,7 +305,7 @@ components:
 
 ## Typography
 
-제목류는 GT Standard L, 본문류는 GT Standard M이다. 유료 글꼴이라 없으면 Pretendard, Apple SD Gothic Neo, Noto Sans KR 순으로 대체된다. 글자 간격은 크기에 비례해 약간 좁게(-0.01em 안팎) 둔다.
+글꼴은 G마켓 산스다. 둥근 기하학적 산세리프라 숫자와 한글이 또렷하면서 포근하다. 무료 상업용 글꼴이라 공개 CDN(jsDelivr)에서 불러오고, 불러오지 못하면 Pretendard, Apple SD Gothic Neo, Noto Sans KR 순으로 대체된다. 굵기는 Light·Medium·Bold 세 가지뿐이라 400 이하는 Light, 500은 Medium, 600 이상은 Bold로 묶인다. 글자 간격은 크기에 비례해 약간 좁게(-0.01em 안팎) 둔다.
 
 - **time (34px):** 출발 시각 전용. 화면에서 가장 크게 읽혀야 하는 숫자에만 쓴다. 홈의 이동 중 카드에서는 도착 시각도 같은 크기로 쓰되, 파랑은 출발 시각에만 준다.
 - **display (58px):** 랜딩·디자인 시스템 페이지 같은 큰 머리말 전용. 앱 화면 안에서는 쓰지 않는다.
