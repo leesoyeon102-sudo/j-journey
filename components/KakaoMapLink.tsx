@@ -21,10 +21,10 @@ interface Props {
   to: Place;
 }
 
-/** 걷는 구간 옆에 붙는 작은 흰색 버튼. 같은 출발·도착 지점으로 카카오맵 도보 길찾기를 새 창에서 연다. */
+/** 걷는 구간 옆에 붙는 작은 흰색 버튼(글자 13px·차콜, 높이 26px·좌우 안쪽 여백 11px). 같은 출발·도착 지점으로 카카오맵 도보 길찾기를 새 창에서 연다. */
 export default function KakaoMapLink({ from, to }: Props) {
   return (
-    <Button asChild variant="outline" size="xs">
+    <Button asChild variant="outline" size="xs" className="h-[26px] px-[11px] text-caption-lg text-ink-soft">
       <a href={kakaoWalkUrl(from, to)} target="_blank" rel="noopener noreferrer" aria-label={`${from.name}에서 ${to.name}까지 카카오맵 도보 길찾기`}>
         카카오맵
       </a>

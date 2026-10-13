@@ -215,7 +215,7 @@ export default function HistoryPage() {
                     <Button
                       onClick={() => (moving ? setConfirmRoute(r) : replan(r))}
                       disabled={busyKey !== null}
-                      className="mt-5 h-11 w-full text-label-lg"
+                      className="mt-5 h-11 w-full text-label"
                     >
                       {busyKey === r.key ? "계산 중…" : "이 계획 다시 안내받기"}
                     </Button>
