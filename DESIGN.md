@@ -11,6 +11,8 @@ colors:
   on-surface: "#14171F"
   tab-icon: "#D2D5D9"
   tab-label: "#888A8C"
+  disabled-fill: "#86878A"
+  toggle-off: "#C9CDD3"
   secondary-fill: "#E8EBED"
   fill-strong: "#DADDE0"
   muted: "#F6F7F7"
@@ -20,8 +22,8 @@ colors:
   inactive: "#C9CBCC"
   border: "#E7E8E8"
   border-subtle: "#F0F1F1"
-  accent: "#2F5BFF"
-  accent-subtle: "#EAEFFF"
+  accent: "#3E7BFF"
+  accent-subtle: "#ECF2FF"
   danger: "#FF5A5E"
   danger-subtle: "#FFEFEF"
   on-danger: "#45192F"
@@ -277,6 +279,8 @@ components:
 
 - **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
 - **tab-icon (#D2D5D9) / tab-label (#888A8C):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
+- **disabled-fill (#86878A):** 메인(primary) 버튼이 비활성일 때의 배경. 글자는 흰색 그대로, 투명도는 쓰지 않는다.
+- **toggle-off (#C9CDD3):** 꺼진 토글의 배경. 켜지면 accent.
 - **secondary-fill (#E8EBED) / fill-strong (#DADDE0):** secondary-fill은 얼럿 취소 같은 보조(secondary) 버튼의 배경이고, fill-strong은 그 버튼을 누를 때와 "이 계획대로 이동중" 버튼의 배경이다. 글자는 `on-surface`.
 - **toast (#646769):** 토스트 배경. 색상 205°, 채도 2%의 회색을 불투명(100%)하게 고정한 값.
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
@@ -286,7 +290,7 @@ components:
 - **muted (#F6F7F7):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#6B6E70), placeholder와 비활성 글자는 `placeholder`(#989B9D)를 쓴다.
 - **border (#E7E8E8):** 카드·outline 버튼·입력의 테두리와 구분선.
 - **border-subtle (#F0F1F1):** 탭바 위의 구분선처럼 화면을 가르되 눈에 덜 띄어야 하는 선.
-- **accent (#2F5BFF) / accent-subtle (#EAEFFF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 안내 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
+- **accent (#3E7BFF) / accent-subtle (#ECF2FF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 켜진 토글의 배경도 accent를 따른다. 안내 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
 - **success (#22B35E) / success-subtle (#E9F7EF):** 지금 진행 중이라는 신호. 이동 중 카드의 동그란 점처럼 작은 도형 채움으로만 쓰고(`success-subtle`은 같은 색 10%), 글자색으로는 쓰지 않는다. 흰 바탕에서 대비가 부족하다.
 - **sky (#3D8BEB) / sky-soft (#A6CCF7):** 홈 배경 하늘의 위쪽과 가운데 색. 위에서 아래로 sky → sky-soft → 흰색으로 풀린다. 하늘 위 글자(머리말·보조 문구)는 `on-sky`(흰색)와 `on-sky-muted`(흰색 78%)를 쓴다.
 - **sky-pale (#D6E8FB):** 홈이 아닌 화면(안내, 안내 내역, 로드맵)의 맨 위에서 흰색으로 풀리는 연한 하늘. 유리 면이 흰 바탕에 묻히지 않도록 뒤에 깔아 둔다.

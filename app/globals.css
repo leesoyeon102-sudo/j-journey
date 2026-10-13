@@ -14,6 +14,8 @@
   --color-on-surface: #14171f;
   --color-tab-icon: #d2d5d9; /* 탭바 비활성 아이콘 */
   --color-tab-label: #888a8c; /* 탭바 비활성 글자 */
+  --color-disabled-fill: #86878a; /* 메인(primary) 버튼이 비활성일 때 배경 */
+  --color-toggle-off: #c9cdd3; /* 꺼진 토글 배경 */
   --color-secondary-fill: #e8ebed; /* 얼럿 취소 같은 보조 버튼 배경 */
   --color-fill-strong: #dadde0; /* "이 계획대로 이동중" 버튼 배경, 보조 버튼을 누를 때 */
   --color-muted: #f6f7f7;
@@ -24,8 +26,8 @@
   --color-border: #e7e8e8;
   --color-border-subtle: #f0f1f1;
   /* DESIGN.md의 accent(파랑). shadcn의 accent(호버 배경)와 겹쳐 코드에서는 brand, 값은 --color-accent-brand */
-  --color-accent-brand: #2f5bff;
-  --color-accent-subtle: #eaefff; /* accent 10%를 흰 배경에 올린 색 */
+  --color-accent-brand: #3e7bff;
+  --color-accent-subtle: #ecf2ff; /* accent 10%를 흰 배경에 올린 색 */
   --color-danger: #ff5a5e;
   --color-danger-subtle: #ffefef;
   --color-on-danger: #45192f;
