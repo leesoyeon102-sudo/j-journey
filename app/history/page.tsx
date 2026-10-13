@@ -206,7 +206,9 @@ export default function HistoryPage() {
                 </div>
 
                 {open && (
-                  <div className="fade-in border-t border-glass-border px-5 pb-5 pt-4">
+                  <div className="fade-in px-5 pb-5">
+                    {/* 디바이더: 카드 좌우에서 12px씩 안쪽으로 들여서 그린다. (안쪽 여백이 20px라 -8px) */}
+                    <div className="-mx-2 mb-4 border-t border-divider" />
                     <p className="mb-4 text-caption text-muted-foreground">
                       마지막 안내 · {fmt(plan.leaveAt)} 출발 · {fmt(plan.arriveBy)} 약속
                     </p>
