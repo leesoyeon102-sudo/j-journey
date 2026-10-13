@@ -13,7 +13,7 @@ colors:
   tab-label: "#838B91"
   disabled-fill: "#86878A"
   toggle-off: "#C9CDD3"
-  divider: "#CAD8E8"
+  divider: "#DFE6F0"
   secondary-fill: "#E8EBED"
   fill-strong: "#DADDE0"
   muted: "#F6F7F7"
@@ -239,7 +239,7 @@ components:
     height: 36px
     padding: 16px
   filter-chip-selected:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "{colors.accent}"
     textColor: "{colors.on-primary}"
   trip-progress-card:
     backgroundColor: "{colors.surface}"
@@ -279,7 +279,7 @@ components:
 ## Colors
 
 - **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
-- **divider (#CAD8E8):** 출발 안내에서 시각 안내와 타임라인을 가르는 가로선.
+- **divider (#DFE6F0):** 출발 안내에서 시각 안내와 타임라인을 가르는 가로선.
 - **tab-icon (#D2D5D9) / tab-label (#838B91):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
 - **disabled-fill (#86878A):** 메인(primary) 버튼이 비활성일 때의 배경. 글자는 흰색 그대로, 투명도는 쓰지 않는다.
 - **toggle-off (#C9CDD3):** 꺼진 토글의 배경. 켜지면 accent.
