@@ -20,23 +20,17 @@ export function markFeedbackAsked() {
   }
 }
 
-type VisitedPage = "history" | "roadmap";
+const ARRIVED_EVENT = "j-outing:arrived";
 
-/** 경로 내역·로드맵에 한 번이라도 들어와 봤는지 (피드백을 묻는 조건) */
-export function markVisited(page: VisitedPage) {
-  try {
-    localStorage.setItem(`j-outing:visited-${page}`, "1");
-  } catch {
-    // 저장 공간을 쓸 수 없는 환경에서는 조용히 무시
-  }
+/** "도착했어요"를 눌렀다고 알린다. 피드백 창이 이 신호를 받아 잠시 뒤 띄운다. */
+export function notifyArrived() {
+  window.dispatchEvent(new Event(ARRIVED_EVENT));
 }
 
-export function hasVisited(page: VisitedPage): boolean {
-  try {
-    return localStorage.getItem(`j-outing:visited-${page}`) !== null;
-  } catch {
-    return false;
-  }
+/** 도착 신호를 구독한다. */
+export function onArrived(cb: () => void) {
+  window.addEventListener(ARRIVED_EVENT, cb);
+  return () => window.removeEventListener(ARRIVED_EVENT, cb);
 }
 
 /** 별점과 의견을 Amplitude 이벤트로 보낸다. (별도 서버·DB는 없다) */

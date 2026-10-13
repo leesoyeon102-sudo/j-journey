@@ -15,7 +15,7 @@ import TripMenu from "./TripMenu";
 import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
-import { useFeedbackBlock } from "@/lib/feedbackGate";
+import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { clearPendingResult, peekPendingResult } from "@/lib/pending";
 import type { Place } from "@/lib/places";
@@ -118,9 +118,6 @@ export default function Planner() {
   // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
 
-  // 출발 안내가 떠 있는 동안에는 피드백 얼럿을 띄우지 않는다.
-  useFeedbackBlock(Boolean(current));
-
   // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다. (이미 출발했으면 이동 중 카드로 돌아올 수 있어 띄우지 않는다.)
   const showingResult = Boolean(current);
   const guardLeave = showingResult && !current?.departedAt;
@@ -215,6 +212,7 @@ export default function Planner() {
         amplitude.track("Arrival Recorded", { on_time: onTime });
       }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
+      notifyArrived();
       setArrivedAlert(true);
     };
     const closeArrivedAlert = () => {

@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import Header from "@/components/Header";
 import RoadmapMap from "@/components/RoadmapMap";
 import { buildRoadmap } from "@/lib/routes";
-import { markVisited } from "@/lib/feedback";
 import { useHome, useTrips } from "@/lib/storage";
 
 export default function RoadmapPage() {
@@ -13,7 +11,6 @@ export default function RoadmapPage() {
   const map = buildRoadmap(trips);
   const empty = map.tripCount === 0;
   // 피드백을 묻는 조건: 로드맵에 한 번 들어와 봤다.
-  useEffect(() => markVisited("roadmap"), []);
 
   return (
     <main className="fade-in">
