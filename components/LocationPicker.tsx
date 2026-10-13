@@ -212,10 +212,10 @@ export default function LocationPicker({
           </Button>
 
           <p className="mb-2 mt-7 text-caption text-muted-foreground">또는 주소·건물 이름으로 검색</p>
-          {/* 라인 인풋: 밑줄 하나로 그리고, 입력 중에는 밑줄이 진해진다. 검색 버튼은 같은 줄 오른쪽 끝에 둔다. */}
+          {/* 라인 인풋: 밑줄(input-line) 하나로 그리고, 입력 중에는 밑줄이 진해진다. 검색 버튼은 같은 줄 오른쪽 끝에 둔다. */}
           <form
             onSubmit={search}
-            className="flex items-center gap-2 border-b border-divider transition-colors focus-within:border-on-surface"
+            className="flex items-center gap-2 border-b border-input-line transition-colors focus-within:border-on-surface"
           >
             <Input
               value={q}

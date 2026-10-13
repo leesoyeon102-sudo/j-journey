@@ -48,6 +48,7 @@
   --color-divider: #dfe6f0; /* 출발 안내의 가로 디바이더 */
   --color-note-fill: #e6e8eb; /* 출발 안내 맨 아래 안내 박스 배경 */
   --color-ink-soft: #484d51; /* 카카오맵 버튼 글자처럼 검정보다 옅은 차콜 (색상 205°, 채도 6%, 밝기 30%) */
+  --color-input-line: #d8e1ed; /* 위치 검색 라인 인풋의 밑줄. divider보다 밝기 2% 어둡다 */
   --color-secondary-fill: #e8ebed; /* 얼럿 취소 같은 보조 버튼 배경 */
   --color-fill-strong: #dadde0; /* "이 계획대로 이동중" 버튼 배경, 보조 버튼을 누를 때 */
   --color-muted: #f6f7f7;
