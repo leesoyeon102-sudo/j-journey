@@ -128,11 +128,12 @@ export default function LocationPicker({
     <div className="sky-wash fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col overflow-y-auto">
       {/* 이 화면의 맨 위는 연한 하늘이라 상태 표시줄도 그 색으로 맞춘다. (아래 홈의 하늘색을 따라가지 않게) */}
       <ThemeColor token="sky-pale" />
-      <div className="flex items-center justify-between px-5 pt-10">
+      {/* 제목 위치·크기는 탭 화면의 Header와 같게(위 여백 28px, 제목 heading semibold) */}
+      <div className="flex items-center justify-between px-5 pt-7">
         <h2 className="text-heading font-semibold">{title}</h2>
         {onClose && (
           // 아이콘이 오른쪽 안쪽 여백(20px)에 맞도록 버튼의 안쪽 빈 공간만큼 당긴다.
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="닫기" className="-mr-1.5 text-muted-foreground">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="닫기" className="-my-0.5 -mr-1.5 text-muted-foreground">
             <XIcon className="size-6" />
           </Button>
         )}
