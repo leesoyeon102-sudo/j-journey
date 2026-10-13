@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
+import { useRouter } from "next/navigation";
 import { memo, useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
@@ -57,6 +58,7 @@ const draft: Partial<Pick<Form, "time" | "tomorrow">> = {};
 export default function Planner() {
   const trips = useTrips();
   const home = useHome();
+  const router = useRouter();
   const savedOrigin = useLastOrigin();
   const savedDestination = useLastDestination();
 
@@ -65,6 +67,11 @@ export default function Planner() {
   const [loading, setLoading] = useState(false);
   // 경로 내역에서 다시 안내받아 넘어온 경우 그 결과를 바로 보여준다.
   const [activeId, setActiveId] = useState<string | null>(() => peekPendingResult()?.tripId ?? null);
+  // 경로 내역에서 다시 안내받아 만든 안내의 id. 이 안내에서 뒤로가기하면 확인 창 없이 경로 내역으로 돌아간다.
+  const [historyTripId] = useState<string | null>(() => {
+    const p = peekPendingResult();
+    return p?.fromHistory ? p.tripId : null;
+  });
   // 계산된 안들: 추천(하나), 지하철 우선·버스 우선(각각 여러 안). 지금 고른 칩과, 그 칩에서 보고 있는 안.
   const [groups, setGroups] = useState<PlanGroups | null>(() => {
     const p = peekPendingResult();
@@ -234,13 +241,17 @@ export default function Planner() {
             variant="ghost"
             size="icon-lg"
             aria-label="뒤로가기 (입력 화면으로)"
-            onClick={() =>
+            onClick={() => {
+              if (current.id === historyTripId) {
+                router.push("/history");
+                return;
+              }
               requestLeave(() => {
                 setEditing(true);
                 setActiveId(null);
                 setGroups(null);
-              })
-            }
+              });
+            }}
           >
             <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 5-7 7 7 7" />

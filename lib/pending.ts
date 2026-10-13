@@ -6,6 +6,8 @@ interface Pending {
   plans: Plan[];
   /** 추천·지하철 우선·버스 우선 묶음. 없으면 plans로 만든다. */
   groups?: PlanGroups;
+  /** 경로 내역에서 넘어왔으면 true. 출발 안내에서 뒤로가기하면 경로 내역으로 돌아간다. */
+  fromHistory?: boolean;
 }
 
 let pending: Pending | null = null;
