@@ -126,7 +126,7 @@ components:
     height: 44px
     padding: 16px
   button-secondary:
-    backgroundColor: "{colors.muted}"
+    backgroundColor: "{colors.border}"
     textColor: "{colors.on-surface}"
     typography: "{typography.label}"
     rounded: "{rounded.button}"
