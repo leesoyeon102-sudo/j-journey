@@ -22,11 +22,11 @@ interface Props {
 
 function PlaceRow({ label, place, onClick }: { label: string; place: PlaceView | null; onClick: () => void }) {
   return (
-    // 오른쪽 맞바꾸기 버튼과 겹치지 않게 오른쪽을 비워 둔다.
-    <button type="button" onClick={onClick} className="flex min-h-16 w-full flex-col justify-center py-4 pl-4 pr-16 text-left">
-      <span className="text-caption text-muted-foreground">{label}</span>
-      <span className="truncate text-body-lg font-medium">{place?.name || "장소 선택"}</span>
-      {place?.area && <span className="mt-1 truncate text-caption text-muted-foreground">{place.area}</span>}
+    // 오른쪽 맞바꾸기 버튼과 겹치지 않게 오른쪽을 비워 둔다. (버튼 안을 flex로 쓰면 폰(사파리)에서 말줄임이 안 먹는 일이 있어 block으로 쌓는다.)
+    <button type="button" onClick={onClick} className="block min-h-16 w-full overflow-hidden py-4 pl-4 pr-16 text-left">
+      <span className="block text-caption text-muted-foreground">{label}</span>
+      <span className="block truncate text-body-lg font-medium">{place?.name || "장소 선택"}</span>
+      {place?.area && <span className="mt-1 block truncate text-caption text-muted-foreground">{place.area}</span>}
     </button>
   );
 }
