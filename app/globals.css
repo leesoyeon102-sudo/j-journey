@@ -174,11 +174,9 @@ body {
   background: linear-gradient(180deg, var(--color-sky-pale) 0, var(--color-surface) 420px) no-repeat var(--color-surface);
 }
 
-/* 홈의 하늘: 위 sky → sky-soft → 흰색. 한쪽에 sun 노을빛이 번지고 흰 구름이 두 점 떠 있다. */
+/* 홈의 하늘: 위 sky → sky-soft → 흰색. 한쪽에 sun 노을빛이 번진다. 구름은 SkyBackdrop이 따로 그린다. */
 .sky-backdrop {
   background:
-    radial-gradient(62% 12% at 16% 58%, rgb(255 255 255 / 0.55), transparent 72%),
-    radial-gradient(50% 10% at 90% 46%, rgb(255 255 255 / 0.45), transparent 72%),
     radial-gradient(62% 11% at 96% 84%, color-mix(in srgb, var(--color-sun) 95%, transparent), transparent 74%),
     linear-gradient(180deg, var(--color-sky) 0%, var(--color-sky-soft) 62%, var(--color-surface) 100%);
 }
@@ -231,6 +229,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* 이동 중 점 세 개: 차례로 올라갔다 내려오며 진행 중임을 알린다. */
+/* 구름이 아주 천천히 좌우로 떠다닌다. */
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-6px);
+  }
+  to {
+    transform: translateX(6px);
+  }
+}
+
+.cloud-drift {
+  animation: cloud-drift 12s ease-in-out infinite alternate;
+}
+
 @keyframes dot-wave {
   0%,
   60%,
@@ -252,6 +264,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   .dot-wave {
     animation: none;
     opacity: 0.7;
+  }
+
+  .cloud-drift {
+    animation: none;
   }
 }
 
