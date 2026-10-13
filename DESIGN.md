@@ -232,15 +232,16 @@ components:
     height: 44px
     padding: 16px
   filter-chip:
-    backgroundColor: "{colors.muted}"
+    backgroundColor: "{colors.glass}"
     textColor: "{colors.on-surface}"
     typography: "{typography.label}"
     rounded: "{rounded.pill}"
     height: 36px
     padding: 16px
   filter-chip-selected:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.on-primary}"
+    backgroundColor: "{colors.accent-subtle}"
+    borderColor: "{colors.accent}"
+    textColor: "{colors.accent}"
   trip-progress-card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
@@ -334,6 +335,7 @@ components:
 - **Card:** surface 배경, 1px border, 4px 반경. 제목은 heading 글꼴, 설명은 `muted-foreground`.
 - **Input:** 44px 높이, muted 배경, border 테두리. 포커스 시 테두리가 `on-surface`로 진해지고, 오류(`aria-invalid`)면 danger 테두리가 된다.
 - **Dialog·Alert·시각 선택 창:** `glass-strong` 중앙 패널(16px). 뒤 화면은 `on-surface` 15% 오버레이와 약한 블러로 물린다. 닫기 버튼 기본 제공.
+- **Filter chip:** 출발 안내 맨 위의 알약 칩. 선택 안 된 칩은 `glass`(반투명 흰 배경 + 흰 1px 테두리 + 블러), 선택된 칩은 같은 유리 모양에 accent 15% 배경, accent 1px 테두리, accent 글자로 바뀐다.
 - **Glass card:** 홈의 출발지·도착지·약속 시각 칸, 이동 중 카드, 안내 내역 항목, 로드맵 통계가 쓴다. `glass`(또는 `glass-strong`) + 16px 반경. 코드에서는 `glass`, `glass-strong` 유틸리티로 쓴다.
 - **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#838B91) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
 - **Status bar:** 화면 맨 위 배경색과 같은 색으로 칠한다(`ThemeColor`). 홈·이동 중 홈은 `sky`, 나머지 화면은 `sky-pale`이라 배경이 상태 표시줄까지 끊김 없이 이어진다. 안내 화면의 위쪽 내비게이션도 흰색 대신 `sky-pale` 80% + 블러로 둬서 같은 이음새를 만든다.
