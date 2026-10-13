@@ -56,15 +56,15 @@ export const WithContent: Story = {
   },
 }
 
-// 출발한 계획이 있을 때 안내 내역에서 다른 계획을 다시 안내받으려는 경우
+// 출발한 계획이 있을 때 안내 내역에서 다른 계획을 다시 검색하려는 경우
 export const ReplanConfirm: Story = {
   args: {
-    title: "이 계획을 다시 안내받을까요?",
+    title: "이 계획을 다시 검색할까요?",
     description: "앞에서 출발한 계획은 사라져요.",
     children: (
       <>
         <Button variant="secondary" size="lg">취소</Button>
-        <Button size="lg">다시 안내받기</Button>
+        <Button size="lg">다시 검색하기</Button>
       </>
     ),
   },

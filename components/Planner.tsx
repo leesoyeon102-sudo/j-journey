@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
-import { useRouter } from "next/navigation";
 import { memo, useEffect, useRef, useState } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
@@ -20,8 +19,7 @@ import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
-import { setHomeAction, setTabOverride } from "@/lib/tabOverride";
-import { clearPendingResult, peekPendingResult } from "@/lib/pending";
+import { draft } from "@/lib/draft";
 import type { Place } from "@/lib/places";
 import {
   addTrip,
@@ -53,31 +51,18 @@ const ARRIVE_EARLY_MIN = 5;
 
 const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false };
 
-// 약속 시각·내일 토글은 다른 탭에 다녀와도 유지한다. (화면이 다시 만들어져도 남도록 모듈에 둔다. 새로고침하면 초기화)
-const draft: Partial<Pick<Form, "time" | "tomorrow">> = {};
-
 export default function Planner() {
   const trips = useTrips();
   const home = useHome();
-  const router = useRouter();
   const savedOrigin = useLastOrigin();
   const savedDestination = useLastDestination();
 
   const [edit, setEdit] = useState<Partial<Form>>(() => ({ ...draft }));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // 경로 내역에서 다시 안내받아 넘어온 경우 그 결과를 바로 보여준다.
-  const [activeId, setActiveId] = useState<string | null>(() => peekPendingResult()?.tripId ?? null);
-  // 경로 내역에서 다시 안내받아 만든 안내의 id. 이 안내에서 뒤로가기하면 확인 창 없이 경로 내역으로 돌아간다.
-  const [historyTripId] = useState<string | null>(() => {
-    const p = peekPendingResult();
-    return p?.fromHistory ? p.tripId : null;
-  });
+  const [activeId, setActiveId] = useState<string | null>(null);
   // 계산된 안들: 추천(하나), 지하철 우선·버스 우선(각각 여러 안). 지금 고른 칩과, 그 칩에서 보고 있는 안.
-  const [groups, setGroups] = useState<PlanGroups | null>(() => {
-    const p = peekPendingResult();
-    return p ? (p.groups ?? (p.plans.length ? groupPlans(p.plans) : null)) : null;
-  });
+  const [groups, setGroups] = useState<PlanGroups | null>(null);
   const [tab, setTab] = useState<PlanTab>("recommended");
   const [page, setPage] = useState(0);
   // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
@@ -131,25 +116,6 @@ export default function Planner() {
   // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다. (이미 출발했으면 이동 중 카드로 돌아올 수 있어 띄우지 않는다.)
   const showingResult = Boolean(current);
   const guardLeave = showingResult && !current?.departedAt;
-  useEffect(() => {
-    clearPendingResult();
-  }, [showingResult]);
-  // 경로 내역에서 다시 안내받은 출발 안내가 떠 있는 동안에는 탭바가 "안내 내역"을 계속 선택해 둔다.
-  const keepHistoryTab = Boolean(current && current.id === historyTripId);
-  useEffect(() => {
-    setTabOverride(keepHistoryTab ? "/history" : null);
-  }, [keepHistoryTab]);
-  useEffect(() => {
-    if (!keepHistoryTab) return;
-    // 이 동안 탭바의 "홈"을 누르면 출발 안내를 닫고 홈 입력 화면으로 간다. (뒤로가기와 같게 확인 창은 없다)
-    setHomeAction(() => {
-      setEditing(true);
-      setActiveId(null);
-      setGroups(null);
-    });
-    return () => setHomeAction(null);
-  }, [keepHistoryTab]);
-  useEffect(() => () => setTabOverride(null), []);
   useEffect(() => {
     setLeaveGuard(guardLeave);
     return () => setLeaveGuard(false);
@@ -258,17 +224,13 @@ export default function Planner() {
             variant="ghost"
             size="icon-lg"
             aria-label="뒤로가기 (입력 화면으로)"
-            onClick={() => {
-              if (current.id === historyTripId) {
-                router.push("/history");
-                return;
-              }
+            onClick={() =>
               requestLeave(() => {
                 setEditing(true);
                 setActiveId(null);
                 setGroups(null);
-              });
-            }}
+              })
+            }
           >
             <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 5-7 7 7 7" />

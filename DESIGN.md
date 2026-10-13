@@ -314,7 +314,7 @@ components:
 - **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목. 홈·안내 내역·로드맵의 화면 제목은 SemiBold(600)이다.
 - **body-lg (16px) / body (14px):** 본문. 앱 기본은 14px.
 - **label (14px, 600):** 버튼과 입력 라벨. 버튼 글자는 SemiBold(600)이다.
-- **label-lg (15px, 600):** 지금은 쓰는 곳이 없다. (안내 내역 상세의 "이 계획 다시 안내받기" 버튼은 14px `label`을 쓴다.)
+- **label-lg (15px, 600):** 지금은 쓰는 곳이 없다. (안내 내역 상세의 "이 계획 다시 검색하기" 버튼은 14px `label`을 쓴다.)
 - **caption (12px, 500):** 배지, 시각 보조 설명.
 - **caption-lg (13px, 500):** "자주 이용한 경로" 같은 accent 배지.
 

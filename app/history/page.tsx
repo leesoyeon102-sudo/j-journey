@@ -9,11 +9,8 @@ import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
 import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
-import { requestPlans } from "@/lib/api";
-import { nextOccurrence } from "@/lib/dates";
-import { setTabOverride } from "@/lib/tabOverride";
-import { setPendingResult } from "@/lib/pending";
-import { addTrip, removeRoute, removeTrip, useTrips } from "@/lib/storage";
+import { draft } from "@/lib/draft";
+import { removeRoute, removeTrip, saveLastDestination, saveLastOrigin, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
 
 /** 밀었을 때 오른쪽에 드러나는 삭제 버튼의 너비(px) */
@@ -22,21 +19,18 @@ const DELETE_W = 80;
 export default function HistoryPage() {
   const trips = useTrips();
   const routes = groupRoutes(trips);
-  // 출발해서 이동 중인 계획. 다른 계획을 다시 안내받으면 이 계획은 사라진다.
+  // 출발해서 이동 중인 계획. 다른 계획을 다시 검색하면 이 계획은 사라진다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
   const [confirmRoute, setConfirmRoute] = useState<RouteSummary | null>(null);
   const router = useRouter();
   const [openKey, setOpenKey] = useState<string | null>(null);
   // 피드백을 묻는 조건: 경로 내역에 한 번 들어와 봤다. 단, 경로 상세를 펼쳐 둔 동안에는 묻지 않는다.
-  const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<{ key: string; message: string } | null>(null);
   // 목록을 왼쪽으로 밀면 삭제 버튼이 나온다. swiped: 열려 있는 줄, drag: 끌고 있는 중의 위치
   const [swiped, setSwiped] = useState<string | null>(null);
   const [drag, setDrag] = useState<{ key: string; x: number } | null>(null);
   const gesture = useRef<{ key: string; x: number; y: number; base: number; last: number; mode: "h" | "v" | null } | null>(null);
   const justSwiped = useRef(false);
-  // 다시 안내받기 계산이 진행 중인지. 빠르게 두 번 눌러도 한 번만 처리한다.
-  const replanning = useRef(false);
   // 삭제 같은 동작 뒤에 잠깐 보이는 안내
   const [toast, setToast] = useState<string | null>(null);
   useEffect(() => {
@@ -73,14 +67,13 @@ export default function HistoryPage() {
     setTimeout(() => (justSwiped.current = false), 0);
   };
 
-  /** 같은 도착지·약속 시각으로 다시 계산해 홈의 출발 안내 화면으로 바로 보낸다. */
-  async function replan(r: RouteSummary) {
-    if (replanning.current) return;
+  /**
+   * 출발지·도착지·약속 시각을 홈 입력 화면에 채워서 홈으로 보낸다. 검색은 하지 않는다.
+   * 약속 시각이 이미 지났는지는 따지지 않는다. (지났으면 홈에서 검색할 때 안내가 나온다)
+   */
+  function reuse(r: RouteSummary) {
     const { plan } = r.latest;
-    const origin = plan.originCoord
-      ? { name: plan.origin, area: "", ...plan.originCoord }
-      : null;
-    if (!origin) {
+    if (!plan.originCoord) {
       setError({ key: r.key, message: "출발지 위치가 저장되지 않은 경로예요. 홈에서 새로 입력해 주세요." });
       return;
     }
@@ -89,33 +82,12 @@ export default function HistoryPage() {
       return;
     }
     setError(null);
-    replanning.current = true;
-    setBusyKey(r.key);
-    try {
-      const { date } = nextOccurrence(plan.arriveBy);
-      const result = await requestPlans({
-        origin,
-        destination: { name: plan.destination, area: "", ...plan.destCoord },
-        arriveBy: plan.arriveBy,
-        buffer: plan.buffer,
-        date,
-      });
-      if (!result.ok) {
-        setError({ key: r.key, message: result.message });
-        return;
-      }
-      setPendingResult({ tripId: addTrip(result.plan).id, plans: result.plans, groups: result.groups, fromHistory: true });
-      // 다시 안내받기가 실제로 이뤄졌을 때(경로 계산 성공 뒤) 한 번만 센다.
-      amplitude.track("Route Reused");
-      // 안내 화면은 "/"에 뜨지만 탭바는 "안내 내역"이 계속 선택돼 있게 한다. (화면이 바뀌는 순간 홈으로 깜빡이지 않도록 미리 정한다.)
-      setTabOverride("/history");
-      router.push("/");
-    } catch {
-      setError({ key: r.key, message: "경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요." });
-    } finally {
-      replanning.current = false;
-      setBusyKey(null);
-    }
+    saveLastOrigin({ name: plan.origin, area: "", ...plan.originCoord });
+    saveLastDestination({ name: plan.destination, area: "", ...plan.destCoord });
+    Object.assign(draft, { time: fmt(plan.arriveBy), tomorrow: false });
+    // 안내 내역을 다시 쓰기 시작했을 때 한 번만 센다.
+    amplitude.track("Route Reused");
+    router.push("/");
   }
 
   return (
@@ -215,11 +187,10 @@ export default function HistoryPage() {
                     <Timeline plan={plan} />
 
                     <Button
-                      onClick={() => (moving ? setConfirmRoute(r) : replan(r))}
-                      disabled={busyKey !== null}
+                      onClick={() => (moving ? setConfirmRoute(r) : reuse(r))}
                       className="mt-5 h-11 w-full text-label"
                     >
-                      {busyKey === r.key ? "계산 중…" : "이 계획 다시 안내받기"}
+                      이 계획 다시 검색하기
                     </Button>
                     {error?.key === r.key && (
                       <p role="alert" className="mt-3 text-body text-on-danger">
@@ -235,7 +206,7 @@ export default function HistoryPage() {
       )}
       {confirmRoute && (
         <AlertPanel
-          title="이 계획을 다시 안내받을까요?"
+          title="이 계획을 다시 검색할까요?"
           description="앞에서 출발한 계획은 사라져요."
           onClose={() => setConfirmRoute(null)}
         >
@@ -249,10 +220,10 @@ export default function HistoryPage() {
               const r = confirmRoute;
               setConfirmRoute(null);
               if (moving) removeTrip(moving.id);
-              replan(r);
+              reuse(r);
             }}
           >
-            다시 안내받기
+            다시 검색하기
           </Button>
         </AlertPanel>
       )}

@@ -91,7 +91,7 @@ export interface Plan {
   /** 출발(집)·도착 장소 */
   origin: string;
   destination: string;
-  /** 출발·도착 장소 좌표 (다시 안내받기용) */
+  /** 출발·도착 장소 좌표 (다시 검색하기용) */
   originCoord?: { lat: number; lng: number };
   destCoord?: { lat: number; lng: number };
   /** 도보 시간을 실제 경로가 아닌 직선거리로 추정했는지 */
