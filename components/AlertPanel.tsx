@@ -4,7 +4,8 @@ import { useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 
 interface Props {
-  title: string;
+  /** 없으면 제목 없이 설명만 보인다. */
+  title?: string;
   description: React.ReactNode;
   /** 설명 아래에 놓는 내용(입력란 등). 없으면 설명 바로 아래에 버튼이 온다. */
   content?: React.ReactNode;
@@ -33,15 +34,17 @@ export default function AlertPanel({ title, description, content, onClose, child
       <div
         role="alertdialog"
         aria-modal="true"
-        aria-labelledby={`${id}-title`}
+        aria-labelledby={title ? `${id}-title` : undefined}
         aria-describedby={`${id}-desc`}
         onClick={(e) => e.stopPropagation()}
         className="fade-in glass-strong w-full rounded-nav p-6"
       >
-        <h2 id={`${id}-title`} className="text-subheading font-medium">
-          {title}
-        </h2>
-        <p id={`${id}-desc`} className="mt-2 text-body text-muted-foreground">
+        {title && (
+          <h2 id={`${id}-title`} className="text-subheading font-medium">
+            {title}
+          </h2>
+        )}
+        <p id={`${id}-desc`} className={`text-body text-muted-foreground ${title ? "mt-2" : ""}`}>
           {description}
         </p>
         {content && <div className="mt-4">{content}</div>}

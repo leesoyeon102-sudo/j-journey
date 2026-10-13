@@ -323,7 +323,6 @@ export default function Planner() {
 
         {departedAlert !== null && (
           <AlertPanel
-            title="출발을 기록했어요"
             description={
               <>
                 소요 시간(약 <b className="font-medium text-on-surface">{departedAlert}분</b>)이 지난 뒤, 도착하면

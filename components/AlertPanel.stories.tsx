@@ -70,10 +70,9 @@ export const ReplanConfirm: Story = {
   },
 }
 
-// "출발했어요"를 누른 직후: 소요 시간이 지난 뒤 도착했어요를 누르라고 알려 준다
+// "출발했어요"를 누른 직후: 제목 없이 설명만. 소요 시간이 지난 뒤 도착했어요를 누르라고 알려 준다
 export const DepartRecorded: Story = {
   args: {
-    title: "출발을 기록했어요",
     description: (
       <>
         소요 시간(약 <b className="font-medium text-on-surface">38분</b>)이 지난 뒤, 도착하면
