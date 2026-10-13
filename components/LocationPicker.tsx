@@ -157,7 +157,7 @@ export default function LocationPicker({
           </Button>
         </form>
 
-        {/* 칩: 현재 위치(검정), 집. 좌우 패딩 8px, 글자 13px. 주소가 길면 집 칩 안의 주소를 말줄임(…)으로 줄인다. */}
+        {/* 칩: 현재 위치(검정), 집. 좌우 패딩 10px, 글자 13px. 주소가 길면 집 칩 안의 주소를 말줄임(…)으로 줄인다. */}
         <div className="mt-4 flex items-center gap-2 px-5">
           <button
             type="button"
@@ -165,7 +165,7 @@ export default function LocationPicker({
               setPhase("locating");
               void locate();
             }}
-            className="flex h-9 shrink-0 items-center gap-1.5 rounded-pill bg-primary px-2 text-caption-lg font-medium text-primary-foreground"
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-pill bg-primary px-2.5 text-caption-lg font-medium text-primary-foreground"
           >
             <LocateFixedIcon className="size-4" />
             현재 위치
@@ -174,7 +174,7 @@ export default function LocationPicker({
               <button
                 type="button"
                 onClick={homeChip.onPick}
-                className="glass-strong flex h-9 min-w-0 items-center gap-1.5 overflow-hidden rounded-pill px-2 text-caption-lg font-medium"
+                className="glass-strong flex h-9 min-w-0 items-center gap-1.5 overflow-hidden rounded-pill px-2.5 text-caption-lg font-medium"
               >
                 <HomeIcon className="size-4 shrink-0" />
                 <span className="shrink-0">집</span>
