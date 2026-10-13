@@ -448,7 +448,7 @@ export default function Planner() {
             aria-labelledby="tomorrow-label"
             onClick={() => set("tomorrow", !form.tomorrow)}
             className={`relative h-8 w-14 rounded-pill transition-colors ${
-              form.tomorrow ? "bg-primary" : "bg-border"
+              form.tomorrow ? "bg-primary" : "bg-inactive"
             }`}
           >
             <span

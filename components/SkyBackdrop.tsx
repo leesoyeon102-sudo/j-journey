@@ -26,7 +26,7 @@ function Cloud({ className, id }: { className: string; id: string }) {
 export default function SkyBackdrop() {
   return (
     <div aria-hidden="true" className="sky-backdrop pointer-events-none absolute inset-x-0 top-0 -z-10 h-[680px] overflow-hidden">
-      <Cloud id="cloud-a" className="-right-6 top-6 w-40 opacity-90" />
+      <Cloud id="cloud-a" className="-right-6 top-[30px] w-48 opacity-90" />
       <Cloud id="cloud-b" className="-left-10 top-[520px] w-60 opacity-95" />
       <Cloud id="cloud-c" className="right-2 top-[590px] w-36 opacity-80" />
     </div>
