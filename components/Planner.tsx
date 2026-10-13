@@ -10,7 +10,7 @@ import PlanFilter, { type PlanTab } from "./PlanFilter";
 import PlanSlider from "./PlanSlider";
 import SkyBackdrop from "./SkyBackdrop";
 import ThemeColor from "./ThemeColor";
-import TimeSheet from "./TimeSheet";
+import RouteCard from "./RouteCard";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
 import TripMenu from "./TripMenu";
@@ -475,31 +475,20 @@ export default function Planner() {
       )}
 
       <form onSubmit={submit} className="space-y-3 px-5 pb-8">
-        <button
-          type="button"
-          onClick={() => setPicker("origin")}
-          className="glass-strong flex min-h-16 w-full flex-col justify-center rounded-nav px-4 py-3 text-left"
-        >
-          <span className="text-caption text-muted-foreground">출발지</span>
-          <span className="text-body-lg font-medium">{form.origin?.name || "장소 선택"}</span>
-          {form.origin?.area && (
-            <span className="mt-1 truncate text-caption text-muted-foreground">{form.origin.area}</span>
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setPicker("destination")}
-          className="glass-strong flex min-h-16 w-full flex-col justify-center rounded-nav px-4 py-3 text-left"
-        >
-          <span className="text-caption text-muted-foreground">도착지</span>
-          <span className="text-body-lg font-medium">{form.destination?.name || "장소 선택"}</span>
-          {form.destination?.area && (
-            <span className="mt-1 truncate text-caption text-muted-foreground">{form.destination.area}</span>
-          )}
-        </button>
-
-        <TimeSheet label="약속 시각" value={form.time} onChange={(v) => set("time", v)} />
+        <RouteCard
+          origin={form.origin}
+          destination={form.destination}
+          time={form.time}
+          onPickOrigin={() => setPicker("origin")}
+          onPickDestination={() => setPicker("destination")}
+          onTimeChange={(v) => set("time", v)}
+          onSwap={() => {
+            // 출발지와 도착지를 맞바꾼다. (둘 다 이번 입력에서만 바뀌고, 홈을 벗어나면 출발지는 다시 현재 위치)
+            const { origin, destination } = form;
+            set("origin", destination);
+            set("destination", origin);
+          }}
+        />
 
         <div className="glass flex h-14 items-center justify-between rounded-nav px-4">
           <span id="tomorrow-label" className="text-body text-on-surface">

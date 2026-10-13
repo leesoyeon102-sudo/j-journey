@@ -9,6 +9,8 @@ interface Props {
   /** "HH:MM" (24시간) */
   value: string;
   onChange: (value: string) => void;
+  /** 다른 카드 안에 들어갈 때: 자기 배경·모서리 없이 내용만 그린다. */
+  bare?: boolean;
 }
 
 const ITEM = 44; // 한 칸 높이(px)
@@ -37,7 +39,7 @@ function display(ampm: number, hourIdx: number, minute: number) {
 }
 
 /** 시각 카드. 누르면 화면 가운데 얼럿 창에서 오전/오후·시·분을 고른다. */
-export default function TimeSheet({ label, value, onChange }: Props) {
+export default function TimeSheet({ label, value, onChange, bare = false }: Props) {
   const [open, setOpen] = useState(false);
   const [a, h, m] = split(value);
   return (
@@ -45,7 +47,7 @@ export default function TimeSheet({ label, value, onChange }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="glass-strong flex min-h-16 w-full flex-col justify-center rounded-nav px-4 py-3 text-left"
+        className={`flex min-h-16 w-full flex-col justify-center px-4 py-3 text-left ${bare ? "" : "glass-strong rounded-nav"}`}
       >
         <span className="text-caption text-muted-foreground">{label}</span>
         <span className="text-body-lg font-medium tabular-nums">{display(a, h, m)}</span>
