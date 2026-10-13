@@ -8,7 +8,7 @@ colors:
   primary-hover: "#1A2132"
   toast: "#646769"
   surface: "#FFFFFF"
-  on-surface: "#14171F"
+  on-surface: "#1E1F22"
   tab-icon: "#D2D5D9"
   tab-label: "#838B91"
   disabled-fill: "#86878A"
@@ -289,7 +289,7 @@ components:
 - **secondary-fill (#E8EBED) / fill-strong (#DADDE0):** secondary-fill은 얼럿 취소 같은 보조(secondary) 버튼의 배경이고, fill-strong은 그 버튼을 누를 때와 "이 계획대로 이동중" 버튼의 배경이다. 글자는 `on-surface`.
 - **toast (#646769):** 토스트 배경. 색상 205°, 채도 2%의 회색을 불투명(100%)하게 고정한 값.
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
-- **surface (#FFFFFF) / on-surface (#14171F):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.
+- **surface (#FFFFFF) / on-surface (#1E1F22):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.
 - **inactive (#C9CBCC):** 선택되지 않은 탭바 아이콘. placeholder보다 한 단계 연하다.
 - **muted-subtle (#FBFCFC):** 안내 내역에서 펼친 상세 영역처럼 흰 바탕과 살짝만 구분되는 면.
 - **muted (#F6F7F7):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#676F74), placeholder와 비활성 글자는 `placeholder`(#949CA1)를 쓴다.

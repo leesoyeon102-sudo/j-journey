@@ -40,7 +40,7 @@
   --color-primary-hover: #1a2132;
   --color-toast: #646769; /* 색상(hue) 205°, 채도 2%의 회색, 불투명도 100% */
   --color-surface: #ffffff;
-  --color-on-surface: #14171f;
+  --color-on-surface: #1e1f22;
   --color-tab-icon: #d2d5d9; /* 탭바 비활성 아이콘 */
   --color-tab-label: #838b91; /* 탭바 비활성 글자 */
   --color-disabled-fill: #86878a; /* 메인(primary) 버튼이 비활성일 때 배경 */
