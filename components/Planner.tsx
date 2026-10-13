@@ -415,7 +415,6 @@ export default function Planner() {
             )
           }
           autoLocate={needHome}
-          locateLabel="현재 위치로 등록"
           confirmQuestion="여기가 집이 맞나요?"
           confirmLabel="네, 집으로 등록할게요"
           onSelect={(p) => {
@@ -438,7 +437,6 @@ export default function Planner() {
             saveLastOrigin(place);
             setPicker(null);
           })}
-          locateLabel="현재 위치로 선택"
           confirmQuestion="여기를 출발지로 선택할까요?"
           confirmLabel="네, 여기서 출발할게요"
           onSelect={(p) => {
@@ -461,7 +459,6 @@ export default function Planner() {
             setPicker(null);
           })}
           description="약속 장소를 현재 위치나 주소로 찾아 보세요."
-          locateLabel="현재 위치로 선택"
           confirmQuestion="여기를 도착지로 선택할까요?"
           confirmLabel="네, 여기로 갈게요"
           onSelect={(p) => {
