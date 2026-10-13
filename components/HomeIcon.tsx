@@ -6,7 +6,7 @@ const base = {
   viewBox: "0 0 24 24",
   fill: "none",
   stroke: "currentColor",
-  strokeWidth: 1.8,
+  strokeWidth: 2,
   strokeLinecap: "round",
   strokeLinejoin: "round",
   "aria-hidden": true,
@@ -16,8 +16,8 @@ const base = {
 export function HomeIcon({ className }: Props) {
   return (
     <svg {...base} className={className}>
-      <path d="M3.5 11 12 4l8.5 7" />
-      <path d="M5.5 9.5V19a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.5" />
+      <path d="M2.5 11.5 12 3l9.5 8.5" />
+      <path d="M4.5 10v9.5a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V10" />
     </svg>
   );
 }
@@ -26,9 +26,9 @@ export function HomeIcon({ className }: Props) {
 export function HomeEditIcon({ className }: Props) {
   return (
     <svg {...base} className={className}>
-      <path d="M3.5 11 12 4l8.5 7" />
-      <path d="M5.5 9.5V19a1 1 0 0 0 1 1H11" />
-      <path d="M18.5 9.5V12" />
+      <path d="M2.5 11.5 12 3l9.5 8.5" />
+      <path d="M4.5 10v9.5a1 1 0 0 0 1 1H11" />
+      <path d="M19.5 10v2" />
       <path d="m13.5 20 .5-2.5 5.3-5.3a1.4 1.4 0 0 1 2 2L16 19.5z" />
     </svg>
   );
