@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { XIcon } from "lucide-react";
+import ThemeColor from "@/components/ThemeColor";
 import { reverseGeocode, searchAddress, type GeoResult } from "@/lib/api";
 
 export interface PickedLocation {
@@ -142,11 +144,14 @@ export default function LocationPicker({
   if (!mounted) return null;
   return createPortal(
     <div className="sky-wash fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col overflow-y-auto">
+      {/* 이 화면의 맨 위는 연한 하늘이라 상태 표시줄도 그 색으로 맞춘다. (아래 홈의 하늘색을 따라가지 않게) */}
+      <ThemeColor token="sky-pale" />
       <div className="flex items-center justify-between px-5 pt-10">
-        <h2 className="text-heading font-medium">{title}</h2>
+        <h2 className="text-heading font-semibold">{title}</h2>
         {onClose && (
-          <Button variant="ghost" onClick={onClose} className="text-muted-foreground">
-            닫기
+          // 아이콘이 오른쪽 안쪽 여백(20px)에 맞도록 버튼의 안쪽 빈 공간만큼 당긴다.
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="닫기" className="-mr-1.5 text-muted-foreground">
+            <XIcon className="size-6" />
           </Button>
         )}
       </div>
@@ -205,14 +210,18 @@ export default function LocationPicker({
           </Button>
 
           <p className="mb-2 mt-7 text-caption text-muted-foreground">또는 주소·건물 이름으로 검색</p>
-          <form onSubmit={search} className="flex gap-2">
+          {/* 라인 인풋: 밑줄 하나로 그리고, 입력 중에는 밑줄이 진해진다. 검색 버튼은 같은 줄 오른쪽 끝에 둔다. */}
+          <form
+            onSubmit={search}
+            className="flex items-center gap-2 border-b border-divider transition-colors focus-within:border-on-surface"
+          >
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="예: 경복궁역, 천호대로 995, 집 근처 병원"
-              className="flex-1"
+              className="h-12 flex-1 rounded-none border-0 bg-transparent px-0 focus-visible:border-0 focus-visible:ring-0"
             />
-            <Button type="submit" variant="outline" size="lg" disabled={searching} className="h-11">
+            <Button type="submit" variant="ghost" disabled={searching} className="-mr-4 shrink-0">
               {searching ? "검색 중" : "검색"}
             </Button>
           </form>
