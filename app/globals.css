@@ -9,16 +9,16 @@
   --color-primary: #222834;
   --color-on-primary: #ffffff;
   --color-primary-hover: #373f51;
-  --color-toast: #646971; /* primary 70%를 흰 바탕에 올린 색, 불투명도 100% */
+  --color-toast: #646469; /* 파란 기운이 2%쯤 도는 회색, 불투명도 100% */
   --color-surface: #ffffff;
   --color-on-surface: #14171f;
-  --color-muted: #f5f6f9;
-  --color-muted-subtle: #fafbfd;
-  --color-muted-foreground: #677084;
-  --color-placeholder: #9ba2b0;
-  --color-inactive: #c9ced8;
-  --color-border: #e5e7eb;
-  --color-border-subtle: #eef0f4;
+  --color-muted: #f4f4f9;
+  --color-muted-subtle: #f9f9fe;
+  --color-muted-foreground: #6b6b70;
+  --color-placeholder: #98989d;
+  --color-inactive: #c8c8cd;
+  --color-border: #e5e5ea;
+  --color-border-subtle: #eeeef3;
   /* DESIGN.md의 accent(파랑). shadcn의 accent(호버 배경)와 겹쳐 코드에서는 brand, 값은 --color-accent-brand */
   --color-accent-brand: #2f5bff;
   --color-accent-subtle: #eaefff; /* accent 10%를 흰 배경에 올린 색 */
@@ -52,7 +52,7 @@
   --color-graphite: var(--color-primary-hover); /* 어두운 구분선·링크 */
   --color-charcoal: var(--color-primary); /* 유일한 채움 버튼 색 */
   --color-deep-ink: #050505;
-  --color-pearl: #d0d4dc;
+  --color-pearl: #d0d0d5;
   /* 카드 채움 전용 강조색 (글자·아이콘·테두리에는 쓰지 않는다) */
   --color-iris: #6a57e3;
   --color-lilac: #ddd8ff;
@@ -63,9 +63,9 @@
   --color-hero-wash: #9ddef9;
 
   /* ── 기존 앱에서 쓰는 색 (모바일 화면) ───────────────────── */
-  --color-sub: #8b8b8b;
-  --color-line: #ececec;
-  --color-soft: #f6f6f6;
+  --color-sub: #8b8b90;
+  --color-line: #ececf1;
+  --color-soft: #f6f6fb;
   /* 출발 시각 등 강조 파랑. shadcn의 accent(호버 배경)와 이름이 겹쳐 brand로 분리했다. */
   --color-brand: var(--color-accent-brand);
 
@@ -128,7 +128,7 @@
 
   /* ── 그림자 ── */
   --shadow-tab: rgb(19, 24, 25) 0px 1px 3px 0px inset;
-  --shadow-nav: rgba(0, 0, 0, 0.05) 0px 10px 20px 0px;
+  --shadow-nav: rgb(20 24 40 / 0.05) 0px 10px 20px 0px;
 }
 
 /* 블러 반투명 유리 면. glass는 입력 칸·카드, glass-strong은 글자가 많이 올라가는 면(탭바·팝업·상세). */

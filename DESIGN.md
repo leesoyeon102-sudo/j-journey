@@ -6,16 +6,16 @@ colors:
   primary: "#222834"
   on-primary: "#FFFFFF"
   primary-hover: "#373F51"
-  toast: "#646971"
+  toast: "#646469"
   surface: "#FFFFFF"
   on-surface: "#14171F"
-  muted: "#F5F6F9"
-  muted-subtle: "#FAFBFD"
-  muted-foreground: "#677084"
-  placeholder: "#9BA2B0"
-  inactive: "#C9CED8"
-  border: "#E5E7EB"
-  border-subtle: "#EEF0F4"
+  muted: "#F4F4F9"
+  muted-subtle: "#F9F9FE"
+  muted-foreground: "#6B6B70"
+  placeholder: "#98989D"
+  inactive: "#C8C8CD"
+  border: "#E5E5EA"
+  border-subtle: "#EEEEF3"
   accent: "#2F5BFF"
   accent-subtle: "#EAEFFF"
   danger: "#FF5A5E"
@@ -268,14 +268,14 @@ components:
 ## Colors
 
 - **primary (#222834):** 채움 버튼과 기본 배지의 유일한 채움색. 순검정보다 부드러워 화면이 무겁지 않다. hover에서는 `primary-hover`(#373F51)로 한 단계 밝아진다.
-- **toast (#646971):** 토스트 배경. primary(#222834) 70%를 흰 바탕에 올렸을 때 보이는 회색을 불투명(100%)한 색으로 고정한 값.
+- **toast (#646469):** 토스트 배경. 파란 기운이 2%쯤 도는 회색을 불투명(100%)하게 고정한 값.
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
 - **surface (#FFFFFF) / on-surface (#14171F):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.
-- **inactive (#C9CED8):** 선택되지 않은 탭바 아이콘. placeholder보다 한 단계 연하다.
-- **muted-subtle (#FAFBFD):** 안내 내역에서 펼친 상세 영역처럼 흰 바탕과 살짝만 구분되는 면.
-- **muted (#F5F6F9):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#677084), placeholder와 비활성 글자는 `placeholder`(#9BA2B0)를 쓴다.
-- **border (#E5E7EB):** 카드·outline 버튼·입력의 테두리와 구분선.
-- **border-subtle (#EEF0F4):** 탭바 위의 구분선처럼 화면을 가르되 눈에 덜 띄어야 하는 선.
+- **inactive (#C8C8CD):** 선택되지 않은 탭바 아이콘. placeholder보다 한 단계 연하다.
+- **muted-subtle (#F9F9FE):** 안내 내역에서 펼친 상세 영역처럼 흰 바탕과 살짝만 구분되는 면.
+- **muted (#F4F4F9):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#6B6B70), placeholder와 비활성 글자는 `placeholder`(#98989D)를 쓴다.
+- **border (#E5E5EA):** 카드·outline 버튼·입력의 테두리와 구분선.
+- **border-subtle (#EEEEF3):** 탭바 위의 구분선처럼 화면을 가르되 눈에 덜 띄어야 하는 선.
 - **accent (#2F5BFF) / accent-subtle (#EAEFFF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 안내 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
 - **success (#22B35E) / success-subtle (#E9F7EF):** 지금 진행 중이라는 신호. 이동 중 카드의 동그란 점처럼 작은 도형 채움으로만 쓰고(`success-subtle`은 같은 색 10%), 글자색으로는 쓰지 않는다. 흰 바탕에서 대비가 부족하다.
 - **sky (#3D8BEB) / sky-soft (#A6CCF7):** 홈 배경 하늘의 위쪽과 가운데 색. 위에서 아래로 sky → sky-soft → 흰색으로 풀린다. 하늘 위 글자(머리말·보조 문구)는 `on-sky`(흰색)와 `on-sky-muted`(흰색 78%)를 쓴다.
@@ -303,7 +303,7 @@ components:
 
 ## Elevation & Depth
 
-깊이는 유리 면으로 만든다. 카드와 입력은 `glass`(블러 20px + 흰 1px 테두리 + 푸른 기운이 도는 아주 약한 그림자 `shadow-glass`)로 하늘 위에 떠 있고, 글자가 많은 면은 `glass-strong`으로 더 하얗게 둔다. 구분선은 `border`를 그대로 쓴다. 버튼에는 그림자를 쓰지 않는다. 예외로 홈의 이동 중 카드에는 `shadow-nav`(검정 5%, 아래로 10px, 블러 20px)를 줘서 지금 진행 중인 계획이 떠 보이게 한다. 다이얼로그는 `on-surface` 40% 오버레이와 약한 블러로 뒤 화면을 물린다.
+깊이는 유리 면으로 만든다. 카드와 입력은 `glass`(블러 20px + 흰 1px 테두리 + 푸른 기운이 도는 아주 약한 그림자 `shadow-glass`)로 하늘 위에 떠 있고, 글자가 많은 면은 `glass-strong`으로 더 하얗게 둔다. 구분선은 `border`를 그대로 쓴다. 버튼에는 그림자를 쓰지 않는다. 예외로 홈의 이동 중 카드에는 `shadow-nav`(검정 5%, 아래로 10px, 블러 20px)를 줘서 지금 진행 중인 계획이 떠 보이게 한다. 다이얼로그는 `on-surface` 15% 오버레이와 약한 블러로 뒤 화면을 물린다.
 
 ## Shapes
 
@@ -330,5 +330,6 @@ components:
 - Don't danger(코랄)를 글자·아이콘·테두리 색으로 쓰지 않는다. 채움(`danger-subtle`)에 `on-danger` 글자로만 쓴다.
 - Don't accent(파랑)를 출발 시각과 "자주 이용한 경로" 배지 외의 장식에 쓰지 않는다. 한 화면에 파랑이 많으면 시각이 묻힌다. 하늘색(sky)은 배경으로만 쓰고 글자·버튼 색으로 쓰지 않는다.
 - Don't 유리 면을 겹겹이 쌓지 않는다. 유리 위의 유리는 흐려져서 글자가 읽히지 않는다.
+- Do 회색은 파란 기운이 2%쯤만 도는 회색으로 쓴다. 밝기가 같은 무채색에서 파랑(B) 값만 5쯤 높다(`muted`, `muted-foreground`, `placeholder`, `inactive`, `border`, `border-subtle`, `toast`). 파란색이 눈에 띄게 도는 회색이나 순수한 무채색 회색(#888, #EEE 같은 값)을 새로 만들지 않는다.
 - Do 하늘(sky) 위에 바로 올라가는 글자는 `on-sky`(흰색)를, 유리 위의 글자는 `on-surface`·`muted-foreground`를 쓴다.
 - Don't 컴포넌트에서 hex 값을 직접 쓰거나 반경을 새로 만들지 않는다. `globals.css`의 토큰과 `rounded-button`, `rounded-input` 같은 이름만 쓴다.
