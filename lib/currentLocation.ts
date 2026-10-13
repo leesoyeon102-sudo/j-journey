@@ -7,10 +7,11 @@ export function readPosition(): Promise<GeolocationPosition> {
       reject({ code: 2 });
       return;
     }
+    // 정확도를 높이면(GPS) 실내나 노트북에서 "위치를 알 수 없음"으로 실패하는 일이 잦다. 주소 정도만 필요하니 기본 정확도로 먼저 읽는다.
     navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 60000,
+      enableHighAccuracy: false,
+      timeout: 10000,
+      maximumAge: 300000,
     });
   });
 }
