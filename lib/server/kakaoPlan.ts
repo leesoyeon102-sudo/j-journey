@@ -346,7 +346,8 @@ async function buildPlan(
 
   const leaveAt = need - walkStart;
   if (leaveAt < 0) return null;
-  if (ctx.isToday && leaveAt < ctx.nowMin) return null; // 이미 지나서 나설 수 없는 안
+  // 출발 시각이 이미 지났어도 버리지 않는다. 약속까지 남은 시간이 모자라도 카카오 추천을 그대로 따라가고,
+  // 이미 늦었다는 것은 출발 안내 화면의 출발 시각으로 알아본다.
 
   // ── 안 만들기: 앞에서부터 도보와 수단을 이어 붙인다. ──
   const vehicles = segs.filter((g) => g.kind !== "walk");
