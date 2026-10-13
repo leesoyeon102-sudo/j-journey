@@ -29,14 +29,14 @@ export default function TripProgressCard({ origin, destination, leaveAt, arriveA
       <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-end gap-2">
         <div>
           <p className="text-caption text-muted-foreground">출발</p>
-          <p className="text-time font-medium tabular-nums text-brand">{fmt(leaveAt)}</p>
+          <p className="text-time font-bold tabular-nums text-brand">{fmt(leaveAt)}</p>
         </div>
         <svg viewBox="0 0 24 24" className="mb-2 size-5 text-inactive" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
         <div>
           <p className="text-caption text-muted-foreground">도착</p>
-          <p className="text-time font-medium tabular-nums">{fmt(arriveAt)}</p>
+          <p className="text-time font-bold tabular-nums">{fmt(arriveAt)}</p>
         </div>
       </div>
 

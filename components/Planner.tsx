@@ -493,11 +493,11 @@ const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta
           </p>
         )}
         <p className="text-time font-medium">
-          <span className="text-brand">{fmt(plan.leaveAt)}</span>
+          <span className="font-bold text-brand">{fmt(plan.leaveAt)}</span>
           <span className="ml-1 text-subheading font-medium text-on-surface">에 출발하면</span>
         </p>
         <p className="text-time font-medium">
-          {fmt(plan.arriveAt)}
+          <span className="font-bold">{fmt(plan.arriveAt)}</span>
           <span className="ml-1 text-subheading font-medium text-on-surface">에 도착해요</span>
         </p>
         <p className="mt-3 text-body text-muted-foreground">약속 {plan.arriveBy - plan.arriveAt}분 전 도착</p>
