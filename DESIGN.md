@@ -11,7 +11,7 @@ colors:
   on-surface: "#1E1F22"
   tab-icon: "#D2D5D9"
   tab-label: "#838B91"
-  disabled-fill: "#86878A"
+  disabled-fill: "#808590"
   toggle-off: "#C9CDD3"
   divider: "#DFE6F0"
   note-fill: "#e6e8eb"
@@ -286,7 +286,7 @@ components:
 - **ink-soft (#484D51):** 검정보다 옅은 차콜 글자색(밝기 30%). 출발 안내의 "카카오맵" 버튼 글자에 쓴다.
 - **divider (#DFE6F0):** 출발 안내에서 시각 안내와 타임라인을 가르는 가로선.
 - **tab-icon (#D2D5D9) / tab-label (#838B91):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
-- **disabled-fill (#86878A):** 메인(primary) 버튼이 비활성일 때의 배경. 글자는 흰색 그대로, 투명도는 쓰지 않는다.
+- **disabled-fill (#808590):** 메인(primary) 버튼이 비활성일 때의 배경. 글자는 흰색 그대로, 투명도는 쓰지 않는다.
 - **toggle-off (#C9CDD3):** 꺼진 토글의 배경. 켜지면 accent.
 - **secondary-fill (#E8EBED) / fill-strong (#DADDE0):** secondary-fill은 얼럿 취소 같은 보조(secondary) 버튼의 배경이고, fill-strong은 그 버튼을 누를 때와 "이 계획대로 이동중" 버튼의 배경이다. 글자는 `on-surface`.
 - **toast (#646769):** 토스트 배경. 색상 205°, 채도 2%의 회색을 불투명(100%)하게 고정한 값.

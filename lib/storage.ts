@@ -58,7 +58,7 @@ function newId(): string {
 }
 
 /** 새 안내를 저장한다. 같은 경로의 기록 없는 안내는 대체한다. */
-export function addTrip(plan: Plan): Trip {
+export function addTrip(plan: Plan, opts?: { reused?: boolean }): Trip {
   const routeKey = routeKeyOf(plan);
   const trip: Trip = {
     id: newId(),
@@ -66,6 +66,7 @@ export function addTrip(plan: Plan): Trip {
     createdAt: Date.now(),
     status: "planned",
     plan,
+    ...(opts?.reused ? { reused: true } : {}),
   };
   const rest = read().filter((t) => !(t.status === "planned" && t.routeKey === routeKey));
   write([trip, ...rest]);
