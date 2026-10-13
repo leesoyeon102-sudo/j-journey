@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
 import Header from "./Header";
 import LocationPicker from "./LocationPicker";
@@ -19,7 +19,8 @@ import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
-import { draft, isReusedSearch, setReusedSearch } from "@/lib/draft";
+import { readCurrentPlace } from "@/lib/currentLocation";
+import { draft, isOriginLocked, isReusedSearch, lockOrigin, setReusedSearch } from "@/lib/draft";
 import type { Place } from "@/lib/places";
 import {
   addTrip,
@@ -48,6 +49,12 @@ interface Form {
 
 /** 약속 시각보다 이만큼 일찍 도착하도록 계산한다. (유저 설정 없음) */
 const ARRIVE_EARLY_MIN = 5;
+
+/** 지금 시각 "HH:MM" */
+const nowHHMM = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+};
 
 const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false };
 
@@ -95,9 +102,17 @@ export default function Planner() {
         }
       : undefined;
 
-  // 입력 초기값: 아무것도 고르지 않았으면 "장소 선택", 고른 기록이 있으면 그대로 유지한다.
+  // 약속 시각은 직접 고르기 전까지 지금 시각이다. (서버에서 그린 화면과 어긋나지 않도록 서버 값은 따로 둔다)
+  const nowTime = useSyncExternalStore(
+    () => () => {},
+    nowHHMM,
+    () => DEFAULTS.time,
+  );
+  // 입력 초기값: 출발지는 현재 위치로 자동 입력되고(아래 effect), 약속 시각은 지금 시각이다.
+  // 도착지는 마지막으로 고른 곳을 그대로 유지한다.
   const form: Form = {
     ...DEFAULTS,
+    time: nowTime,
     ...(savedOrigin ? { origin: savedOrigin } : {}),
     ...(savedDestination ? { destination: savedDestination } : {}),
     ...edit,
@@ -106,6 +121,8 @@ export default function Planner() {
     if (k === "time" || k === "tomorrow") Object.assign(draft, { [k]: v });
     // 불러온 값을 직접 고치면 더는 "다시 검색한 계획"이 아니다. (내일 토글은 약속 날짜만 고르는 거라 해당 없음)
     if (k !== "tomorrow") setReusedSearch(false);
+    // 출발지를 직접 고르면 그 값을 지킨다. (현재 위치 자동 입력은 멈춘다)
+    if (k === "origin") lockOrigin();
     setEdit((e) => ({ ...e, [k]: v }));
   };
 
@@ -114,6 +131,23 @@ export default function Planner() {
 
   // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
+
+  // 홈 입력 화면이 열릴 때마다 출발지를 현재 위치로 자동 입력한다. 위치를 못 읽으면(권한 꺼짐, http 주소 등) 조용히 건너뛰고
+  // 마지막으로 고른 출발지를 그대로 둔다. 직접 고르거나 안내 내역에서 불러온 출발지는 지킨다.
+  const showingForm = !current && !moving && home !== undefined && home !== null && picker === null;
+  useEffect(() => {
+    if (!showingForm || isOriginLocked()) return;
+    let cancelled = false;
+    readCurrentPlace()
+      .then((p) => {
+        if (cancelled || isOriginLocked()) return;
+        saveLastOrigin({ name: p.name, area: p.address, lat: p.lat, lng: p.lng });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [showingForm]);
 
   // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다. (이미 출발했으면 이동 중 카드로 돌아올 수 있어 띄우지 않는다.)
   const showingResult = Boolean(current);

@@ -11,3 +11,13 @@ export const setReusedSearch = (on: boolean) => {
   reused = on;
 };
 export const isReusedSearch = () => reused;
+
+/**
+ * 홈의 출발지는 열 때마다 현재 위치로 자동 입력된다. 사용자가 출발지를 직접 고르거나 안내 내역에서 불러온 뒤에는
+ * 그 값을 지키려고 자동 입력을 멈춘다. (새로고침하면 다시 자동 입력)
+ */
+let originLocked = false;
+export const lockOrigin = () => {
+  originLocked = true;
+};
+export const isOriginLocked = () => originLocked;

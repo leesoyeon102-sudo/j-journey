@@ -6,7 +6,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { XIcon } from "lucide-react";
 import ThemeColor from "@/components/ThemeColor";
-import { reverseGeocode, searchAddress, type GeoResult } from "@/lib/api";
+import { searchAddress, type GeoResult } from "@/lib/api";
+import { readCurrentPlace } from "@/lib/currentLocation";
 
 export interface PickedLocation {
   name: string;
@@ -37,20 +38,6 @@ interface Props {
 }
 
 type Phase = "locating" | "confirm" | "choose" | "denied";
-
-function readPosition(): Promise<GeolocationPosition> {
-  return new Promise((resolve, reject) => {
-    if (!("geolocation" in navigator)) {
-      reject({ code: 2 });
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 60000,
-    });
-  });
-}
 
 function deniedMessage(code: number) {
   // http://IP 같은 보안 연결(HTTPS)이 아닌 주소에서는 브라우저가 위치 허용 창을 아예 띄우지 않는다.
@@ -88,12 +75,7 @@ export default function LocationPicker({
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState(false);
 
-  async function resolvePosition(): Promise<PickedLocation> {
-    const pos = await readPosition();
-    const { latitude: lat, longitude: lng } = pos.coords;
-    const address = (await reverseGeocode({ lat, lng })) ?? "";
-    return { name: "현재 위치", address, lat, lng };
-  }
+  const resolvePosition = (): Promise<PickedLocation> => readCurrentPlace();
 
   async function locate() {
     try {

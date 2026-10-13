@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
 import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
-import { draft, setReusedSearch } from "@/lib/draft";
+import { draft, lockOrigin, setReusedSearch } from "@/lib/draft";
 import { removeRoute, removeTrip, saveLastDestination, saveLastOrigin, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
 
@@ -83,6 +83,9 @@ export default function HistoryPage() {
     }
     setError(null);
     saveLastOrigin({ name: plan.origin, area: "", ...plan.originCoord });
+    // 불러온 출발지를 홈의 현재 위치 자동 입력이 덮어쓰지 않게 한다. 다만 그때 출발지가 "현재 위치"였다면
+    // 그 시각의 낡은 좌표 대신 지금 위치로 다시 입력되도록 잠그지 않는다. (위치를 못 읽으면 불러온 값이 그대로 남는다)
+    if (plan.origin !== "현재 위치") lockOrigin();
     saveLastDestination({ name: plan.destination, area: "", ...plan.destCoord });
     Object.assign(draft, { time: fmt(plan.arriveBy), tomorrow: false });
     setReusedSearch(true);
