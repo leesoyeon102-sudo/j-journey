@@ -564,7 +564,7 @@ function SourceNote({ plan }: { plan: Plan }) {
         </div>
       )}
       {hasBus && (
-        <p className="mt-4 rounded-card bg-muted px-3 py-3 text-caption text-muted-foreground">
+        <p className="mt-4 rounded-card bg-note-fill px-3 py-3 text-caption text-muted-foreground">
           {plan.busEstimated
             ? "버스 도착 정보가 없거나 약속이 2시간 이상 남은 경우, 배차 간격을 기준으로 안내해요. 약속 1~2시간 전에 다시 확인하면 좀 더 명확하게 알려드려요."
             : "버스 시각은 지금 버스 도착 정보를 바탕으로 예상하여 실제와 몇 분 차이가 있을 수 있어요."}

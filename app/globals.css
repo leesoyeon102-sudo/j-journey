@@ -17,6 +17,7 @@
   --color-disabled-fill: #86878a; /* 메인(primary) 버튼이 비활성일 때 배경 */
   --color-toggle-off: #c9cdd3; /* 꺼진 토글 배경 */
   --color-divider: #dfe6f0; /* 출발 안내의 가로 디바이더 */
+  --color-note-fill: #e6e8eb; /* 출발 안내 맨 아래 안내 박스 배경 */
   --color-secondary-fill: #e8ebed; /* 얼럿 취소 같은 보조 버튼 배경 */
   --color-fill-strong: #dadde0; /* "이 계획대로 이동중" 버튼 배경, 보조 버튼을 누를 때 */
   --color-muted: #f6f7f7;
