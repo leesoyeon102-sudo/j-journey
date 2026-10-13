@@ -185,15 +185,17 @@ export default function LocationPicker({
             </p>
           )}
           {homeChip && (
-            <div className="mb-3 flex items-center gap-3">
-              <Button variant="outline" onClick={homeChip.onPick} className="min-w-0 max-w-full">
+            <div className="mb-3 flex items-center">
+              {/* 주소가 길면 칩 안의 주소를 말줄임(…)으로 줄여서 "변경"이 오른쪽 안쪽 여백(20px) 끝에 그대로 보이게 한다. */}
+              <Button variant="outline" onClick={homeChip.onPick} className="min-w-0 shrink overflow-hidden">
                 <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z" />
                 </svg>
                 <span className="shrink-0">집</span>
                 <span className="truncate text-caption font-normal text-muted-foreground">{homeChip.address}</span>
               </Button>
-              <Button variant="ghost" size="sm" onClick={homeChip.onEdit} className="shrink-0 text-muted-foreground">
+              {/* 칩과 "변경" 글자 사이가 10px(왼쪽 1px + 버튼 안쪽 8px + 글자 옆 여백 1px). 글자 오른쪽 끝이 안쪽 여백 끝에 맞도록 오른쪽 안쪽 8px는 밖으로 뺀다. */}
+              <Button variant="ghost" size="sm" onClick={homeChip.onEdit} className="ml-px -mr-2 shrink-0 px-2 text-muted-foreground">
                 변경
               </Button>
             </div>
