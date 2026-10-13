@@ -51,7 +51,7 @@ export default function TabBar() {
   const activeIndex = TABS.findIndex((t) => t.href === pathname);
   return (
     // 하늘 위에 떠 있는 유리 막대. 바깥 nav는 투명하고, 클릭은 막대에서만 받는다.
-    <nav className="pointer-events-none fixed bottom-0 left-1/2 z-20 w-[390px] max-w-full -translate-x-1/2 bg-linear-to-t from-sky-pale to-sky-pale/0 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-6">
+    <nav className="pointer-events-none fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 bg-linear-to-t from-sky-pale to-sky-pale/0 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-6">
       <ul className="glass pointer-events-auto relative grid grid-cols-3 rounded-nav p-1">
         {/* 선택 표시: 탭을 누르면 이 알약이 옆 탭으로 미끄러져 간다. */}
         <li

@@ -10,7 +10,7 @@ export default function Toast({ message }: { message: string }) {
   return createPortal(
     // 좌우 여백(px-5)은 화면 안쪽 여백과 같고, 박스는 그 사이를 가득 채운다.
     // 아래는 탭바(테두리 1px + 56px + 안전 영역) 위로 toast-offset(10px)만큼 띄운다.
-    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(67px+env(safe-area-inset-bottom))] z-30 mx-auto w-[390px] max-w-full px-5">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(67px+env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-[480px] px-5">
       <p
         role="status"
         aria-live="polite"

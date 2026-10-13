@@ -123,7 +123,7 @@ export default function LocationPicker({
   // 부모(.fade-in)의 transform 안에서는 fixed가 화면 기준이 아니라서 body에 직접 그린다.
   if (!mounted) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col bg-surface">
+    <div className="fixed inset-0 z-50 mx-auto flex w-full max-w-[480px] flex-col bg-surface">
       {/* 이 화면의 맨 위는 연한 하늘이라 상태 표시줄도 그 색으로 맞춘다. (아래 홈의 하늘색을 따라가지 않게) */}
       <ThemeColor token="sky-pale" />
 

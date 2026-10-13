@@ -101,7 +101,7 @@ function Sheet({
   // 화면 가운데에 뜨는 얼럿 창. 부모 요소의 transform 영향을 받지 않도록 body에 그린다.
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] mx-auto flex w-[390px] max-w-full items-center justify-center px-6"
+      className="fixed inset-0 z-[60] mx-auto flex w-full max-w-[480px] items-center justify-center px-6"
       role="presentation"
     >
       <div className="fade-backdrop absolute inset-0 bg-on-surface/15 backdrop-blur-sm" onClick={onClose} />

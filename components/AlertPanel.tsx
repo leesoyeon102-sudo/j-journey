@@ -28,7 +28,7 @@ export default function AlertPanel({ title, description, content, onClose, child
   // .fade-in 같은 transform을 가진 부모 안에서는 fixed가 화면 기준이 아니라서 body에 직접 붙인다.
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] mx-auto flex w-[390px] max-w-full items-center justify-center bg-on-surface/15 px-8 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] mx-auto flex w-full max-w-[480px] items-center justify-center bg-on-surface/15 px-8 backdrop-blur-sm"
       onClick={onClose}
     >
       <div

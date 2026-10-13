@@ -197,11 +197,11 @@ body {
   background: transparent; /* 앱 바깥의 연한 회색(html 배경)을 그대로 보이게 */
 }
 
-/* 모바일 390px 기준 앱 화면 */
+/* 모바일 앱 화면: 폰 화면 폭(360~430px 등)에 맞춰 꽉 채우고, 그보다 넓은 화면(태블릿·PC)에서는 480px로 가운데에 둔다. */
 .app-shell {
   margin: 0 auto;
-  width: 390px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 480px;
   min-height: 100dvh;
   /* 홈이 아닌 화면도 유리 면 뒤에 색이 있도록 맨 위에 연한 하늘을 깔아 흰색으로 푼다. */
   background: linear-gradient(180deg, var(--color-sky-pale) 0, var(--color-surface) 420px) no-repeat var(--color-surface);
