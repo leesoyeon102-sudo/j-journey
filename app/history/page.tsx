@@ -11,6 +11,7 @@ import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
 import { requestPlans } from "@/lib/api";
 import { nextOccurrence } from "@/lib/dates";
+import { setTabOverride } from "@/lib/tabOverride";
 import { setPendingResult } from "@/lib/pending";
 import { addTrip, removeRoute, removeTrip, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
@@ -106,6 +107,8 @@ export default function HistoryPage() {
       setPendingResult({ tripId: addTrip(result.plan).id, plans: result.plans, groups: result.groups, fromHistory: true });
       // 다시 안내받기가 실제로 이뤄졌을 때(경로 계산 성공 뒤) 한 번만 센다.
       amplitude.track("Route Reused");
+      // 안내 화면은 "/"에 뜨지만 탭바는 "안내 내역"이 계속 선택돼 있게 한다. (화면이 바뀌는 순간 홈으로 깜빡이지 않도록 미리 정한다.)
+      setTabOverride("/history");
       router.push("/");
     } catch {
       setError({ key: r.key, message: "경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요." });

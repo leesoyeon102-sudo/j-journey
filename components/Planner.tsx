@@ -20,6 +20,7 @@ import { requestPlans } from "@/lib/api";
 import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
+import { setTabOverride } from "@/lib/tabOverride";
 import { clearPendingResult, peekPendingResult } from "@/lib/pending";
 import type { Place } from "@/lib/places";
 import {
@@ -133,6 +134,12 @@ export default function Planner() {
   useEffect(() => {
     clearPendingResult();
   }, [showingResult]);
+  // 경로 내역에서 다시 안내받은 출발 안내가 떠 있는 동안에는 탭바가 "안내 내역"을 계속 선택해 둔다.
+  const keepHistoryTab = Boolean(current && current.id === historyTripId);
+  useEffect(() => {
+    setTabOverride(keepHistoryTab ? "/history" : null);
+  }, [keepHistoryTab]);
+  useEffect(() => () => setTabOverride(null), []);
   useEffect(() => {
     setLeaveGuard(guardLeave);
     return () => setLeaveGuard(false);
