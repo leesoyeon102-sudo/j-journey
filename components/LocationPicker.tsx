@@ -178,7 +178,8 @@ export default function LocationPicker({
       )}
 
       {(phase === "choose" || phase === "denied") && (
-        <div className="px-5 pt-6">
+        // 남는 높이를 검색 결과 목록이 차지하고, 목록만 따로 스크롤된다. (화면 전체는 움직이지 않는다)
+        <div className="flex min-h-0 flex-1 flex-col px-5 pt-6">
           {denied && phase === "denied" && (
             <p role="alert" className="mb-4 rounded-card bg-muted px-4 py-3 text-body text-on-surface">
               {denied}
@@ -235,7 +236,7 @@ export default function LocationPicker({
             <p className="mt-6 text-center text-body text-muted-foreground">검색 결과가 없어요</p>
           )}
           {results && results.length > 0 && (
-            <ul className="mt-2 divide-y divide-border">
+            <ul className="mt-2 min-h-0 flex-1 divide-y divide-border overflow-y-auto overscroll-contain pb-6">
               {results.map((r, i) => (
                 <li key={i}>
                   <button
