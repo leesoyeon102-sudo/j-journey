@@ -9,6 +9,7 @@ import LocationPicker from "./LocationPicker";
 import PlanFilter, { type PlanTab } from "./PlanFilter";
 import PlanSlider from "./PlanSlider";
 import SkyBackdrop from "./SkyBackdrop";
+import ThemeColor from "./ThemeColor";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
@@ -227,7 +228,7 @@ export default function Planner() {
     return (
       <main className="fade-in -mb-[23px]">
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
-        <nav className="sticky top-0 z-20 flex items-center gap-1 bg-glass-strong px-2 pt-2 backdrop-blur-glass">
+        <nav className="sticky top-0 z-20 flex items-center gap-1 bg-sky-pale/80 px-2 pt-2 backdrop-blur-glass">
           <Button
             type="button"
             variant="ghost"
@@ -277,7 +278,7 @@ export default function Planner() {
         {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 바로 위에 달라붙는다. */}
         {!done && (
           // 뒤 내용이 자연스럽게 묻히도록 위는 투명, 아래는 흰색으로 이어지는 그라데이션. 빈 부분은 클릭이 아래 내용으로 지나간다.
-          <div className="pointer-events-none sticky bottom-[calc(3.5rem+1px+env(safe-area-inset-bottom))] z-10 bg-linear-to-b from-surface/0 to-surface to-30% px-5 pb-3 pt-5">
+          <div className="pointer-events-none sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 bg-linear-to-b from-surface/0 to-surface to-30% px-5 pb-3 pt-5">
             <div className="pointer-events-auto">
               <TripActionButton
                 departedAt={current.departedAt}
@@ -309,6 +310,7 @@ export default function Planner() {
     return (
       <main className="fade-in relative isolate">
         <SkyBackdrop />
+        <ThemeColor token="sky" />
         <Header title="J의 외출" sub="지금 이동 중이에요." onSky />
         <div className="px-5 pb-8">
           <TripProgressCard
@@ -331,6 +333,7 @@ export default function Planner() {
   return (
     <main className="fade-in relative isolate">
       <SkyBackdrop />
+      <ThemeColor token="sky" />
       <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." onSky />
 
       {showHomePicker && (

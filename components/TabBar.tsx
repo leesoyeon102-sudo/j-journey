@@ -49,8 +49,9 @@ export default function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
   return (
-    <nav className="fixed bottom-0 left-1/2 z-20 w-[390px] max-w-full -translate-x-1/2 border-t border-glass-border bg-glass-strong backdrop-blur-glass">
-      <ul className="grid grid-cols-3 pb-[env(safe-area-inset-bottom)]">
+    // 하늘 위에 떠 있는 유리 막대. 바깥 nav는 투명하고, 클릭은 막대에서만 받는다.
+    <nav className="pointer-events-none fixed bottom-0 left-1/2 z-20 w-[390px] max-w-full -translate-x-1/2 bg-linear-to-t from-sky-pale to-sky-pale/0 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-6">
+      <ul className="glass pointer-events-auto grid grid-cols-3 rounded-nav p-1">
         {TABS.map((t) => {
           const active = pathname === t.href;
           return (
@@ -65,8 +66,8 @@ export default function TabBar() {
                     requestLeave(() => router.push(t.href));
                   }
                 }}
-                className={`flex h-14 flex-col items-center justify-center gap-1 text-caption ${
-                  active ? "font-semibold text-on-surface" : "font-normal text-muted-foreground"
+                className={`flex h-12 flex-col items-center justify-center gap-0.5 rounded-input text-caption transition-colors ${
+                  active ? "bg-glass-strong font-semibold text-on-surface" : "font-normal text-muted-foreground"
                 }`}
               >
                 {/* 비활성 아이콘은 글자보다 한 단계 연한 inactive 색 */}
