@@ -45,7 +45,7 @@ export default function TimeSheet({ label, value, onChange }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex min-h-16 w-full flex-col justify-center rounded-input bg-muted px-4 py-3 text-left"
+        className="glass-strong flex min-h-16 w-full flex-col justify-center rounded-nav px-4 py-3 text-left"
       >
         <span className="text-caption text-muted-foreground">{label}</span>
         <span className="text-body-lg font-medium tabular-nums">{display(a, h, m)}</span>
@@ -102,12 +102,12 @@ function Sheet({
       className="fixed inset-0 z-[60] mx-auto flex w-[390px] max-w-full items-center justify-center px-6"
       role="presentation"
     >
-      <div className="fade-backdrop absolute inset-0 bg-on-surface/40" onClick={onClose} />
+      <div className="fade-backdrop absolute inset-0 bg-on-surface/15 backdrop-blur-sm" onClick={onClose} />
       <div
         role="alertdialog"
         aria-modal="true"
         aria-label={`${label} 선택`}
-        className="alert-in relative w-full rounded-nav bg-surface p-5"
+        className="alert-in glass-strong relative w-full rounded-nav p-5"
       >
         <h2 className="text-center text-subheading font-medium">{label}</h2>
 

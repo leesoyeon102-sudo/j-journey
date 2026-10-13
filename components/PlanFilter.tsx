@@ -35,7 +35,7 @@ export default function PlanFilter({ value, onChange, unavailable = {}, count, p
               disabled={off}
               onClick={() => onChange(t.id)}
               className={`h-9 shrink-0 whitespace-nowrap rounded-pill px-4 text-label font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40 ${
-                on ? "bg-primary text-on-primary" : "bg-muted text-on-surface hover:bg-border"
+                on ? "bg-primary text-on-primary" : "glass text-on-surface hover:bg-glass-strong"
               }`}
             >
               {t.label}

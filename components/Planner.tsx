@@ -8,6 +8,7 @@ import Header from "./Header";
 import LocationPicker from "./LocationPicker";
 import PlanFilter, { type PlanTab } from "./PlanFilter";
 import PlanSlider from "./PlanSlider";
+import SkyBackdrop from "./SkyBackdrop";
 import TimeSheet from "./TimeSheet";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
@@ -226,7 +227,7 @@ export default function Planner() {
     return (
       <main className="fade-in -mb-[23px]">
         {/* 위로 스크롤하면 맨 위에 붙어 있도록 sticky. 위쪽 여백은 상태 표시줄에 바짝 붙게 최소로 둔다. */}
-        <nav className="sticky top-0 z-20 flex items-center gap-1 bg-surface px-2 pt-2">
+        <nav className="sticky top-0 z-20 flex items-center gap-1 bg-glass-strong px-2 pt-2 backdrop-blur-glass">
           <Button
             type="button"
             variant="ghost"
@@ -306,8 +307,9 @@ export default function Planner() {
 
   if (moving && !showHomePicker) {
     return (
-      <main className="fade-in">
-        <Header title="J의 외출" sub="지금 이동 중이에요." />
+      <main className="fade-in relative isolate">
+        <SkyBackdrop />
+        <Header title="J의 외출" sub="지금 이동 중이에요." onSky />
         <div className="px-5 pb-8">
           <TripProgressCard
             origin={moving.plan.origin}
@@ -327,8 +329,9 @@ export default function Planner() {
   }
 
   return (
-    <main className="fade-in">
-      <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." />
+    <main className="fade-in relative isolate">
+      <SkyBackdrop />
+      <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." onSky />
 
       {showHomePicker && (
         <LocationPicker
@@ -408,7 +411,7 @@ export default function Planner() {
         <button
           type="button"
           onClick={() => setPicker("origin")}
-          className="flex min-h-16 w-full flex-col justify-center rounded-input bg-muted px-4 py-3 text-left"
+          className="glass-strong flex min-h-16 w-full flex-col justify-center rounded-nav px-4 py-3 text-left"
         >
           <span className="text-caption text-muted-foreground">출발지</span>
           <span className="text-body-lg font-medium">{form.origin?.name || "장소 선택"}</span>
@@ -420,7 +423,7 @@ export default function Planner() {
         <button
           type="button"
           onClick={() => setPicker("destination")}
-          className="flex min-h-16 w-full flex-col justify-center rounded-input bg-muted px-4 py-3 text-left"
+          className="glass-strong flex min-h-16 w-full flex-col justify-center rounded-nav px-4 py-3 text-left"
         >
           <span className="text-caption text-muted-foreground">도착지</span>
           <span className="text-body-lg font-medium">{form.destination?.name || "장소 선택"}</span>
@@ -431,7 +434,7 @@ export default function Planner() {
 
         <TimeSheet label="약속 시각" value={form.time} onChange={(v) => set("time", v)} />
 
-        <div className="flex h-12 items-center justify-between px-1">
+        <div className="glass flex h-14 items-center justify-between rounded-nav px-4">
           <span id="tomorrow-label" className="text-body text-on-surface">
             내일 약속이에요
           </span>

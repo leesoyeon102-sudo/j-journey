@@ -11,7 +11,7 @@ const meta = {
   args: { value: "recommended", onChange: () => {}, count: 1, page: 0 },
   decorators: [
     (Story) => (
-      <div className="w-[390px] pt-4">
+      <div className="sky-wash w-[390px] pt-4">
         <Story />
       </div>
     ),

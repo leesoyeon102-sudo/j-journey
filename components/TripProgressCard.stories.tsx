@@ -16,7 +16,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="w-[390px] p-5">
+      <div className="sky-wash w-[390px] p-5">
         <Story />
       </div>
     ),

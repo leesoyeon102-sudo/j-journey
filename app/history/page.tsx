@@ -126,14 +126,18 @@ export default function HistoryPage() {
           홈에서 약속 시각을 입력해 보세요.
         </p>
       ) : (
-        <ul className="divide-y divide-border border-y border-border">
+        <ul className="space-y-3 px-5 pb-8">
           {routes.map((r) => {
             const open = openKey === r.key;
             const { plan } = r.latest;
             return (
-              <li key={r.key}>
+              <li key={r.key} className="glass-strong overflow-hidden rounded-nav">
                 <div className="relative overflow-hidden">
-                  <div className="absolute inset-y-0 right-0" style={{ width: DELETE_W }}>
+                  {/* 유리처럼 비치는 카드라, 밀기 전에는 삭제 버튼이 비쳐 보이지 않게 숨겨 둔다. */}
+                  <div
+                    className="absolute inset-y-0 right-0 transition-opacity"
+                    style={{ width: DELETE_W, opacity: drag?.key === r.key || swiped === r.key ? 1 : 0 }}
+                  >
                     <Button
                       variant="danger"
                       tabIndex={swiped === r.key ? 0 : -1}
@@ -157,7 +161,7 @@ export default function HistoryPage() {
                     onClickCapture={(e) => {
                       if (justSwiped.current) e.stopPropagation();
                     }}
-                    className="relative touch-pan-y bg-surface select-none"
+                    className="relative touch-pan-y select-none"
                     style={{
                       transform: `translateX(${drag?.key === r.key ? drag.x : swiped === r.key ? -DELETE_W : 0}px)`,
                       transition: drag?.key === r.key ? "none" : "transform 0.2s ease-out",
@@ -199,7 +203,7 @@ export default function HistoryPage() {
                 </div>
 
                 {open && (
-                  <div className="fade-in bg-muted-subtle px-5 pb-5 pt-4">
+                  <div className="fade-in border-t border-glass-border px-5 pb-5 pt-4">
                     <p className="mb-4 text-caption text-muted-foreground">
                       마지막 안내 · {fmt(plan.leaveAt)} 출발 · {fmt(plan.arriveBy)} 약속
                     </p>

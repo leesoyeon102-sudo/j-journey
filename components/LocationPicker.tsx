@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { reverseGeocode, searchAddress, type GeoResult } from "@/lib/api";
 
 export interface PickedLocation {
@@ -72,6 +73,11 @@ export default function LocationPicker({
   onSelect,
   onClose,
 }: Props) {
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [phase, setPhase] = useState<Phase>(autoLocate ? "locating" : "choose");
   const [found, setFound] = useState<PickedLocation | null>(null);
   const [denied, setDenied] = useState<string | null>(null);
@@ -132,8 +138,10 @@ export default function LocationPicker({
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col overflow-y-auto bg-surface">
+  // 부모(.fade-in)의 transform 안에서는 fixed가 화면 기준이 아니라서 body에 직접 그린다.
+  if (!mounted) return null;
+  return createPortal(
+    <div className="sky-wash fixed inset-0 z-50 mx-auto flex w-[390px] max-w-full flex-col overflow-y-auto">
       <div className="flex items-center justify-between px-5 pt-10">
         <h2 className="text-heading font-medium">{title}</h2>
         {onClose && (
@@ -234,6 +242,7 @@ export default function LocationPicker({
           )}
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }

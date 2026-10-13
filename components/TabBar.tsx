@@ -49,7 +49,7 @@ export default function TabBar() {
   const pathname = usePathname();
   const router = useRouter();
   return (
-    <nav className="fixed bottom-0 left-1/2 z-20 w-[390px] max-w-full -translate-x-1/2 border-t border-border-subtle bg-surface">
+    <nav className="fixed bottom-0 left-1/2 z-20 w-[390px] max-w-full -translate-x-1/2 border-t border-glass-border bg-glass-strong backdrop-blur-glass">
       <ul className="grid grid-cols-3 pb-[env(safe-area-inset-bottom)]">
         {TABS.map((t) => {
           const active = pathname === t.href;

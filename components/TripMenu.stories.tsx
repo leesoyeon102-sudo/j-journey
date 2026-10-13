@@ -10,7 +10,7 @@ const meta = {
   args: { onCancelDeparture: fn() },
   decorators: [
     (Story) => (
-      <div className="flex w-[390px] justify-end px-2 pt-2">
+      <div className="sky-wash flex h-[200px] w-[390px] justify-end px-2 pt-2">
         <Story />
       </div>
     ),

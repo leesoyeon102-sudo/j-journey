@@ -27,6 +27,18 @@
   --color-on-danger: #45192f;
   --color-success: #22b35e;
   --color-success-subtle: #e9f7ef; /* success 10%를 흰 배경에 올린 색 */
+  /* 하늘 + 블러 반투명 유리 */
+  --color-sky: #3d8beb;
+  --color-sky-soft: #a6ccf7;
+  --color-sky-pale: #d6e8fb;
+  --color-sun: #ffd9a8; /* 하늘에 번지는 노을빛, 배경 장식 전용 */
+  --color-on-sky: #ffffff;
+  --color-on-sky-muted: rgb(255 255 255 / 0.78);
+  --color-glass: rgb(255 255 255 / 0.5);
+  --color-glass-strong: rgb(255 255 255 / 0.86);
+  --color-glass-border: rgb(255 255 255 / 0.7);
+  --blur-glass: 20px;
+  --shadow-glass: 0 8px 24px 0 rgb(47 91 255 / 0.08);
 }
 
 @theme {
@@ -119,6 +131,21 @@
   --shadow-nav: rgba(0, 0, 0, 0.05) 0px 10px 20px 0px;
 }
 
+/* 블러 반투명 유리 면. glass는 입력 칸·카드, glass-strong은 글자가 많이 올라가는 면(탭바·팝업·상세). */
+.glass {
+  background-color: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-glass);
+  @apply backdrop-blur-glass;
+}
+
+.glass-strong {
+  background-color: var(--color-glass-strong);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: var(--shadow-glass);
+  @apply backdrop-blur-glass;
+}
+
 html {
   background: var(--color-muted);
   -webkit-tap-highlight-color: transparent;
@@ -137,8 +164,23 @@ body {
   width: 390px;
   max-width: 100%;
   min-height: 100dvh;
-  background: var(--color-surface);
+  /* 홈이 아닌 화면도 유리 면 뒤에 색이 있도록 맨 위에 연한 하늘을 깔아 흰색으로 푼다. */
+  background: linear-gradient(180deg, var(--color-sky-pale) 0, var(--color-surface) 420px) no-repeat var(--color-surface);
   position: relative;
+}
+
+/* 전체 화면을 덮는 선택 창의 배경: 뒤 화면이 비치지 않도록 불투명한 연한 하늘 */
+.sky-wash {
+  background: linear-gradient(180deg, var(--color-sky-pale) 0, var(--color-surface) 420px) no-repeat var(--color-surface);
+}
+
+/* 홈의 하늘: 위 sky → sky-soft → 흰색. 한쪽에 sun 노을빛이 번지고 흰 구름이 두 점 떠 있다. */
+.sky-backdrop {
+  background:
+    radial-gradient(62% 12% at 16% 58%, rgb(255 255 255 / 0.55), transparent 72%),
+    radial-gradient(50% 10% at 90% 46%, rgb(255 255 255 / 0.45), transparent 72%),
+    radial-gradient(62% 11% at 96% 84%, color-mix(in srgb, var(--color-sun) 95%, transparent), transparent 74%),
+    linear-gradient(180deg, var(--color-sky) 0%, var(--color-sky-soft) 62%, var(--color-surface) 100%);
 }
 
 input[type="time"]::-webkit-calendar-picker-indicator {

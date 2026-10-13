@@ -10,7 +10,6 @@ export default function RoadmapPage() {
   const home = useHome();
   const map = buildRoadmap(trips);
   const empty = map.tripCount === 0;
-  // 피드백을 묻는 조건: 로드맵에 한 번 들어와 봤다.
 
   return (
     <main className="fade-in">
@@ -42,7 +41,7 @@ export default function RoadmapPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-card bg-muted px-3 py-3">
+    <div className="glass-strong rounded-nav px-3 py-3">
       <dt className="text-caption text-muted-foreground">{label}</dt>
       <dd className="mt-1 text-subheading font-medium tabular-nums">{value}</dd>
     </div>

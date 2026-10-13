@@ -25,7 +25,7 @@ export default function TripMenu({ onCancelDeparture }: Props) {
         <DropdownMenu.Content
           align="end"
           sideOffset={4}
-          className="fade-in z-[70] min-w-36 rounded-input border border-border-subtle bg-surface p-1 shadow-nav"
+          className="fade-in z-[70] min-w-36 glass-strong rounded-nav p-1"
         >
           <DropdownMenu.Item
             onSelect={onCancelDeparture}
