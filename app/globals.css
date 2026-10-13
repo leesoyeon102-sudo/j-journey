@@ -13,15 +13,16 @@
   --color-surface: #ffffff;
   --color-on-surface: #14171f;
   --color-tab-icon: #d2d5d9; /* 탭바 비활성 아이콘 */
-  --color-tab-label: #888a8c; /* 탭바 비활성 글자 */
+  --color-tab-label: #838b91; /* 탭바 비활성 글자 */
   --color-disabled-fill: #86878a; /* 메인(primary) 버튼이 비활성일 때 배경 */
   --color-toggle-off: #c9cdd3; /* 꺼진 토글 배경 */
+  --color-divider: #cad8e8; /* 출발 안내의 가로 디바이더 */
   --color-secondary-fill: #e8ebed; /* 얼럿 취소 같은 보조 버튼 배경 */
   --color-fill-strong: #dadde0; /* "이 계획대로 이동중" 버튼 배경, 보조 버튼을 누를 때 */
   --color-muted: #f6f7f7;
   --color-muted-subtle: #fbfcfc;
-  --color-muted-foreground: #6b6e70;
-  --color-placeholder: #989b9d;
+  --color-muted-foreground: #676f74;
+  --color-placeholder: #949ca1;
   --color-inactive: #c9cbcc;
   --color-border: #e7e8e8;
   --color-border-subtle: #f0f1f1;

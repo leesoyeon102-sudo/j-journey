@@ -10,15 +10,16 @@ colors:
   surface: "#FFFFFF"
   on-surface: "#14171F"
   tab-icon: "#D2D5D9"
-  tab-label: "#888A8C"
+  tab-label: "#838B91"
   disabled-fill: "#86878A"
   toggle-off: "#C9CDD3"
+  divider: "#CAD8E8"
   secondary-fill: "#E8EBED"
   fill-strong: "#DADDE0"
   muted: "#F6F7F7"
   muted-subtle: "#FBFCFC"
-  muted-foreground: "#6B6E70"
-  placeholder: "#989B9D"
+  muted-foreground: "#676F74"
+  placeholder: "#949CA1"
   inactive: "#C9CBCC"
   border: "#E7E8E8"
   border-subtle: "#F0F1F1"
@@ -212,7 +213,7 @@ components:
     backgroundColor: "{colors.border-subtle}"
     height: 1px
   divider:
-    backgroundColor: "{colors.border}"
+    backgroundColor: "{colors.divider}"
     height: 1px
   departure-time:
     textColor: "{colors.accent}"
@@ -278,7 +279,8 @@ components:
 ## Colors
 
 - **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
-- **tab-icon (#D2D5D9) / tab-label (#888A8C):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
+- **divider (#CAD8E8):** 출발 안내에서 시각 안내와 타임라인을 가르는 가로선.
+- **tab-icon (#D2D5D9) / tab-label (#838B91):** 탭바에서 선택되지 않은 탭의 아이콘과 글자.
 - **disabled-fill (#86878A):** 메인(primary) 버튼이 비활성일 때의 배경. 글자는 흰색 그대로, 투명도는 쓰지 않는다.
 - **toggle-off (#C9CDD3):** 꺼진 토글의 배경. 켜지면 accent.
 - **secondary-fill (#E8EBED) / fill-strong (#DADDE0):** secondary-fill은 얼럿 취소 같은 보조(secondary) 버튼의 배경이고, fill-strong은 그 버튼을 누를 때와 "이 계획대로 이동중" 버튼의 배경이다. 글자는 `on-surface`.
@@ -287,7 +289,7 @@ components:
 - **surface (#FFFFFF) / on-surface (#14171F):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.
 - **inactive (#C9CBCC):** 선택되지 않은 탭바 아이콘. placeholder보다 한 단계 연하다.
 - **muted-subtle (#FBFCFC):** 안내 내역에서 펼친 상세 영역처럼 흰 바탕과 살짝만 구분되는 면.
-- **muted (#F6F7F7):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#6B6E70), placeholder와 비활성 글자는 `placeholder`(#989B9D)를 쓴다.
+- **muted (#F6F7F7):** 입력 배경, 보조 버튼, 태그처럼 한 단계 가라앉은 면. 보조 글자는 `muted-foreground`(#676F74), placeholder와 비활성 글자는 `placeholder`(#949CA1)를 쓴다.
 - **border (#E7E8E8):** 카드·outline 버튼·입력의 테두리와 구분선.
 - **border-subtle (#F0F1F1):** 탭바 위의 구분선처럼 화면을 가르되 눈에 덜 띄어야 하는 선.
 - **accent (#3E7BFF) / accent-subtle (#ECF2FF):** 출발 시각 등 앱에서 가장 중요한 숫자 하나. 켜진 토글의 배경도 accent를 따른다. 안내 내역의 "자주 이용한 경로" 배지에도 쓴다(accent 글자 + accent-subtle 배경). shadcn의 `accent`(호버 배경)와 이름이 겹쳐 코드에서는 `brand`로 쓴다.
@@ -333,7 +335,7 @@ components:
 - **Input:** 44px 높이, muted 배경, border 테두리. 포커스 시 테두리가 `on-surface`로 진해지고, 오류(`aria-invalid`)면 danger 테두리가 된다.
 - **Dialog·Alert·시각 선택 창:** `glass-strong` 중앙 패널(16px). 뒤 화면은 `on-surface` 15% 오버레이와 약한 블러로 물린다. 닫기 버튼 기본 제공.
 - **Glass card:** 홈의 출발지·도착지·약속 시각 칸, 이동 중 카드, 안내 내역 항목, 로드맵 통계가 쓴다. `glass`(또는 `glass-strong`) + 16px 반경. 코드에서는 `glass`, `glass-strong` 유틸리티로 쓴다.
-- **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#888A8C) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
+- **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#838B91) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
 - **Status bar:** 화면 맨 위 배경색과 같은 색으로 칠한다(`ThemeColor`). 홈·이동 중 홈은 `sky`, 나머지 화면은 `sky-pale`이라 배경이 상태 표시줄까지 끊김 없이 이어진다. 안내 화면의 위쪽 내비게이션도 흰색 대신 `sky-pale` 80% + 블러로 둬서 같은 이음새를 만든다.
 - **Sky backdrop:** 홈과 이동 중 홈의 맨 위에 깔리는 하늘(위 sky → sky-soft → 흰색, 한쪽에 sun 번짐, 흰 뭉게구름 세 점). `SkyBackdrop` 컴포넌트.
 
@@ -344,6 +346,6 @@ components:
 - Don't danger(코랄)를 글자·아이콘·테두리 색으로 쓰지 않는다. 채움(`danger-subtle`)에 `on-danger` 글자로만 쓴다.
 - Don't accent(파랑)를 출발 시각과 "자주 이용한 경로" 배지 외의 장식에 쓰지 않는다. 한 화면에 파랑이 많으면 시각이 묻힌다. 하늘색(sky)은 배경으로만 쓰고 글자·버튼 색으로 쓰지 않는다.
 - Don't 유리 면을 겹겹이 쌓지 않는다. 유리 위의 유리는 흐려져서 글자가 읽히지 않는다.
-- Do 회색은 색상(hue) 205°, 채도 2%로 쓴다. 밝기만 달라지고 색조는 같다(`muted`, `muted-foreground`, `placeholder`, `inactive`, `border`, `border-subtle`, `toast`). 보라 쪽으로 기울거나 파란색이 눈에 띄는 회색, 순수한 무채색 회색(#888, #EEE 같은 값)을 새로 만들지 않는다.
+- Do 회색은 색상(hue) 205°로 맞춘다. 면·선·아이콘의 회색은 채도 2%, 회색 글자(`muted-foreground`, `placeholder`, `tab-label`)는 채도 6%라서 파란 기운이 조금 더 돈다. 밝기만 달라지고 색조는 같다. 보라 쪽으로 기울거나 파란색이 눈에 띄는 회색, 순수한 무채색 회색(#888, #EEE 같은 값)을 새로 만들지 않는다.
 - Do 하늘(sky) 위에 바로 올라가는 글자는 `on-sky`(흰색)를, 유리 위의 글자는 `on-surface`·`muted-foreground`를 쓴다.
 - Don't 컴포넌트에서 hex 값을 직접 쓰거나 반경을 새로 만들지 않는다. `globals.css`의 토큰과 `rounded-button`, `rounded-input` 같은 이름만 쓴다.

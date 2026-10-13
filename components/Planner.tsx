@@ -521,7 +521,7 @@ const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta
         <p className="mt-3 text-body text-muted-foreground">약속 {plan.arriveBy - plan.arriveAt}분 전 도착</p>
       </section>
 
-      <div className="border-t border-border" />
+      <div className="border-t border-divider" />
 
       <section className="px-5 pt-[22px]">
         <Timeline plan={plan} />
