@@ -25,7 +25,7 @@ const GROUP_SIZE = 3;
 /** 카카오 경로의 버스 정류장을 우리 버스 데이터의 정류장과 같다고 볼 최대 거리(m) */
 const STOP_MATCH_M = 150;
 /** 우리 지하철 노선도에 없는 노선의 표시 색 (placeholder 토큰 값) */
-const UNKNOWN_LINE_COLOR = "#98989d";
+const UNKNOWN_LINE_COLOR = "#989b9d";
 
 type LatLng = { lat: number; lng: number };
 
