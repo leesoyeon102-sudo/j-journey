@@ -29,6 +29,7 @@ import {
   cancelDeparture,
   saveHome,
   saveLastDestination,
+  clearLastDestination,
   saveLastOrigin,
   useHome,
   useLastDestination,
@@ -213,6 +214,13 @@ export default function Planner() {
       setPage(0);
       // 추천 안을 우선 저장하고, 다른 안으로 도착 기록을 남기면 그 안으로 바꾼다.
       setActiveId(addTrip(result.plan).id);
+      // 검색을 마치면 도착지를 비운다. 뒤로 와도 도착지는 새로 고르게 하고, 출발지는 현재 위치로 다시 채워진다.
+      clearLastDestination();
+      setEdit((e) => {
+        const next = { ...e };
+        delete next.destination;
+        return next;
+      });
       setEditing(false);
     } catch {
       setError("경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요.");

@@ -140,6 +140,16 @@ function createPlaceStore(key: string) {
       }
       listeners.forEach((l) => l());
     },
+    /** 기억해 둔 장소를 지운다. */
+    clear: () => {
+      memory = null;
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // 저장할 수 없는 환경에서는 메모리 값만 지운다.
+      }
+      listeners.forEach((l) => l());
+    },
   };
 }
 
@@ -155,6 +165,7 @@ export const useLastOrigin = originStore.use;
 export const saveLastOrigin = originStore.save;
 export const useLastDestination = destinationStore.use;
 export const saveLastDestination = destinationStore.save;
+export const clearLastDestination = destinationStore.clear;
 
 /**
  * 경로 내역에서 경로를 지운다. 도착을 기록한 안내는 로드맵에 남도록 지우지 않고 숨기기만 하고,
