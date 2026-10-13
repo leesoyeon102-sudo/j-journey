@@ -1,10 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Hahmlet } from "next/font/google";
 import "./globals.css";
 import AmplitudeInit from "@/components/AmplitudeInit";
 import FeedbackPrompt from "@/components/FeedbackPrompt";
 import LeaveConfirm from "@/components/LeaveConfirm";
 import TabBar from "@/components/TabBar";
 import ThemeColor from "@/components/ThemeColor";
+
+// 함렛(Hahmlet, 구글 글꼴·OFL). 굵기 100~900 가변 글꼴이고, 한글은 조각(unicode-range)으로 나뉘어 필요한 글자만 내려받는다.
+const hahmlet = Hahmlet({ preload: false, variable: "--font-hahmlet", display: "swap" });
 
 export const metadata: Metadata = {
   title: "J의 외출",
@@ -21,7 +25,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={hahmlet.variable}>
       <body>
         <AmplitudeInit />
         <ThemeColor />
