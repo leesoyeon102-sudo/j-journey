@@ -30,7 +30,7 @@ interface Props {
   /** 검색 때 가까운 곳을 먼저 보여 줄 기준 좌표 (예: 도착지 검색 때 출발지) */
   near?: { lat: number; lng: number };
   /** "현재 위치로 선택" 버튼 위에 놓이는 집 칩. 누르면 집 주소가 선택된다. */
-  homeChip?: { address: string; onPick: () => void; onEdit: () => void };
+  homeChip?: { address: string; onPick: () => void };
   onSelect: (place: PickedLocation) => void;
   onClose?: () => void;
 }
@@ -156,7 +156,7 @@ export default function LocationPicker({
           </Button>
         </form>
 
-        {/* 칩: 현재 위치, 집. 주소가 길면 집 칩 안의 주소를 말줄임(…)으로 줄여서 "변경"이 오른쪽 안쪽 여백(20px) 끝에 그대로 보이게 한다. */}
+        {/* 칩: 현재 위치(검정), 집. 좌우 패딩 8px, 글자 13px. 주소가 길면 집 칩 안의 주소를 말줄임(…)으로 줄인다. */}
         <div className="mt-4 flex items-center gap-2 px-5">
           <button
             type="button"
@@ -164,28 +164,23 @@ export default function LocationPicker({
               setPhase("locating");
               void locate();
             }}
-            className="glass-strong flex h-9 shrink-0 items-center gap-1.5 rounded-pill px-4 text-label font-semibold"
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-pill bg-primary px-2 text-caption-lg font-semibold text-primary-foreground"
           >
             <LocateFixedIcon className="size-4" />
             현재 위치
           </button>
           {homeChip && (
-            <>
               <button
                 type="button"
                 onClick={homeChip.onPick}
-                className="glass-strong flex h-9 min-w-0 items-center gap-1.5 overflow-hidden rounded-pill px-4 text-label font-semibold"
+                className="glass-strong flex h-9 min-w-0 items-center gap-1.5 overflow-hidden rounded-pill px-2 text-caption-lg font-semibold"
               >
                 <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z" />
                 </svg>
                 <span className="shrink-0">집</span>
-                <span className="truncate text-caption font-normal text-muted-foreground">{homeChip.address}</span>
+                <span className="truncate font-normal text-muted-foreground">{homeChip.address}</span>
               </button>
-              <Button variant="ghost" size="sm" onClick={homeChip.onEdit} className="-mr-2 shrink-0 px-2 text-muted-foreground">
-                변경
-              </Button>
-            </>
           )}
         </div>
       </div>

@@ -89,28 +89,13 @@ export default function Planner() {
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
   const [picker, setPicker] = useState<"origin" | "destination" | "home" | null>(null);
-  // 출발지·도착지 선택 화면에서 집 주소를 고치러 들어왔다면, 끝난 뒤 그 화면으로 돌려보낸다.
-  // (처음 집 주소를 등록할 때는 비어 있어서 홈으로 간다.)
-  const [returnTo, setReturnTo] = useState<"origin" | "destination" | null>(null);
   const needHome = home === null;
   const showHomePicker = needHome || picker === "home";
-  const leaveHomePicker = () => {
-    setPicker(returnTo);
-    setReturnTo(null);
-  };
+  const leaveHomePicker = () => setPicker(null);
 
-  /** 출발지·도착지 선택 화면에서 "현재 위치" 버튼 위에 놓는 집 칩 */
-  const homeChip = (from: "origin" | "destination", apply: (place: Place) => void) =>
-    home
-      ? {
-          address: home.area,
-          onPick: () => apply(home),
-          onEdit: () => {
-            setReturnTo(from);
-            setPicker("home");
-          },
-        }
-      : undefined;
+  /** 출발지·도착지 선택 화면의 주소 입력 아래에 놓는 집 칩 */
+  const homeChip = (apply: (place: Place) => void) =>
+    home ? { address: home.area, onPick: () => apply(home) } : undefined;
 
   // 약속 시각은 직접 고르기 전까지 지금 시각이다. (서버에서 그린 화면과 어긋나지 않도록 서버 값은 따로 둔다)
   const nowTime = useSyncExternalStore(
@@ -398,7 +383,22 @@ export default function Planner() {
     <main className="fade-in relative isolate">
       <SkyBackdrop />
       <ThemeColor token="sky" />
-      <Header title="J의 외출" sub="어디로, 몇 시까지 갈지만 알려주세요." onSky />
+      <Header
+        title="J의 외출"
+        sub="어디로, 몇 시까지 갈지만 알려주세요."
+        onSky
+        action={
+          // 집 주소를 다시 설정하는 화면을 연다.
+          <button
+            type="button"
+            onClick={() => setPicker("home")}
+            aria-label="집 주소 변경"
+            className="-mr-2 flex size-10 items-center justify-center rounded-pill text-on-sky transition-colors active:bg-glass"
+          >
+            <HomeEditIcon className="size-6" />
+          </button>
+        }
+      />
 
       {showHomePicker && (
         <LocationPicker
@@ -432,7 +432,7 @@ export default function Planner() {
           title="출발지 선택"
           description="출발할 곳을 현재 위치나 주소로 찾아 보세요."
           near={form.destination ?? undefined}
-          homeChip={homeChip("origin", (place) => {
+          homeChip={homeChip((place) => {
             set("origin", place);
             saveLastOrigin(place);
             setPicker(null);
@@ -453,7 +453,7 @@ export default function Planner() {
         <LocationPicker
           title="도착지 선택"
           near={form.origin ?? undefined}
-          homeChip={homeChip("destination", (place) => {
+          homeChip={homeChip((place) => {
             set("destination", place);
             saveLastDestination(place);
             setPicker(null);
@@ -527,6 +527,18 @@ export default function Planner() {
         </Button>
       </form>
     </main>
+  );
+}
+
+/** 집 모양에 연필이 겹친 아이콘 */
+function HomeEditIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M3.5 11 12 4l8.5 7" />
+      <path d="M5.5 9.5V19a1 1 0 0 0 1 1H11" />
+      <path d="M18.5 9.5V12" />
+      <path d="m13.5 20 .5-2.5 5.3-5.3a1.4 1.4 0 0 1 2 2L16 19.5z" />
+    </svg>
   );
 }
 
