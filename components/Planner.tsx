@@ -74,6 +74,8 @@ export default function Planner() {
   const [page, setPage] = useState(0);
   // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
   const [arrivedAlert, setArrivedAlert] = useState(false);
+  // "출발했어요"를 누른 직후 띄우는 안내. 소요 시간(분)이 지난 뒤에 도착했어요를 누르라고 알려 준다. 안 띄울 땐 null.
+  const [departedAlert, setDepartedAlert] = useState<number | null>(null);
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
   const arrivalTracked = useRef<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -233,6 +235,7 @@ export default function Planner() {
       });
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
+      setDepartedAlert(active.arriveAt - active.leaveAt);
     };
     const arrive = (plan: Plan, onTime: boolean) => {
       // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
@@ -316,6 +319,24 @@ export default function Planner() {
               />
             </div>
           </div>
+        )}
+
+        {departedAlert !== null && (
+          <AlertPanel
+            title="출발을 기록했어요"
+            description={
+              <>
+                소요 시간(약 <b className="font-medium text-on-surface">{departedAlert}분</b>)이 지난 뒤, 도착하면
+                <br />
+                <b className="font-medium text-on-surface">도착했어요</b>를 눌러 주세요.
+              </>
+            }
+            onClose={() => setDepartedAlert(null)}
+          >
+            <Button size="lg" autoFocus onClick={() => setDepartedAlert(null)}>
+              확인
+            </Button>
+          </AlertPanel>
         )}
 
         {arrivedAlert && (
