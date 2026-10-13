@@ -6,6 +6,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { LocateFixedIcon, XIcon } from "lucide-react";
 import ThemeColor from "@/components/ThemeColor";
+import { HomeIcon } from "@/components/HomeIcon";
 import { searchAddress, type GeoResult } from "@/lib/api";
 import { readCurrentPlace } from "@/lib/currentLocation";
 
@@ -164,7 +165,7 @@ export default function LocationPicker({
               setPhase("locating");
               void locate();
             }}
-            className="flex h-9 shrink-0 items-center gap-1.5 rounded-pill bg-primary px-2 text-caption-lg font-semibold text-primary-foreground"
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-pill bg-primary px-2 text-caption-lg font-medium text-primary-foreground"
           >
             <LocateFixedIcon className="size-4" />
             현재 위치
@@ -173,11 +174,9 @@ export default function LocationPicker({
               <button
                 type="button"
                 onClick={homeChip.onPick}
-                className="glass-strong flex h-9 min-w-0 items-center gap-1.5 overflow-hidden rounded-pill px-2 text-caption-lg font-semibold"
+                className="glass-strong flex h-9 min-w-0 items-center gap-1.5 overflow-hidden rounded-pill px-2 text-caption-lg font-medium"
               >
-                <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z" />
-                </svg>
+                <HomeIcon className="size-4 shrink-0" />
                 <span className="shrink-0">집</span>
                 <span className="truncate font-normal text-muted-foreground">{homeChip.address}</span>
               </button>

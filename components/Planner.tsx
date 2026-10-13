@@ -11,6 +11,7 @@ import PlanSlider from "./PlanSlider";
 import SkyBackdrop from "./SkyBackdrop";
 import ThemeColor from "./ThemeColor";
 import RouteCard from "./RouteCard";
+import { HomeEditIcon } from "./HomeIcon";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
 import TripMenu from "./TripMenu";
@@ -527,18 +528,6 @@ export default function Planner() {
         </Button>
       </form>
     </main>
-  );
-}
-
-/** 집 모양에 연필이 겹친 아이콘 */
-function HomeEditIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M3.5 11 12 4l8.5 7" />
-      <path d="M5.5 9.5V19a1 1 0 0 0 1 1H11" />
-      <path d="M18.5 9.5V12" />
-      <path d="m13.5 20 .5-2.5 5.3-5.3a1.4 1.4 0 0 1 2 2L16 19.5z" />
-    </svg>
   );
 }
 
