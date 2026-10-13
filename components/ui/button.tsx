@@ -14,7 +14,7 @@ const buttonVariants = cva(
         outline:
           "border-hairline bg-paper text-ink hover:bg-mist aria-expanded:bg-mist",
         secondary:
-          "bg-border text-ink hover:bg-inactive aria-expanded:bg-inactive",
+          "bg-secondary-fill text-ink hover:bg-border aria-expanded:bg-border",
         ghost: "text-ink hover:bg-mist aria-expanded:bg-mist",
         // 코랄은 채움으로만 쓰고 글자는 와인(진한 자주)으로 둔다.
         destructive:

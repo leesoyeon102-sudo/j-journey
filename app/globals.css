@@ -6,12 +6,13 @@
 
 @theme {
   /* ── DESIGN.md 역할 토큰 (값의 원본). 팔레트 이름(ink, mist …)과 shadcn 변수는 아래에서 이 값을 가리킨다. ── */
-  --color-primary: #222834;
+  --color-primary: #050a15;
   --color-on-primary: #ffffff;
-  --color-primary-hover: #373f51;
+  --color-primary-hover: #1a2132;
   --color-toast: #646769; /* 색상(hue) 205°, 채도 2%의 회색, 불투명도 100% */
   --color-surface: #ffffff;
   --color-on-surface: #14171f;
+  --color-secondary-fill: #f0f3f5; /* 얼럿 취소 같은 보조 버튼 배경 */
   --color-muted: #f6f7f7;
   --color-muted-subtle: #fbfcfc;
   --color-muted-foreground: #6b6e70;

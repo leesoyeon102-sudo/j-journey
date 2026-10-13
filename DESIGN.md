@@ -3,12 +3,13 @@ version: alpha
 name: J의 외출
 description: 약속 출발 시각을 알려주는 390px 모바일 플래너. 맑은 하늘색 배경 위에 블러 반투명 유리 면을 얹고, 버튼은 블랙을 유지한다. 출발 시각만 파랑으로 강조한다.
 colors:
-  primary: "#222834"
+  primary: "#050A15"
   on-primary: "#FFFFFF"
-  primary-hover: "#373F51"
+  primary-hover: "#1A2132"
   toast: "#646769"
   surface: "#FFFFFF"
   on-surface: "#14171F"
+  secondary-fill: "#F0F3F5"
   muted: "#F6F7F7"
   muted-subtle: "#FBFCFC"
   muted-foreground: "#6B6E70"
@@ -126,7 +127,7 @@ components:
     height: 44px
     padding: 16px
   button-secondary:
-    backgroundColor: "{colors.border}"
+    backgroundColor: "{colors.secondary-fill}"
     textColor: "{colors.on-surface}"
     typography: "{typography.label}"
     rounded: "{rounded.button}"
@@ -267,7 +268,8 @@ components:
 
 ## Colors
 
-- **primary (#222834):** 채움 버튼과 기본 배지의 유일한 채움색. 순검정보다 부드러워 화면이 무겁지 않다. hover에서는 `primary-hover`(#373F51)로 한 단계 밝아진다.
+- **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
+- **secondary-fill (#F0F3F5):** 얼럿 취소 같은 보조(secondary) 버튼의 배경. 글자는 `on-surface`.
 - **toast (#646769):** 토스트 배경. 색상 205°, 채도 2%의 회색을 불투명(100%)하게 고정한 값.
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
 - **surface (#FFFFFF) / on-surface (#14171F):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.
