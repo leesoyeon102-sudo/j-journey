@@ -167,7 +167,7 @@ export default function LocationPicker({
             }}
             className="flex h-9 shrink-0 items-center gap-1.5 rounded-pill bg-primary px-2.5 text-caption-lg font-medium text-primary-foreground"
           >
-            <LocateFixedIcon className="size-4" />
+            <LocateFixedIcon className="size-4" strokeWidth={1.5} />
             현재 위치
           </button>
           {homeChip && (
