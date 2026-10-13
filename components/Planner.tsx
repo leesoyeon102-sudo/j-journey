@@ -20,7 +20,7 @@ import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { readCurrentPlace } from "@/lib/currentLocation";
-import { draft, isOriginLocked, lockOrigin } from "@/lib/draft";
+import { draft, isOriginLocked, unlockOrigin } from "@/lib/draft";
 import type { Place } from "@/lib/places";
 import {
   addTrip,
@@ -57,6 +57,13 @@ const nowHHMM = () => {
 };
 
 const DEFAULTS: Form = { origin: null, destination: null, time: "14:00", tomorrow: false };
+
+/** 직접 고른 출발지를 지운 입력값 */
+const withoutOrigin = (e: Partial<Form>) => {
+  const next = { ...e };
+  delete next.origin;
+  return next;
+};
 
 export default function Planner() {
   const trips = useTrips();
@@ -121,8 +128,6 @@ export default function Planner() {
   };
   const set = <K extends keyof Form>(k: K, v: Form[K]) => {
     if (k === "time" || k === "tomorrow") Object.assign(draft, { [k]: v });
-    // 출발지를 직접 고르면 그 값을 지킨다. (현재 위치 자동 입력은 멈춘다)
-    if (k === "origin") lockOrigin();
     setEdit((e) => ({ ...e, [k]: v }));
   };
 
@@ -134,18 +139,25 @@ export default function Planner() {
 
   // 홈 입력 화면이 열릴 때마다 출발지를 현재 위치로 자동 입력한다. 위치를 못 읽으면(권한 꺼짐, http 주소 등) 조용히 건너뛰고
   // 마지막으로 고른 출발지를 그대로 둔다. 직접 고르거나 안내 내역에서 불러온 출발지는 지킨다.
-  const showingForm = !current && !moving && home !== undefined && home !== null && picker === null;
+  const showingForm = !current && !moving && home !== undefined && home !== null;
   useEffect(() => {
-    if (!showingForm || isOriginLocked()) return;
+    if (!showingForm) return;
     let cancelled = false;
-    readCurrentPlace()
-      .then((p) => {
-        if (cancelled || isOriginLocked()) return;
-        saveLastOrigin({ name: p.name, area: p.address, lat: p.lat, lng: p.lng });
-      })
-      .catch(() => {});
+    if (!isOriginLocked()) {
+      readCurrentPlace()
+        .then((p) => {
+          if (cancelled || isOriginLocked()) return;
+          saveLastOrigin({ name: p.name, area: p.address, lat: p.lat, lng: p.lng });
+          // 직접 고른 출발지가 있었다면 현재 위치로 되돌린다.
+          setEdit(withoutOrigin);
+        })
+        .catch(() => {});
+    }
     return () => {
       cancelled = true;
+      // 홈 입력 화면을 벗어나면(검색, 다른 탭) 직접 고른 출발지와 불러온 출발지를 놓는다. 돌아오면 다시 현재 위치.
+      unlockOrigin();
+      setEdit(withoutOrigin);
     };
   }, [showingForm]);
 
