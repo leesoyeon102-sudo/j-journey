@@ -1,7 +1,7 @@
 import { meters } from "../geo";
 import type { Place } from "../places";
 import { directionLabel, FIRST_TRAIN, latestDeparture, PLATFORM, type Ride } from "../planner";
-import { LINES, STATIONS } from "../stations";
+import { LINES, lineColorByKakaoName, STATIONS } from "../stations";
 import type { Timetable } from "../timetable";
 import { planMode } from "../planGroups";
 import type { BusLeg, Leg, Line, Plan, PlanGroups, RideLeg, WalkLeg } from "../types";
@@ -325,7 +325,7 @@ async function buildPlan(
         kind: "ride",
         line: info.line?.id ?? info.kName,
         lineName: info.line?.name ?? info.kName,
-        color: info.line?.color ?? UNKNOWN_LINE_COLOR,
+        color: lineColorByKakaoName(info.kName) ?? info.line?.color ?? UNKNOWN_LINE_COLOR,
         direction: info.direction,
         stations: info.labels,
         start,

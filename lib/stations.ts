@@ -31,6 +31,47 @@ const META: Record<string, { name: string; color: string; headway: number }> = {
   W: { name: "서해선", color: "#81A914", headway: 12 },
 };
 
+/**
+ * 카카오가 알려 주는 노선 이름별 표시 색. 우리 노선도(2018년경 기준)에 없는 신설 구간·역(예: 5호선 하남 연장, 공항철도 마곡나루)은
+ * 노선을 찾지 못해 색이 비어 버리므로, 노선 이름만으로 색을 정한다.
+ */
+const COLOR_BY_KAKAO_NAME: Record<string, string> = {
+  "1호선": "#0052A4",
+  "2호선": "#00A84D",
+  "3호선": "#EF7C1C",
+  "4호선": "#00A5DE",
+  "5호선": "#996CAC",
+  "6호선": "#CD7C2F",
+  "7호선": "#747F00",
+  "8호선": "#E6186C",
+  "9호선": "#BDB092",
+  "공항철도": "#0090D2",
+  "경의중앙선": "#77C4A3",
+  "경춘선": "#0C8E72",
+  "수인분당선": "#F5A200",
+  "분당선": "#F5A200",
+  "수인선": "#F5A200",
+  "신분당선": "#D4003B",
+  "경강선": "#003DA5",
+  "서해선": "#81A914",
+  "인천1호선": "#7CA8D5",
+  "인천2호선": "#ED8B00",
+  "의정부경전철": "#FDA600",
+  "에버라인": "#56AD2D",
+  "용인에버라인": "#56AD2D",
+  "우이신설": "#B0CE18",
+  "우이신설선": "#B0CE18",
+  "김포골드": "#A17800",
+  "김포골드라인": "#A17800",
+  "신림선": "#6789CA",
+  "GTX-A": "#9A6292",
+};
+
+/** 카카오 노선 이름("5호선", "우이신설", "GTX-A" …)에 해당하는 색. 모르는 이름이면 undefined */
+export function lineColorByKakaoName(name: string): string | undefined {
+  return COLOR_BY_KAKAO_NAME[name.trim()];
+}
+
 export const STATIONS: Record<string, Station> = Object.fromEntries(
   Object.entries(data.stations as unknown as Record<string, [number, number]>).map(([name, [lat, lng]]) => [
     name,
