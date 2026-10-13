@@ -9,7 +9,8 @@ colors:
   toast: "#646769"
   surface: "#FFFFFF"
   on-surface: "#14171F"
-  secondary-fill: "#F0F3F5"
+  secondary-fill: "#E8EBED"
+  fill-strong: "#DADDE0"
   muted: "#F6F7F7"
   muted-subtle: "#FBFCFC"
   muted-foreground: "#6B6E70"
@@ -269,7 +270,7 @@ components:
 ## Colors
 
 - **primary (#050A15):** 채움 버튼과 기본 배지의 유일한 채움색. 푸른 기운이 아주 약하게 도는 거의 검정이다. hover에서는 `primary-hover`(#1A2132)로 한 단계 밝아진다.
-- **secondary-fill (#F0F3F5):** 얼럿 취소 같은 보조(secondary) 버튼의 배경. 글자는 `on-surface`.
+- **secondary-fill (#E8EBED) / fill-strong (#DADDE0):** secondary-fill은 얼럿 취소 같은 보조(secondary) 버튼의 배경이고, fill-strong은 그 버튼을 누를 때와 "이 계획대로 이동중" 버튼의 배경이다. 글자는 `on-surface`.
 - **toast (#646769):** 토스트 배경. 색상 205°, 채도 2%의 회색을 불투명(100%)하게 고정한 값.
 - **on-primary (#FFFFFF):** primary 위의 글자와 아이콘.
 - **surface (#FFFFFF) / on-surface (#14171F):** 기본 캔버스·카드와 그 위의 본문·제목·아이콘.

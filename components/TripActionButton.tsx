@@ -62,11 +62,11 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   }
   if (phase === "moving") {
     // 눌러도 아무 일이 없지만 흐려 보이지 않게 disabled 대신 aria-disabled로 둔다.
-    // 배경은 비활성(muted)보다 한 단계 어두운 border 색.
+    // 배경은 비활성(muted)보다 한 단계 어두운 fill-strong 색.
     return (
       <Button
         size="lg"
-        className="w-full cursor-default bg-border text-on-surface hover:bg-border"
+        className="w-full cursor-default bg-fill-strong text-on-surface hover:bg-fill-strong"
         aria-disabled="true"
         aria-live="polite"
       >

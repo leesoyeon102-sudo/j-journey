@@ -12,7 +12,8 @@
   --color-toast: #646769; /* 색상(hue) 205°, 채도 2%의 회색, 불투명도 100% */
   --color-surface: #ffffff;
   --color-on-surface: #14171f;
-  --color-secondary-fill: #f0f3f5; /* 얼럿 취소 같은 보조 버튼 배경 */
+  --color-secondary-fill: #e8ebed; /* 얼럿 취소 같은 보조 버튼 배경 */
+  --color-fill-strong: #dadde0; /* "이 계획대로 이동중" 버튼 배경, 보조 버튼을 누를 때 */
   --color-muted: #f6f7f7;
   --color-muted-subtle: #fbfcfc;
   --color-muted-foreground: #6b6e70;
