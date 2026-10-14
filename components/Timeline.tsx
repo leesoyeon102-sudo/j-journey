@@ -105,17 +105,20 @@ function toSteps(plan: Plan): Step[] {
       });
       const next = legs[i + 1];
       const after = legs[i + 2];
+      const sameStop = after?.type === "bus" && b.to === after.from && b.toArs === after.fromArs;
       if (next?.type === "walk" && next.kind === "transfer") {
         steps.push({
           time: b.end,
           title: `${busStop(b.to, b.toArs)} 하차`,
-          detail:
-            after?.type === "ride"
+          detail: sameStop
+            ? "같은 정류장에서 갈아타요"
+            : after?.type === "ride"
               ? `${after.from}역까지 도보 ${next.end - next.start}분`
               : after?.type === "bus"
                 ? `${busStop(after.from, after.fromArs)}까지 도보 ${next.end - next.start}분`
                 : `도보 ${next.end - next.start}분`,
-          walk: walkLink(next, b, after),
+          // 같은 정류장에서 갈아타면 걷지 않으니 카카오맵 버튼도 붙이지 않는다.
+          walk: sameStop ? undefined : walkLink(next, b, after),
         });
       } else if (next?.type === "walk" && next.kind === "dest") {
         steps.push({
