@@ -207,6 +207,27 @@ function matchBus(data: BusData | null, step: KStep): BusMatch | null {
   return best;
 }
 
+/** 버스 구간의 승·하차 정류장 위치와 정류소 번호. 우리 버스 데이터와 연결되지 않으면 카카오 경로의 시작·끝 좌표만 쓴다. */
+function busEnds(data: BusData | null, step: KStep) {
+  const m = matchBus(data, step);
+  const from = m ? data!.stops[m.route.stops[m.board]] : undefined;
+  const to = m ? data!.stops[m.route.stops[m.alight]] : undefined;
+  return {
+    fromCoord: from ? { lat: from.lat, lng: from.lng } : step.first,
+    toCoord: to ? { lat: to.lat, lng: to.lng } : step.last,
+    fromArs: from?.ars || undefined,
+    toArs: to?.ars || undefined,
+  };
+}
+
+/** 구간의 시작(first)·끝(last) 위치. 버스는 정류장 위치를 쓰고, 나머지는 카카오 경로의 좌표를 쓴다. */
+function endCoord(data: BusData | null, step: KStep | undefined, side: "first" | "last") {
+  if (!step) return undefined;
+  if (step.type !== "BUS") return step[side];
+  const e = busEnds(data, step);
+  return side === "first" ? e.fromCoord : e.toCoord;
+}
+
 // ─── 시각 계산 ───────────────────────────────────────────────
 
 type Seg =
@@ -225,6 +246,8 @@ type Seg =
     }
   | {
       kind: "bus";
+      fromArs?: string;
+      toArs?: string;
       routeName: string;
       busKind: string;
       from: string;
@@ -284,7 +307,7 @@ async function buildPlan(
     // 카카오가 환승 도보를 따로 주지 않고 수단끼리 바로 이어 주면, 1분짜리 환승 도보를 끼워 넣는다.
     const after = steps[i + 1];
     if (s.type !== "WALKING" && after && after.type !== "WALKING") {
-      segs.unshift({ kind: "walk", from: endName(s), to: startName(after), min: 1, fromCoord: s.last, toCoord: after.first });
+      segs.unshift({ kind: "walk", from: endName(s), to: startName(after), min: 1, fromCoord: endCoord(data, s, "last"), toCoord: endCoord(data, after, "first") });
       need -= 1;
     }
 
@@ -297,8 +320,8 @@ async function buildPlan(
         from: prev ? endName(prev) : "",
         to: next ? startName(next) : "",
         min,
-        fromCoord: s.first ?? prev?.last,
-        toCoord: s.last ?? next?.first,
+        fromCoord: s.first ?? endCoord(data, prev, "last"),
+        toCoord: s.last ?? endCoord(data, next, "first"),
       });
       need -= min;
       continue;
@@ -375,7 +398,7 @@ async function buildPlan(
     start,
     end: start + min,
   });
-  legs.push(walk("home", ctx.origin.name, firstName, leaveAt, walkStart, ctx.origin, steps[0].first));
+  legs.push(walk("home", ctx.origin.name, firstName, leaveAt, walkStart, ctx.origin, endCoord(data, steps[0], "first")));
   let cursor = leaveAt + walkStart;
 
   for (const g of segs) {
@@ -408,6 +431,8 @@ async function buildPlan(
         color: busColor(g.busKind),
         from: g.from,
         to: g.to,
+        fromArs: g.fromArs,
+        toArs: g.toArs,
         stopCount: g.stopCount,
         arriveStop: g.start - g.wait,
         start: g.start,
@@ -420,7 +445,7 @@ async function buildPlan(
       cursor = g.end;
     }
   }
-  legs.push(walk("dest", lastName, ctx.destination.name, cursor, walkEnd, steps[steps.length - 1].last, ctx.destination));
+  legs.push(walk("dest", lastName, ctx.destination.name, cursor, walkEnd, endCoord(data, steps[steps.length - 1], "last"), ctx.destination));
 
   const firstVehicle = vehicles[0];
   const lastVehicle = vehicles[vehicles.length - 1];
@@ -462,6 +487,7 @@ async function scheduleBus(
 ): Promise<Extract<Seg, { kind: "bus" }> | null> {
   const latestBoard = need - rideMin;
   const vehicle = s.vehicles[0];
+  const ends = busEnds(data, s);
   const base = {
     kind: "bus" as const,
     routeName: vehicle?.name ?? "",
@@ -469,6 +495,8 @@ async function scheduleBus(
     from: stopLabel(s.stops[0] ?? ""),
     to: stopLabel(s.stops[s.stops.length - 1] ?? ""),
     stopCount: Math.max(1, s.stops.length - 1),
+    fromArs: ends.fromArs,
+    toArs: ends.toArs,
   };
 
   // 심야버스는 밤(23시~5시 30분)에만 다닌다. 우리 버스 데이터에 첫차·막차가 없어도 이 시간대가 아니면 건너뛴다.

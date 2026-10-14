@@ -70,6 +70,9 @@ export interface BusLeg {
   color: string;
   from: string;
   to: string;
+  /** 승차·하차 정류장의 정류소 번호(5자리). 모르면 없다. */
+  fromArs?: string;
+  toArs?: string;
   /** 지나는 정류장 수 (승차 정류장 제외) */
   stopCount: number;
   /** 승차 정류장에 도착하는 시각 */
