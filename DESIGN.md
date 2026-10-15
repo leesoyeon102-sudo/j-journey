@@ -239,8 +239,8 @@ components:
     textColor: "{colors.muted-foreground}"
     typography: "{typography.label}"
     rounded: "{rounded.pill}"
-    height: 36px
-    padding: 16px
+    height: 34px
+    padding: 15px
   filter-chip-selected:
     backgroundColor: "{colors.accent-subtle}"
     borderColor: "{colors.accent}"
