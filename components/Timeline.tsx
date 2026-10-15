@@ -1,3 +1,4 @@
+import { CircleAlertIcon } from "lucide-react";
 import KakaoMapLink from "@/components/KakaoMapLink";
 import { meters } from "@/lib/geo";
 import { fmt } from "@/lib/time";
@@ -175,17 +176,24 @@ export default function Timeline({ plan }: { plan: Plan }) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-body font-medium">{s.title}</p>
+            {/* G마켓 산스에는 세미볼드가 없어 Medium에 얇은 외곽선을 더해 표현한다. (TabBar와 같은 방식) */}
+            <p className="text-body font-medium [-webkit-text-stroke:0.3px]">{s.title}</p>
             {s.walk ? (
               // 걷는 구간: 설명 바로 옆에 작은 카카오맵 버튼을 붙인다.
               <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                {s.detail && <p className="text-body text-muted-foreground">{s.detail}</p>}
+                {s.detail && <p className="text-caption-lg text-muted-foreground">{s.detail}</p>}
                 <KakaoMapLink from={s.walk.from} to={s.walk.to} />
               </div>
             ) : (
-              s.detail && <p className="mt-1 text-body text-muted-foreground">{s.detail}</p>
+              s.detail && <p className="mt-1 text-caption-lg text-muted-foreground">{s.detail}</p>
             )}
-            {s.note && <p className="mt-1 text-caption text-muted-foreground">{s.note}</p>}
+            {s.note && (
+              // 12px 글자(줄 높이 약 17px)의 첫 줄 가운데에 14px 아이콘이 오도록 맞춘다.
+              <p className="mt-1 flex items-start gap-1 text-caption text-muted-foreground">
+                <CircleAlertIcon className="mt-[1.5px] size-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+                <span>{s.note}</span>
+              </p>
+            )}
           </div>
         </li>
       ))}
