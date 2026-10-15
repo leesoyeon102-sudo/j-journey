@@ -100,7 +100,7 @@ function toSteps(plan: Plan): Step[] {
         detail: `${b.kind} · ${b.stopCount}개 정류장 · ${b.end - b.start}분 이동`,
         note: b.realtime
           ? "현재 도착 정보를 바탕으로 예상한 시각"
-          : `배차 간격 ${b.headway}분 · 정류장에서 기다리다 늦어도 이 시각까지 탑승`,
+          : `배차 간격 ${b.headway}분 · 평균 대기 시간으로 계산한 예상 시각 (최대 ${b.headway}분 더 기다릴 수 있어요)`,
         color: b.color,
       });
       const next = legs[i + 1];

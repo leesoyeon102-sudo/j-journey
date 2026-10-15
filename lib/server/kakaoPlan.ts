@@ -3,7 +3,7 @@ import type { Place } from "../places";
 import { directionLabel, FIRST_TRAIN, latestDeparture, PLATFORM, type Ride } from "../planner";
 import { LINES, lineColorByKakaoName, STATIONS } from "../stations";
 import type { Timetable } from "../timetable";
-import { planMode } from "../planGroups";
+import { planMode, usesSubway } from "../planGroups";
 import type { BusLeg, Leg, Line, Plan, PlanGroups, RideLeg, WalkLeg } from "../types";
 import { busColor, headwayAt, loadBus, type BusData, type BusRoute, type DayType } from "./bus";
 import { fetchArrival } from "./busArrival";
@@ -16,6 +16,8 @@ import { walkMatrix } from "./walk";
 
 /** 정류장에 버스보다 이만큼 일찍 도착하도록 안내한다. */
 const STOP_BUFFER = 3;
+/** 현재 도착 정보가 없을 때 정류장에서 기다리는 시간: 배차 간격의 절반(평균 대기) + 여유. 카카오맵도 평균 대기로 계산한다. */
+const avgWait = (headway: number) => Math.round(headway / 2) + STOP_BUFFER;
 /** 이 시간(분) 안에 탈 버스까지만 현재 도착 정보로 예상한다. */
 const REALTIME_HORIZON = 120;
 /** 카카오가 준 경로 중 앞에서 이만큼까지만 시각을 계산해 본다. */
@@ -510,7 +512,7 @@ async function scheduleBus(
     // 우리 버스 데이터에 없는 노선: 같은 구간을 지나는 버스가 여러 대면 더 자주 오는 것으로 본다.
     const h = s.vehicles.length >= 3 ? 6 : s.vehicles.length === 2 ? 8 : 10;
     const t = Math.floor(latestBoard);
-    return { ...base, start: t, end: Math.ceil(t + rideMin), wait: h + STOP_BUFFER, headway: h, realtime: false };
+    return { ...base, start: t, end: Math.ceil(t + rideMin), wait: avgWait(h), headway: h, realtime: false };
   }
 
   const { route, board } = m;
@@ -534,7 +536,7 @@ async function scheduleBus(
     if (last < first) last += 1440;
     if (t < first + offset || t > last + offset + 10) return null; // 첫차 전이거나 막차 이후
   }
-  return { ...base, start: t, end: Math.ceil(t + rideMin), wait: h + STOP_BUFFER, headway: h, realtime: false };
+  return { ...base, start: t, end: Math.ceil(t + rideMin), wait: avgWait(h), headway: h, realtime: false };
 }
 
 // ─── 바깥에서 부르는 함수 ─────────────────────────────────────
@@ -596,9 +598,9 @@ export async function kakaoPlans(
     if (seen.has(sig)) continue;
     seen.add(sig);
     recommended ??= plan;
-    const mode = planMode(plan);
-    const list = mode === "subway" ? subway : mode === "bus" ? bus : null;
-    if (list && list.length < GROUP_SIZE) list.push(plan);
+    // 지하철을 한 번이라도 타면 지하철 칩에(지하철+버스도 포함), 버스가 더 긴 안은 버스 칩에 넣는다.
+    if (usesSubway(plan) && subway.length < GROUP_SIZE) subway.push(plan);
+    if (planMode(plan) === "bus" && bus.length < GROUP_SIZE) bus.push(plan);
   }
   if (!recommended) return null;
 

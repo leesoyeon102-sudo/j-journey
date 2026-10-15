@@ -15,11 +15,14 @@ export function planMode(plan: Plan): "subway" | "bus" | null {
   return subway >= bus ? "subway" : "bus";
 }
 
+/** 지하철을 한 번이라도 타는 안인가. 지하철+버스 환승도 포함한다. */
+export const usesSubway = (plan: Plan) => plan.legs.some((l) => l.type === "ride");
+
 /** 안들을 칩 필터용으로 묶는다. plans[0]이 추천. */
 export function groupPlans(plans: Plan[]): PlanGroups {
   return {
     recommended: plans[0],
-    subway: plans.filter((p) => planMode(p) === "subway"),
+    subway: plans.filter(usesSubway),
     bus: plans.filter((p) => planMode(p) === "bus"),
   };
 }
