@@ -75,9 +75,9 @@ export const DepartRecorded: Story = {
   args: {
     description: (
       <>
-        소요 시간(약 <b className="font-medium text-on-surface">38분</b>)이 지난 뒤, 도착하면
+        소요 시간(약 <b className="font-medium">38분</b>)이 지난 뒤, 도착하면
         <br />
-        <b className="font-medium text-on-surface">도착했어요</b>를 눌러 주세요.
+        <b className="font-medium">도착했어요</b>를 눌러 주세요.
       </>
     ),
     children: <Button size="lg">확인</Button>,
