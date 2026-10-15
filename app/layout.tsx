@@ -9,6 +9,8 @@ import ThemeColor from "@/components/ThemeColor";
 export const metadata: Metadata = {
   title: "J의 외출",
   description: "약속 시각만 넣으면 몇 시에 집을 나서 어떤 열차를 타야 하는지 알려주는 약속 출발 플래너",
+  icons: { apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "J의 외출", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
