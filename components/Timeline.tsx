@@ -17,6 +17,8 @@ interface Step {
   note?: string;
   color?: string;
   strong?: boolean;
+  /** 배차 간격·예상 시각처럼 "정확하지 않을 수 있는" 안내면 note 앞에 느낌표 아이콘을 붙인다. */
+  alert?: boolean;
   /** 걷는 구간이면 카카오맵 도보 길찾기를 이 줄에 붙인다. */
   walk?: { from: { name: string; lat: number; lng: number }; to: { name: string; lat: number; lng: number } };
 }
@@ -67,6 +69,7 @@ function toSteps(plan: Plan): Step[] {
         detail: `${r.lineName} · ${r.direction}`,
         note: `${r.stations.length - 1}개 역 · ${r.end - r.start}분 이동 · 승강장 대기 ${r.waitMin}분${r.scheduled ? "" : " · 예상 시각"}`,
         color: r.color,
+        alert: !r.scheduled,
       });
       const next = legs[i + 1];
       if (next?.type === "walk" && next.kind === "transfer") {
@@ -103,6 +106,7 @@ function toSteps(plan: Plan): Step[] {
           ? "현재 도착 정보를 바탕으로 예상한 시각"
           : `배차 간격 ${b.headway}분 · 평균 대기 시간으로 계산한 예상 시각 (최대 ${b.headway}분 더 기다릴 수 있어요)`,
         color: b.color,
+        alert: true,
       });
       const next = legs[i + 1];
       const after = legs[i + 2];
@@ -170,14 +174,16 @@ export default function Timeline({ plan }: { plan: Plan }) {
             />
             {i < steps.length - 1 && (
               <span
-                className="absolute top-4 h-[calc(100%+0.75rem)] w-px bg-border"
+                className={`absolute top-4 h-[calc(100%+0.75rem)] ${
+                  steps[i].color ? "w-px" : "w-0 border-l border-dashed border-inactive" // 대중교통이 아닌 구간은 점선
+                }`}
                 style={steps[i].color ? { backgroundColor: steps[i].color } : undefined}
               />
             )}
           </div>
           <div className="min-w-0 flex-1">
             {/* G마켓 산스에는 세미볼드가 없어 Medium에 얇은 외곽선을 더해 표현한다. (TabBar와 같은 방식) */}
-            <p className="text-body font-medium [-webkit-text-stroke:0.3px]">{s.title}</p>
+            <p className="text-body-md font-medium [-webkit-text-stroke:0.3px]">{s.title}</p>
             {s.walk ? (
               // 걷는 구간: 설명 바로 옆에 작은 카카오맵 버튼을 붙인다.
               <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -188,10 +194,9 @@ export default function Timeline({ plan }: { plan: Plan }) {
               s.detail && <p className="mt-1 text-caption-lg text-muted-foreground">{s.detail}</p>
             )}
             {s.note && (
-              // 12px 글자(줄 높이 약 17px)의 첫 줄 가운데에 14px 아이콘이 오도록 맞춘다.
-              <p className="mt-1 flex items-start gap-1 text-caption text-muted-foreground">
-                <CircleAlertIcon className="mt-[1.5px] size-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
-                <span>{s.note}</span>
+              <p className={`mt-1 text-caption text-muted-foreground ${s.alert ? "flex items-start gap-1" : ""}`}>
+                {s.alert && <CircleAlertIcon className="mt-0 size-3.5 shrink-0" strokeWidth={1.5} aria-hidden />}
+                {s.alert ? <span>{s.note}</span> : s.note}
               </p>
             )}
           </div>
