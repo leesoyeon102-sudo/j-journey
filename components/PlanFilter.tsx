@@ -34,8 +34,8 @@ export default function PlanFilter({ value, onChange, unavailable = {}, count, p
               aria-selected={on}
               disabled={off}
               onClick={() => onChange(t.id)}
-              className={`h-[34px] shrink-0 whitespace-nowrap rounded-pill px-[15px] text-label font-medium [-webkit-text-stroke:0.3px] transition-colors disabled:pointer-events-none disabled:opacity-40 ${
-                on ? "border border-brand bg-brand/15 text-brand shadow-glass backdrop-blur-glass" : "glass text-muted-foreground hover:bg-glass-strong"
+              className={`h-8 shrink-0 whitespace-nowrap rounded-pill px-3.5 text-label font-medium [-webkit-text-stroke:0.3px] transition-colors disabled:pointer-events-none disabled:opacity-40 ${
+                on ? "border border-brand bg-brand/15 text-brand shadow-glass backdrop-blur-glass" : "glass text-placeholder hover:bg-glass-strong"
               }`}
             >
               {t.label}
