@@ -2,33 +2,19 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* 에이투지체(A2Z, OFL). public/fonts에 굵기 4개를 두고 쓴다. */
+/* G마켓 산스(Gmarket Sans). public/fonts에 Medium·Bold 두 굵기를 두고, 400·500은 Medium으로, 600·700은 Bold로 보여 준다. */
 @font-face {
-  font-family: "A2Z";
-  font-weight: 400;
+  font-family: "Gmarket Sans";
+  font-weight: 400 500;
   font-display: swap;
-  src: url("/fonts/A2Z-Regular.woff2") format("woff2");
+  src: url("/fonts/GmarketSans-Medium.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "A2Z";
-  font-weight: 500;
+  font-family: "Gmarket Sans";
+  font-weight: 600 700;
   font-display: swap;
-  src: url("/fonts/A2Z-Medium.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "A2Z";
-  font-weight: 600;
-  font-display: swap;
-  src: url("/fonts/A2Z-SemiBold.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "A2Z";
-  font-weight: 700;
-  font-display: swap;
-  src: url("/fonts/A2Z-Bold.woff2") format("woff2");
+  src: url("/fonts/GmarketSans-Bold.woff2") format("woff2");
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -108,10 +94,10 @@
   /* 출발 시각 등 강조 파랑. shadcn의 accent(호버 배경)와 이름이 겹쳐 brand로 분리했다. */
   --color-brand: var(--color-accent-brand);
 
-  /* ── 글꼴: 에이투지체(A2Z)를 먼저 쓰고, 불러오지 못하면 기존 한글 폰트로 대체된다. 변수 이름(gt-standard)은 예전 이름 그대로 둔다. ── */
-  --font-gt-standard-m: "A2Z", "GT Standard M", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+  /* ── 글꼴: G마켓 산스를 먼저 쓰고, 불러오지 못하면 기존 한글 폰트로 대체된다. 변수 이름(gt-standard)은 예전 이름 그대로 둔다. ── */
+  --font-gt-standard-m: "Gmarket Sans", "GT Standard M", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
     "Noto Sans KR", "Segoe UI", sans-serif;
-  --font-gt-standard-l: "A2Z", "GT Standard L", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+  --font-gt-standard-l: "Gmarket Sans", "GT Standard L", -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
     "Noto Sans KR", "Segoe UI", sans-serif;
   --font-sans: var(--font-gt-standard-m);
   --font-heading: var(--font-gt-standard-l);

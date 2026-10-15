@@ -44,60 +44,60 @@ colors:
   glass-border: "#FFFFFFB3"
 typography:
   display:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 58px
     fontWeight: 500
     lineHeight: 1.05
     letterSpacing: -0.58px
   heading:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 23px
     fontWeight: 500
     lineHeight: 1.39
     letterSpacing: -0.23px
   time:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 34px
     fontWeight: 500
     lineHeight: 1.2
     letterSpacing: -0.34px
   subheading:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 19px
     fontWeight: 500
     lineHeight: 1.33
     letterSpacing: -0.19px
   body-lg:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: -0.16px
   body:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.43
     letterSpacing: -0.14px
   label:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 14px
     fontWeight: 600
     lineHeight: 1.43
     letterSpacing: -0.14px
   label-lg:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 15px
     fontWeight: 600
     lineHeight: 1.43
     letterSpacing: -0.15px
   caption:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 12px
     fontWeight: 500
     lineHeight: 1.4
   caption-lg:
-    fontFamily: A2Z
+    fontFamily: Gmarket Sans
     fontSize: 13px
     fontWeight: 500
     lineHeight: 1.4
@@ -309,7 +309,7 @@ components:
 
 ## Typography
 
-글꼴은 에이투지체(A2Z)다. SIL 오픈 폰트 라이선스(OFL)라 `public/fonts`에 굵기 4개(Regular 400 · Medium 500 · SemiBold 600 · Bold 700)를 두고 쓴다. 불러오지 못하면 Pretendard, Apple SD Gothic Neo, Noto Sans KR 순으로 대체된다. 글자 간격은 크기에 비례해 약간 좁게(-0.01em 안팎) 둔다.
+글꼴은 G마켓 산스(Gmarket Sans)다. 굵기가 Medium·Bold 두 가지뿐이라 `public/fonts`에 그 둘을 두고, 코드의 일반(400)·중간(500) 굵기는 Medium으로, 반굵게(600)·굵게(700)는 Bold로 보여 준다. 불러오지 못하면 Pretendard, Apple SD Gothic Neo, Noto Sans KR 순으로 대체된다. 글자 간격은 크기에 비례해 약간 좁게(-0.01em 안팎) 둔다.
 
 - **time (34px):** 출발 시각 전용. 화면에서 가장 크게 읽혀야 하는 숫자에만 쓴다. 홈의 이동 중 카드에서는 도착 시각도 같은 크기로 쓰되, 파랑은 출발 시각에만 준다.
 - **display (58px):** 랜딩·디자인 시스템 페이지 같은 큰 머리말 전용. 앱 화면 안에서는 쓰지 않는다.
