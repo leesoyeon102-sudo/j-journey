@@ -73,8 +73,9 @@ export default function TabBar() {
                     requestLeave(() => router.push(t.href));
                   }
                 }}
+                // G마켓 산스에는 세미볼드가 없어서(Medium·Bold뿐) Medium에 아주 얇은 외곽선을 더해 그 사이 굵기로 보이게 한다.
                 className={`relative flex h-12 flex-col items-center justify-center gap-0.5 rounded-input text-caption transition-colors duration-300 ${
-                  active ? "font-semibold text-primary" : "font-normal text-tab-label"
+                  active ? "font-medium text-primary [-webkit-text-stroke:0.3px]" : "font-normal text-tab-label"
                 }`}
               >
                 {/* 비활성 아이콘은 글자보다 한 단계 연한 inactive 색 */}
