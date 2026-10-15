@@ -8,7 +8,7 @@ import type { Line, Neighbor, Station } from "./types";
  */
 const META: Record<string, { name: string; color: string; headway: number }> = {
   "1": { name: "1호선", color: "#0052A4", headway: 5 },
-  "2": { name: "2호선", color: "#00A84D", headway: 4 },
+  "2": { name: "2호선", color: "#007A3D", headway: 4 },
   "3": { name: "3호선", color: "#EF7C1C", headway: 5 },
   "4": { name: "4호선", color: "#00A5DE", headway: 5 },
   "5": { name: "5호선", color: "#996CAC", headway: 5 },
@@ -37,7 +37,7 @@ const META: Record<string, { name: string; color: string; headway: number }> = {
  */
 const COLOR_BY_KAKAO_NAME: Record<string, string> = {
   "1호선": "#0052A4",
-  "2호선": "#00A84D",
+  "2호선": "#007A3D",
   "3호선": "#EF7C1C",
   "4호선": "#00A5DE",
   "5호선": "#996CAC",
