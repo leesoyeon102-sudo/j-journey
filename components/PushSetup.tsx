@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { enablePush, onForegroundPush, type PushResult } from "@/lib/firebase";
 
+type Saved = "none" | "saved" | "failed";
 type Status = "idle" | "loading" | "done" | PushResult;
 
 const FAIL_TEXT = {
@@ -22,6 +23,7 @@ export default function PushSetup({ initialToken }: Props) {
   const [status, setStatus] = useState<Status>(initialToken ? { ok: true, token: initialToken } : "idle");
   const [copied, setCopied] = useState(false);
   const [received, setReceived] = useState<string | null>(null);
+  const [saved, setSaved] = useState<Saved>("none");
 
   const token = typeof status === "object" && status.ok ? status.token : null;
 
@@ -35,7 +37,17 @@ export default function PushSetup({ initialToken }: Props) {
 
   async function turnOn() {
     setStatus("loading");
-    setStatus(await enablePush());
+    const result = await enablePush();
+    setStatus(result);
+    // 받은 푸시 주소를 서버에 저장해 둔다. (서버가 이 기기로 알림을 보낼 수 있게)
+    if (result.ok) {
+      const res = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token: result.token }),
+      }).catch(() => null);
+      setSaved(res?.ok ? "saved" : "failed");
+    }
   }
 
   async function copy() {
@@ -62,6 +74,11 @@ export default function PushSetup({ initialToken }: Props) {
         <div className="mt-4">
           <p className="text-caption text-muted-foreground">이 기기의 푸시 주소</p>
           <p className="mt-1 break-all rounded-input bg-muted px-3 py-2 text-caption text-muted-foreground">{token}</p>
+          {saved !== "none" && (
+            <p className="mt-2 text-caption text-muted-foreground">
+              {saved === "saved" ? "서버에 저장했어요." : "서버에 저장하지 못했어요."}
+            </p>
+          )}
           <Button variant="secondary" size="lg" onClick={copy} className="mt-3 w-full">
             {copied ? "복사했어요" : "주소 복사"}
           </Button>
