@@ -17,6 +17,7 @@ import TripActionButton from "./TripActionButton";
 import TripMenu from "./TripMenu";
 import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
+import { askPush, canAskPush, cancelArrivalReminder, scheduleArrivalReminder } from "@/lib/pushReminder";
 import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
 import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
@@ -85,6 +86,8 @@ export default function Planner() {
   const [arrivedAlert, setArrivedAlert] = useState(false);
   // "출발했어요"를 누른 직후 띄우는 안내. 소요 시간(분)이 지난 뒤에 도착했어요를 누르라고 알려 준다. 안 띄울 땐 null.
   const [departedAlert, setDepartedAlert] = useState<number | null>(null);
+  /** 출발 알림 창에서 도착 알림을 새로 허용받을 수 있는지(브라우저가 아직 묻지 않은 상태) */
+  const [askArrivalPush, setAskArrivalPush] = useState(false);
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
   const arrivalTracked = useRef<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -239,6 +242,9 @@ export default function Planner() {
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
       setDepartedAlert(active.arriveAt - active.leaveAt);
+      // 소요 시간이 지나면 "도착하셨나요?" 알림을 보낸다. 알림을 아직 허용하지 않았다면 아래 안내 창에서 묻는다.
+      setAskArrivalPush(canAskPush());
+      void scheduleArrivalReminder(current.id, active.arriveAt - active.leaveAt);
     };
     const arrive = (plan: Plan, onTime: boolean) => {
       // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
@@ -247,6 +253,7 @@ export default function Planner() {
         amplitude.track("Arrival Recorded", { on_time: onTime });
       }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
+      void cancelArrivalReminder(current.id);
       notifyArrived();
       setArrivedAlert(true);
     };
@@ -283,7 +290,12 @@ export default function Planner() {
           {/* 출발한 뒤에만: 맨 오른쪽 점 세 개 메뉴 */}
           {departed && !done && (
             <div className="ml-auto">
-              <TripMenu onCancelDeparture={() => cancelDeparture(current.id)} />
+              <TripMenu
+                onCancelDeparture={() => {
+                  cancelDeparture(current.id);
+                  void cancelArrivalReminder(current.id);
+                }}
+              />
             </div>
           )}
         </nav>
@@ -335,6 +347,19 @@ export default function Planner() {
             }
             onClose={() => setDepartedAlert(null)}
           >
+            {askArrivalPush && (
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={async () => {
+                  const minutes = departedAlert;
+                  setDepartedAlert(null);
+                  if (current && (await askPush())) void scheduleArrivalReminder(current.id, minutes);
+                }}
+              >
+                도착 알림 받기
+              </Button>
+            )}
             <Button size="lg" autoFocus onClick={() => setDepartedAlert(null)}>
               확인
             </Button>

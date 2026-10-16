@@ -10,6 +10,7 @@ import Timeline from "@/components/Timeline";
 import Toast from "@/components/Toast";
 import { groupRoutes, type RouteSummary } from "@/lib/routes";
 import { draft, lockOrigin } from "@/lib/draft";
+import { cancelArrivalReminder } from "@/lib/pushReminder";
 import { removeRoute, removeTrip, saveLastDestination, saveLastOrigin, useTrips } from "@/lib/storage";
 import { fmt, fmtDate } from "@/lib/time";
 
@@ -222,7 +223,10 @@ export default function HistoryPage() {
             onClick={() => {
               const r = confirmRoute;
               setConfirmRoute(null);
-              if (moving) removeTrip(moving.id);
+              if (moving) {
+                removeTrip(moving.id);
+                void cancelArrivalReminder(moving.id);
+              }
               reuse(r);
             }}
           >
