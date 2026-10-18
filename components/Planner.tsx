@@ -247,6 +247,8 @@ export default function Planner() {
     const depart = () => {
       // 장소·주소 이름은 보내지 않는다. 어떤 종류의 안으로 출발했는지만 기록한다.
       amplitude.track("Departure Recorded", {
+        planned_departure_time: fmt(active.leaveAt),
+        departure_diff_min: nowMinutes() - active.leaveAt, // 실제 누른 시각 - 안내된 출발 시각
         plan_tab: tab,
         is_recommended: groups ? active === groups.recommended : true,
         transfers: active.transfers,
@@ -262,7 +264,11 @@ export default function Planner() {
       // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
       if (current.status === "planned" && arrivalTracked.current !== current.id) {
         arrivalTracked.current = current.id;
-        amplitude.track("Arrival Recorded", { on_time: onTime });
+        amplitude.track("Arrival Recorded", {
+          on_time: onTime,
+          appointment_time: fmt(plan.arriveBy),
+          arrival_diff_min: nowMinutes() - plan.arriveBy, // 실제 누른 시각 - 약속 시간 (음수면 일찍 도착)
+        });
       }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
       void cancelArrivalReminder(current.id);
@@ -558,7 +564,16 @@ export default function Planner() {
           size="lg"
           disabled={loading}
           // 버튼을 누를 때마다 한 번. 계산 중에는 버튼이 비활성이라 중복으로 눌리지 않는다.
-          onClick={() => amplitude.track("Route Search Clicked")}
+          onClick={() => {
+            const searchMin = nowMinutes();
+            amplitude.track("Route Search Clicked", {
+              appointment_time: form.time,
+              search_time: fmt(searchMin),
+              destination: form.destination?.name ?? null,
+              is_tomorrow: form.tomorrow,
+              minutes_until_appointment: (form.tomorrow ? 1440 : 0) + parseTime(form.time) - searchMin, // 약속 시간 - 검색 시각
+            });
+          }}
           className="mt-1.5 h-[54px] w-full text-body-lg"
         >
           {loading ? "실제 시간표 확인 중…" : "나갈 시각 알아보기"}
@@ -567,6 +582,12 @@ export default function Planner() {
     </main>
   );
 }
+
+/** 지금 시각(분, 0~1439) */
+const nowMinutes = () => {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+};
 
 const DAY = { weekday: "평일", saturday: "토요일", sunday: "일요일" } as const;
 
