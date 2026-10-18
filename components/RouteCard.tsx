@@ -26,7 +26,7 @@ function PlaceRow({ label, place, onClick }: { label: string; place: PlaceView |
     <button type="button" onClick={onClick} className="block min-h-16 w-full overflow-hidden py-4 pl-4 pr-16 text-left">
       <span className="block text-caption text-muted-foreground">{label}</span>
       <span className="block truncate text-body-lg font-medium">{place?.name || "장소 선택"}</span>
-      {place?.area && <span className="mt-1 block truncate text-caption text-muted-foreground">{place.area}</span>}
+      {place?.area && place.name !== "집" && <span className="mt-1 block truncate text-caption text-muted-foreground">{place.area}</span>}
     </button>
   );
 }

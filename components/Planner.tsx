@@ -20,7 +20,7 @@ import { requestPlans } from "@/lib/api";
 import { askPush, canAskPush, cancelArrivalReminder, scheduleArrivalReminder } from "@/lib/pushReminder";
 import { dateString } from "@/lib/dates";
 import { notifyArrived } from "@/lib/feedback";
-import { requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
+import { GO_HOME_EVENT, requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { readCurrentPlace } from "@/lib/currentLocation";
 import { draft, isOriginLocked, unlockOrigin } from "@/lib/draft";
 import type { Place } from "@/lib/places";
@@ -158,6 +158,18 @@ export default function Planner() {
     setLeaveGuard(guardLeave);
     return () => setLeaveGuard(false);
   }, [guardLeave]);
+
+  // 출발 안내 화면에서 탭바 홈을 누르면(확인 후) 입력 화면(홈)으로 돌아간다.
+  useEffect(() => {
+    if (!showingResult) return;
+    const goHome = () => {
+      setEditing(true);
+      setActiveId(null);
+      setGroups(null);
+    };
+    window.addEventListener(GO_HOME_EVENT, goHome);
+    return () => window.removeEventListener(GO_HOME_EVENT, goHome);
+  }, [showingResult]);
 
   // 출발 안내와 입력 화면을 오갈 때, 앞 화면에서 내려가 있던 스크롤 위치가 남지 않게 맨 위에서 시작한다.
   useEffect(() => {

@@ -2,6 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 
+/** 홈 탭을 눌렀을 때 출발 안내 화면(Planner)이 입력 화면으로 돌아가게 하는 신호 */
+export const GO_HOME_EVENT = "j-outing:go-home";
+
 // 출발 안내 화면을 나갈 때 확인 창을 띄우기 위한 작은 전역 상태.
 let active = false;
 let pending: (() => void) | null = null;

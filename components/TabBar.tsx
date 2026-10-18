@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { isLeaveGuardActive, requestLeave } from "@/lib/leaveGuard";
+import { GO_HOME_EVENT, isLeaveGuardActive, requestLeave } from "@/lib/leaveGuard";
 
 // 홈·안내 내역은 채운(fill) 아이콘이고 선택 여부는 색으로만 구분한다. (비활성 muted-foreground, 활성 on-surface)
 const HOME =
@@ -71,6 +71,10 @@ export default function TabBar() {
                   if (!active && isLeaveGuardActive()) {
                     e.preventDefault();
                     requestLeave(() => router.push(t.href));
+                  } else if (active && t.href === "/") {
+                    // 이미 홈인데 출발 안내 화면이 떠 있다면: 확인 창(이탈 중일 때만) 후 입력 화면(홈)으로 돌아간다.
+                    e.preventDefault();
+                    requestLeave(() => window.dispatchEvent(new Event(GO_HOME_EVENT)));
                   }
                 }}
                 // G마켓 산스에는 세미볼드가 없어서(Medium·Bold뿐) Medium에 아주 얇은 외곽선을 더해 그 사이 굵기로 보이게 한다.
