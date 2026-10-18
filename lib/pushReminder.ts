@@ -14,14 +14,6 @@ const readToken = () => {
 const post = (url: string, method: "POST" | "DELETE", body: unknown) =>
   fetch(url, { method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).catch(() => null);
 
-/** 알림을 새로 허용받아야 하는 상태인가: 지원하는 브라우저이고 아직 허용·거절을 고르지 않았다. */
-export const canAskPush = () =>
-  typeof window !== "undefined" &&
-  "Notification" in window &&
-  "serviceWorker" in navigator &&
-  "PushManager" in window &&
-  Notification.permission === "default";
-
 /** 알림 허용 창을 띄우고, 허용하면 푸시 주소를 서버와 이 브라우저에 저장한다. */
 export async function askPush(): Promise<boolean> {
   const r = await enablePush();
@@ -36,10 +28,14 @@ export async function askPush(): Promise<boolean> {
   return true;
 }
 
-/** 소요 시간(분) 뒤 "도착하셨나요?" 알림을 예약한다. 알림을 허용하지 않았으면 아무것도 하지 않는다. */
+/**
+ * 소요 시간(분) 뒤 "도착하셨나요?" 알림을 예약한다. 출발했어요를 누를 때 부른다.
+ * 아직 허용 여부를 고르지 않았다면 이때 허용 창을 띄운다. (반드시 버튼 클릭 안에서 불러야 창이 뜬다)
+ * 거절했거나 지원하지 않는 브라우저면 아무것도 하지 않는다.
+ */
 export async function scheduleArrivalReminder(tripId: string, delayMin: number) {
-  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
-  // 허용은 했는데 이 브라우저에 푸시 주소가 없으면(확인 화면에서 허용한 경우 등) 창 없이 다시 받아 저장한다.
+  if (typeof Notification === "undefined" || Notification.permission === "denied") return;
+  // 허용을 처음 받거나, 허용은 했는데 이 브라우저에 푸시 주소가 없으면 받아서 저장한다.
   if (!readToken() && !(await askPush())) return;
   const token = readToken();
   if (!token) return;

@@ -23,9 +23,11 @@ export type PushResult =
 
 /** 알림 허용 창을 띄우고, 허용하면 이 폰(브라우저)의 푸시 주소(토큰)를 돌려준다. */
 export async function enablePush(): Promise<PushResult> {
+  if (typeof Notification === "undefined" || !("serviceWorker" in navigator)) return { ok: false, reason: "unsupported" };
+  // 허용 창은 버튼을 누른 직후에만 뜨는 브라우저(사파리 등)가 있어, 다른 걸 기다리기 전에 먼저 띄운다.
+  const permission = await Notification.requestPermission();
   const { getMessaging, getToken, isSupported } = await import("firebase/messaging");
   if (!(await isSupported())) return { ok: false, reason: "unsupported" };
-  const permission = await Notification.requestPermission();
   if (permission !== "granted") return { ok: false, reason: "denied" };
   try {
     const registration = await navigator.serviceWorker.register(SW_URL);
