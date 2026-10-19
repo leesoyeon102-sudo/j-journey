@@ -1,4 +1,4 @@
-import { CircleAlertIcon } from "lucide-react";
+import { BusFrontIcon, CircleAlertIcon, TrainFrontIcon } from "lucide-react";
 import KakaoMapLink from "@/components/KakaoMapLink";
 import { meters } from "@/lib/geo";
 import { fmt } from "@/lib/time";
@@ -16,6 +16,8 @@ interface Step {
   detail?: string;
   note?: string;
   color?: string;
+  /** 탑승 줄이면 점 안에 수단 아이콘(지하철·버스)을 넣어 구분한다. */
+  mode?: "ride" | "bus";
   strong?: boolean;
   /** 배차 간격·예상 시각처럼 "정확하지 않을 수 있는" 안내면 note 앞에 느낌표 아이콘을 붙인다. */
   alert?: boolean;
@@ -69,6 +71,7 @@ function toSteps(plan: Plan): Step[] {
         detail: `${r.lineName} · ${r.direction}`,
         note: `${r.stations.length - 1}개 역 · ${r.end - r.start}분 이동 · 승강장 대기 ${r.waitMin}분${r.scheduled ? "" : " · 예상 시각"}`,
         color: r.color,
+        mode: "ride",
         alert: !r.scheduled,
       });
       const next = legs[i + 1];
@@ -106,6 +109,7 @@ function toSteps(plan: Plan): Step[] {
           ? "현재 도착 정보를 바탕으로 예상한 시각"
           : `배차 간격 ${b.headway}분 · 평균 대기 시간으로 계산한 예상 시각 (최대 ${b.headway}분 더 기다릴 수 있어요)`,
         color: b.color,
+        mode: "bus",
         alert: true,
       });
       const next = legs[i + 1];
@@ -166,15 +170,29 @@ export default function Timeline({ plan }: { plan: Plan }) {
             )}
           </div>
           <div className="relative flex flex-col items-center">
-            <span
-              className={`z-10 mt-2 size-3 shrink-0 rounded-pill border-2 ${
-                s.strong ? "border-primary bg-primary" : "border-muted-foreground bg-surface"
-              }`}
-              style={s.color ? { borderColor: s.color } : undefined}
-            />
+            {s.mode ? (
+              // 탑승 줄: 노선 색 테두리는 그대로 두고, 안에 지하철·버스 아이콘을 넣어 수단을 구분한다.
+              <span
+                className="z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-pill border-2 bg-surface"
+                style={{ borderColor: s.color, color: s.color }}
+              >
+                {s.mode === "ride" ? (
+                  <TrainFrontIcon className="size-3" strokeWidth={1.5} aria-label="지하철" />
+                ) : (
+                  <BusFrontIcon className="size-3" strokeWidth={1.5} aria-label="버스" />
+                )}
+              </span>
+            ) : (
+              <span
+                className={`z-10 mt-2 size-3 shrink-0 rounded-pill border-2 ${
+                  s.strong ? "border-primary bg-primary" : "border-muted-foreground bg-surface"
+                }`}
+                style={s.color ? { borderColor: s.color } : undefined}
+              />
+            )}
             {i < steps.length - 1 && (
               <span
-                className={`absolute top-4 h-[calc(100%+0.75rem)] ${
+                className={`absolute ${steps[i].mode ? "top-6 h-[calc(100%+0.25rem)]" : "top-4 h-[calc(100%+0.75rem)]"} ${
                   steps[i].color ? "w-px" : "w-0 border-l border-dashed border-inactive" // 대중교통이 아닌 구간은 점선
                 }`}
                 style={steps[i].color ? { backgroundColor: steps[i].color } : undefined}
