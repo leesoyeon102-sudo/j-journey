@@ -37,7 +37,7 @@ export default function AlertPanel({ title, description, content, onClose, child
         aria-labelledby={title ? `${id}-title` : undefined}
         aria-describedby={`${id}-desc`}
         onClick={(e) => e.stopPropagation()}
-        className="fade-in glass-strong w-full rounded-nav p-6"
+        className="fade-in w-full rounded-nav border border-glass-border bg-surface p-6 shadow-glass"
       >
         {title && (
           <h2 id={`${id}-title`} className="text-subheading font-medium">
