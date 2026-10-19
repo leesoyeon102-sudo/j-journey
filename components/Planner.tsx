@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
 import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
