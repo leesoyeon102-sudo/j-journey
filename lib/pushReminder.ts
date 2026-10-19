@@ -61,6 +61,15 @@ function trackPermission(prompted: boolean, trigger: "departure" | "settings") {
 }
 
 /**
+ * 출발했어요를 눌렀을 때 알림 허용 안내 얼럿을 띄워야 하는지. 아직 허용 여부를 고르지 않은 최초 한 번만 true다.
+ * 이미 허용·거부했거나 설정에서 껐다면 얼럿 없이 넘어간다.
+ */
+export function shouldAskPush(): boolean {
+  if (typeof Notification === "undefined" || !("serviceWorker" in navigator)) return false;
+  return Notification.permission === "default" && !isOff();
+}
+
+/**
  * 소요 시간(분) 뒤 "도착하셨나요?" 알림을 예약한다. 출발했어요를 누를 때 부른다.
  * 아직 허용 여부를 고르지 않았다면 이때 허용 창을 띄운다. (반드시 버튼 클릭 안에서 불러야 창이 뜬다)
  * 거절했거나 지원하지 않는 브라우저면 아무것도 하지 않는다.

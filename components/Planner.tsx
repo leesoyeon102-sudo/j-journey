@@ -20,7 +20,7 @@ import TripActionButton from "./TripActionButton";
 import TripMenu from "./TripMenu";
 import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
-import { cancelArrivalReminder, scheduleArrivalReminder } from "@/lib/pushReminder";
+import { cancelArrivalReminder, scheduleArrivalReminder, shouldAskPush } from "@/lib/pushReminder";
 import { dateString } from "@/lib/dates";
 import { hasAskedFeedback, notifyArrived } from "@/lib/feedback";
 import { GO_HOME_EVENT, requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
@@ -344,8 +344,15 @@ export default function Planner() {
       }
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
-      setDepartedAlert(active.arriveAt - active.leaveAt);
-      amplitude.track("Alert Panel Shown", { alert_type: "departed_guide" });
+      const minutes = active.arriveAt - active.leaveAt;
+      if (shouldAskPush()) {
+        // 알림 허용을 아직 고르지 않은 최초 한 번만 안내 얼럿을 띄우고, 확인을 누르면 허용 창이 뜬다.
+        setDepartedAlert(minutes);
+        amplitude.track("Alert Panel Shown", { alert_type: "departed_guide" });
+      } else {
+        // 이미 허용했거나 거부했다면 얼럿 없이 바로 도착 알림을 예약한다. (거부·끔이면 예약하지 않는다)
+        void scheduleArrivalReminder(current.id, minutes);
+      }
     };
     // 안내 얼럿의 확인을 누르면 "도착하셨나요?" 알림을 예약한다. 알림을 아직 허용하지 않았다면 이때 허용 창이 뜬다.
     const confirmDeparted = () => {
