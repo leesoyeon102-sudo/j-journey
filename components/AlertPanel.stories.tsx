@@ -70,16 +70,11 @@ export const ReplanConfirm: Story = {
   },
 }
 
-// "출발했어요"를 누른 직후: 제목 없이 설명만. 소요 시간이 지난 뒤 도착했어요를 누르라고 알려 준다
+// "출발할게요"를 누른 직후: 도착 예정 시간과 알림 허용 부탁. 확인을 누르면 iOS 알림 허용 창이 이어서 뜬다
 export const DepartRecorded: Story = {
   args: {
-    description: (
-      <>
-        소요 시간(약 <b className="font-medium text-on-surface">38분</b>)이 지난 뒤, 도착하면
-        <br />
-        <b className="font-medium text-on-surface">도착했어요</b>를 눌러 주세요.
-      </>
-    ),
+    title: "38분 뒤 도착 예정",
+    description: "소요 시간 이후 이동을 마칠 수 있도록 알림을 허용해 주세요.",
     children: <Button size="lg">확인</Button>,
   },
 }

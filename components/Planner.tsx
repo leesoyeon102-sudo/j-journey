@@ -84,7 +84,7 @@ export default function Planner() {
   const [page, setPage] = useState(0);
   // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
   const [arrivedAlert, setArrivedAlert] = useState(false);
-  // "출발했어요"를 누른 직후 띄우는 안내. 소요 시간(분)이 지난 뒤에 도착했어요를 누르라고 알려 준다. 안 띄울 땐 null.
+  // "출발할게요"를 누른 직후 띄우는 안내. 도착 예정까지 남은 분과 알림 허용을 부탁한다. 안 띄울 땐 null.
   const [departedAlert, setDepartedAlert] = useState<number | null>(null);
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
   const arrivalTracked = useRef<string | null>(null);
@@ -254,8 +254,11 @@ export default function Planner() {
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
       setDepartedAlert(active.arriveAt - active.leaveAt);
-      // 소요 시간이 지나면 "도착하셨나요?" 알림을 보낸다. 알림을 아직 허용하지 않았다면 이 버튼을 누른 직후 허용 창이 뜬다.
-      void scheduleArrivalReminder(current.id, active.arriveAt - active.leaveAt);
+    };
+    // 안내 얼럿의 확인을 누르면 "도착하셨나요?" 알림을 예약한다. 알림을 아직 허용하지 않았다면 이때 허용 창이 뜬다.
+    const confirmDeparted = () => {
+      if (departedAlert !== null) void scheduleArrivalReminder(current.id, departedAlert);
+      setDepartedAlert(null);
     };
     const arrive = (plan: Plan, onTime: boolean) => {
       // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
@@ -353,16 +356,11 @@ export default function Planner() {
 
         {departedAlert !== null && (
           <AlertPanel
-            description={
-              <>
-                소요 시간(약 <b className="font-medium text-on-surface">{departedAlert}분</b>)이 지난 뒤, 도착하면
-                <br />
-                <b className="font-medium text-on-surface">도착했어요</b>를 눌러 주세요.
-              </>
-            }
+            title={`${departedAlert}분 뒤 도착 예정`}
+            description="소요 시간 이후 이동을 마칠 수 있도록 알림을 허용해 주세요."
             onClose={() => setDepartedAlert(null)}
           >
-            <Button size="lg" autoFocus onClick={() => setDepartedAlert(null)}>
+            <Button size="lg" autoFocus onClick={confirmDeparted}>
               확인
             </Button>
           </AlertPanel>
