@@ -25,7 +25,7 @@ type Story = StoryObj<typeof meta>
 // 출발 전: 누르면 onDepart
 export const Ready: Story = {
   play: async ({ canvas, args }) => {
-    await canvas.getByRole("button", { name: "출발했어요" }).click()
+    await canvas.getByRole("button", { name: "출발할게요" }).click()
     await expect(args.onDepart).toHaveBeenCalled()
   },
 }

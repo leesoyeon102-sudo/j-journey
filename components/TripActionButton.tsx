@@ -23,7 +23,7 @@ export function isLate(departedAt: number, durationMin: number, now: number) {
 }
 
 interface Props {
-  /** "출발했어요"를 누른 시각(ms). 아직 안 눌렀으면 비운다. */
+  /** "출발할게요"를 누른 시각(ms). 아직 안 눌렀으면 비운다. */
   departedAt?: number;
   /** 안내된 총 소요 시간(분) */
   durationMin: number;
@@ -56,7 +56,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   if (phase === "ready") {
     return (
       <Button size="lg" className="w-full" onClick={onDepart}>
-        출발했어요
+        출발할게요
       </Button>
     );
   }
