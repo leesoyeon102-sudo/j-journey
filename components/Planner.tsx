@@ -97,6 +97,8 @@ export default function Planner() {
   const openedFromPush = useRef<string | null>(null);
   // "놓쳤어요"로 경로를 다시 찾는 중인지와, 못 찾았을 때의 이유
   const [missing, setMissing] = useState(false);
+  // "놓쳤어요"를 잘못 누르지 않도록 먼저 묻는 확인 얼럿
+  const [missedConfirm, setMissedConfirm] = useState(false);
   const [missedError, setMissedError] = useState<string | null>(null);
   const pushTracked = useRef(false);
   const [editing, setEditing] = useState(false);
@@ -479,11 +481,29 @@ export default function Planner() {
               setActiveId(moving.id);
               setEditing(false);
             }}
-            onMissed={() => void missedTrip(moving)}
+            onMissed={() => setMissedConfirm(true)}
             missing={missing}
             missedError={missedError}
           />
         </div>
+
+        {missedConfirm && (
+          <AlertPanel description="현재 위치를 기준으로 경로를 재안내해요.">
+            <Button variant="secondary" size="lg" onClick={() => setMissedConfirm(false)}>
+              취소
+            </Button>
+            <Button
+              size="lg"
+              autoFocus
+              onClick={() => {
+                setMissedConfirm(false);
+                void missedTrip(moving);
+              }}
+            >
+              확인
+            </Button>
+          </AlertPanel>
+        )}
       </main>
     );
   }

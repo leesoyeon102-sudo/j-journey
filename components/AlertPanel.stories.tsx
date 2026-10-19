@@ -78,3 +78,16 @@ export const DepartRecorded: Story = {
     children: <Button size="lg">확인</Button>,
   },
 }
+
+// 이동 중 카드에서 "놓쳤어요"를 눌렀을 때: 잘못 누르지 않도록 먼저 묻는다. 확인을 누르면 출발 안내로 넘어간다
+export const MissedConfirm: Story = {
+  args: {
+    description: "현재 위치를 기준으로 경로를 재안내해요.",
+    children: (
+      <>
+        <Button variant="secondary" size="lg">취소</Button>
+        <Button size="lg">확인</Button>
+      </>
+    ),
+  },
+}
