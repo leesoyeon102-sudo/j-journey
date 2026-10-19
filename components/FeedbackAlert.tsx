@@ -22,8 +22,8 @@ export default function FeedbackAlert({ onSubmit, onClose }: Props) {
 
   return (
     <AlertPanel
-      title="J의 외출, 어땠나요?"
-      description="별점과 의견을 남겨 주시면 서비스를 고치는 데 큰 도움이 돼요."
+      title="약속 시간에 늦지 않게 도착하셨나요?"
+      description="도움이 되셨는지 피드백을 남겨 주시면 서비스 개선에 큰 도움이 돼요."
       onClose={onClose}
       content={
         <div className="space-y-3">
@@ -48,7 +48,7 @@ export default function FeedbackAlert({ onSubmit, onClose }: Props) {
           <Textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="불편했던 점이나 바라는 점을 적어 주세요 (선택)"
+            placeholder="좋았던 점이나 바라는 점을 적어 주세요 (선택)"
             maxLength={500}
             aria-label="의견"
           />
