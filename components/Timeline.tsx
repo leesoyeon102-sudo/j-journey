@@ -173,7 +173,7 @@ export default function Timeline({ plan }: { plan: Plan }) {
             {s.mode ? (
               // 탑승 줄: 노선 색 테두리는 그대로 두고, 안에 지하철·버스 아이콘을 넣어 수단을 구분한다.
               <span
-                className="z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-pill border bg-surface"
+                className="z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-pill border-[1.5px] bg-surface"
                 style={{ borderColor: s.color, color: s.color }}
               >
                 {s.mode === "ride" ? (
