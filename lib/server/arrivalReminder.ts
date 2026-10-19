@@ -45,8 +45,8 @@ export async function deliverArrivalReminder(tripId: string): Promise<"sent" | "
   if (!r) return "skipped"; // 이미 취소됐거나 보냈다.
   const result = await sendPush({
     token: r.token,
-    title: "도착하셨나요?",
-    body: "예상 소요 시간이 지났어요. 도착했다면 '도착했어요'를 눌러 주세요.",
+    title: "약속 장소에 잘 도착하셨나요?",
+    body: "'도착했어요'만 누르면 오늘 외출 기록이 완성돼요.",
     url: "/",
   });
   await redis().del(key(tripId));
