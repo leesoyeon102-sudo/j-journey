@@ -30,7 +30,11 @@ function viewBox(points: Point[]) {
 
 export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?: Point }) {
   const visited = [...roadmap.stations];
-  const box = viewBox([...visited.map((n) => STATIONS[n]), ...(home ? [home] : [])]);
+  const box = viewBox([
+    ...visited.map((n) => STATIONS[n]),
+    ...roadmap.segments.flatMap((s) => s.points),
+    ...(home ? [home] : []),
+  ]);
   // 위도에 따른 경도 길이 보정
   const kx = Math.cos(((box.minLat + box.maxLat) / 2) * (Math.PI / 180));
   const spanX = (box.maxLng - box.minLng) * kx;
@@ -63,7 +67,7 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
         )}
       </g>
 
-      {/* 내가 다닌 길: 탈 때마다 한 줄씩 반투명하게 얹어서, 겹치면 겹친 대로 진해 보인다. */}
+      {/* 내가 다닌 길: 탈 때마다 한 줄씩 반투명하게 얹어서, 겹치면 겹친 대로 진해 보인다. 지하철 구간은 실선, 걷기·버스 구간은 점선. */}
       <g
         fill="none"
         stroke="var(--color-primary)"
@@ -72,10 +76,11 @@ export default function RoadmapMap({ roadmap, home }: { roadmap: Roadmap; home?:
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        {roadmap.paths.map((path, i) => (
+        {roadmap.segments.map((seg, i) => (
           <polyline
             key={i}
-            points={path.map((n) => pos(n).map((v) => v.toFixed(1)).join(",")).join(" ")}
+            points={seg.points.map((p) => at(p).map((v) => v.toFixed(1)).join(",")).join(" ")}
+            strokeDasharray={seg.ride ? undefined : "1 7"}
           />
         ))}
       </g>
