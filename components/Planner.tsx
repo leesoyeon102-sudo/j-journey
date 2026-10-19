@@ -137,6 +137,16 @@ export default function Planner() {
 
   // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
+  // 홈 제목줄 오른쪽 설정 아이콘(집 주소 변경, 알림). 이동 중 홈에도 똑같이 보인다.
+  const settingsLink = (
+    <Link
+      href="/settings"
+      aria-label="설정"
+      className="-mr-2 flex size-10 items-center justify-center rounded-pill text-on-sky transition-colors active:bg-glass"
+    >
+      <SettingsIcon className="size-6" strokeWidth={1.5} />
+    </Link>
+  );
 
   // 도착 확인 푸시를 눌러 들어오면(/?trip=<id>) 그 안내의 출발 안내 화면을 바로 연다. 이미 도착을 기록했거나 없는 안내면 무시한다.
   useEffect(() => {
@@ -469,7 +479,7 @@ export default function Planner() {
       <main className="fade-in relative isolate">
         <SkyBackdrop />
         <ThemeColor token="sky" />
-        <Header title="J의 외출" sub="지금 이동 중이에요." onSky />
+        <Header title="J의 외출" sub="지금 이동 중이에요." onSky action={settingsLink} />
         <div className="px-5 pb-8">
           <TripProgressCard
             origin={moving.plan.origin}
@@ -517,16 +527,7 @@ export default function Planner() {
         title="J의 외출"
         sub="어디로, 몇 시까지 갈지만 알려주세요."
         onSky
-        action={
-          // 설정 화면(집 주소 변경, 알림)을 연다.
-          <Link
-            href="/settings"
-            aria-label="설정"
-            className="-mr-2 flex size-10 items-center justify-center rounded-pill text-on-sky transition-colors active:bg-glass"
-          >
-            <SettingsIcon className="size-6" strokeWidth={1.5} />
-          </Link>
-        }
+        action={settingsLink}
       />
 
       {showHomePicker && (
