@@ -33,7 +33,7 @@ interface Props {
   notToday?: boolean;
 }
 
-/** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요 */
+/** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요! */
 export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive, notToday }: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   }
   return (
     <Button size="lg" className="w-full" onClick={() => onArrive(!isLate(departedAt!, durationMin, Date.now()))}>
-      도착했어요
+      도착했어요!
     </Button>
   );
 }

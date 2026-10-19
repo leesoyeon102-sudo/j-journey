@@ -125,6 +125,20 @@ export default function Planner() {
   // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
 
+  // 도착 확인 푸시를 눌러 들어오면(/?trip=<id>) 그 안내의 출발 안내 화면을 바로 연다. 이미 도착을 기록했거나 없는 안내면 무시한다.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("trip");
+    if (!id) return;
+    const trip = trips.find((t) => t.id === id);
+    if (!trip) return; // 저장된 기록을 아직 못 읽었을 수 있어 주소는 그대로 두고 다음에 다시 본다.
+    window.history.replaceState(null, "", window.location.pathname);
+    if (trip.status !== "planned") return;
+    setGroups(null);
+    setPage(0);
+    setActiveId(trip.id);
+    setEditing(false);
+  }, [trips]);
+
   // 홈 입력 화면이 열릴 때마다 출발지를 현재 위치로 자동 입력한다. 위치를 못 읽으면(권한 꺼짐, http 주소 등) 조용히 건너뛰고
   // 마지막으로 고른 출발지를 그대로 둔다. 직접 고르거나 안내 내역에서 불러온 출발지는 지킨다.
   const showingForm = !current && !moving && home !== undefined && home !== null;

@@ -46,8 +46,9 @@ export async function deliverArrivalReminder(tripId: string): Promise<"sent" | "
   const result = await sendPush({
     token: r.token,
     title: "잘 도착하셨나요?😊",
-    body: "'도착했어요'를 눌러주세요. 이동 중 상태를 마칠게요!",
-    url: "/",
+    body: "'도착했어요!'를 눌러주세요. 이동 중 상태를 마칠게요!",
+    // 알림을 누르면 이 안내의 출발 안내 화면이 바로 열린다. (Planner가 trip 값을 읽는다)
+    url: `/?trip=${tripId}`,
   });
   await redis().del(key(tripId));
   if (result === "gone") {

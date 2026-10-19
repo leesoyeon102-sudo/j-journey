@@ -55,7 +55,7 @@ export const Moving: Story = {
 export const Arrivable: Story = {
   args: { departedAt: Date.now() - 26 * MIN },
   play: async ({ canvas, args }) => {
-    await canvas.getByRole("button", { name: "도착했어요" }).click()
+    await canvas.getByRole("button", { name: "도착했어요!" }).click()
     await expect(args.onArrive).toHaveBeenCalledWith(true)
   },
 }
@@ -64,7 +64,7 @@ export const Arrivable: Story = {
 export const ArrivableLate: Story = {
   args: { departedAt: Date.now() - 40 * MIN },
   play: async ({ canvas, args }) => {
-    await canvas.getByRole("button", { name: "도착했어요" }).click()
+    await canvas.getByRole("button", { name: "도착했어요!" }).click()
     await expect(args.onArrive).toHaveBeenCalledWith(false)
   },
 }
