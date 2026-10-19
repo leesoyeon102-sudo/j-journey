@@ -678,8 +678,7 @@ const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta
           // 놓쳐서 지금 위치에서 다시 찾은 안: "지금 출발하면 00:00에 도착해요"
           <>
             <p className="text-time font-medium">
-              <span className="font-bold text-brand">지금</span>
-              <span className="ml-1 text-subheading font-medium text-on-surface">출발하면</span>
+              <span className="text-subheading font-medium text-on-surface">지금 출발하면</span>
             </p>
             <p className="text-time font-medium">
               <span className="font-bold">{fmt(plan.arriveAt)}</span>
