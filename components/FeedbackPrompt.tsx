@@ -1,5 +1,6 @@
 "use client";
 
+import * as amplitude from "@amplitude/analytics-browser";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import FeedbackAlert from "@/components/FeedbackAlert";
@@ -48,11 +49,13 @@ export default function FeedbackPrompt() {
       {open && (
         <FeedbackAlert
           onClose={() => {
+            amplitude.track("Feedback Alert Result", { action: "dismissed" });
             setOpen(false);
             router.push("/roadmap");
           }}
           onSubmit={(rating, comment) => {
             submitFeedback(rating, comment);
+            amplitude.track("Feedback Alert Result", { action: "submitted" });
             setOpen(false);
             router.push("/roadmap");
             setToast("의견을 보냈어요. 고맙습니다!");

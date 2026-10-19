@@ -1,3 +1,4 @@
+import * as amplitude from "@amplitude/analytics-browser";
 import { enablePush } from "./firebase";
 
 // 이 기기의 푸시 주소(토큰)는 알림을 허용할 때 한 번 받아 브라우저에 기억해 둔다.
@@ -49,14 +50,32 @@ export async function askPush(): Promise<boolean> {
 }
 
 /**
+ * 알림 허용 결과를 기록한다. 허용 창이 떴다면 그 결과이고, 이미 허용·거부 상태라 창이 안 떴다면 현재 상태다.
+ * 허용 창을 닫기만 해서 아직 고르지 않은 상태(default)는 결과가 아니라 기록하지 않는다.
+ */
+function trackPermission(prompted: boolean, trigger: "departure" | "settings") {
+  if (typeof Notification === "undefined") return;
+  const p = Notification.permission;
+  if (p === "default") return;
+  amplitude.track("Notification Permission Result", { result: p === "granted" ? "granted" : "denied", prompted, trigger });
+}
+
+/**
  * 소요 시간(분) 뒤 "도착하셨나요?" 알림을 예약한다. 출발했어요를 누를 때 부른다.
  * 아직 허용 여부를 고르지 않았다면 이때 허용 창을 띄운다. (반드시 버튼 클릭 안에서 불러야 창이 뜬다)
  * 거절했거나 지원하지 않는 브라우저면 아무것도 하지 않는다.
  */
 export async function scheduleArrivalReminder(tripId: string, delayMin: number) {
-  if (typeof Notification === "undefined" || Notification.permission === "denied" || isOff()) return;
+  if (typeof Notification === "undefined") return;
+  const prompted = Notification.permission === "default";
+  if (Notification.permission === "denied" || isOff()) {
+    trackPermission(false, "departure");
+    return;
+  }
   // 허용을 처음 받거나, 허용은 했는데 이 브라우저에 푸시 주소가 없으면 받아서 저장한다.
-  if (!readToken() && !(await askPush())) return;
+  const registered = readToken() ? true : await askPush();
+  trackPermission(prompted, "departure");
+  if (!registered) return;
   const token = readToken();
   if (!token) return;
   await post("/api/push/reminder", "POST", { token, tripId, delayMin });
@@ -80,7 +99,9 @@ export function readPushState(): PushState {
 /** 알림을 켠다. 아직 허용하지 않았다면 허용 창이 뜬다. (버튼 클릭 안에서 불러야 한다) */
 export async function turnOnPush(): Promise<PushState> {
   setOff(false);
+  const prompted = typeof Notification !== "undefined" && Notification.permission === "default";
   await askPush();
+  trackPermission(prompted, "settings");
   return readPushState();
 }
 

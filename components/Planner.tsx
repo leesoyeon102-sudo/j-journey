@@ -92,6 +92,9 @@ export default function Planner() {
   const [departedAlert, setDepartedAlert] = useState<number | null>(null);
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
   const arrivalTracked = useRef<string | null>(null);
+  // 도착 푸시를 눌러 연 안내의 id. 도착 기록의 진입 경로(source)를 가린다. pushTracked: 푸시 진입 이벤트를 이미 보냈는지.
+  const openedFromPush = useRef<string | null>(null);
+  const pushTracked = useRef(false);
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
   const [picker, setPicker] = useState<"origin" | "destination" | null>(null);
@@ -134,10 +137,15 @@ export default function Planner() {
     /* eslint-disable react-hooks/set-state-in-effect -- 주소로 들어온 안내를 한 번 여는 동기화라 effect 안에서 상태를 바꾼다. */
     const id = new URLSearchParams(window.location.search).get("trip");
     if (!id) return;
+    if (!pushTracked.current) {
+      pushTracked.current = true;
+      amplitude.track("Arrival Push Opened");
+    }
     const trip = trips.find((t) => t.id === id);
     if (!trip) return; // 저장된 기록을 아직 못 읽었을 수 있어 주소는 그대로 두고 다음에 다시 본다.
     window.history.replaceState(null, "", window.location.pathname);
     if (trip.status !== "planned") return;
+    openedFromPush.current = trip.id;
     setGroups(null);
     setPage(0);
     setActiveId(trip.id);
@@ -274,6 +282,7 @@ export default function Planner() {
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
       setDepartedAlert(active.arriveAt - active.leaveAt);
+      amplitude.track("Alert Panel Shown", { alert_type: "departed_guide" });
     };
     // 안내 얼럿의 확인을 누르면 "도착하셨나요?" 알림을 예약한다. 알림을 아직 허용하지 않았다면 이때 허용 창이 뜬다.
     const confirmDeparted = () => {
@@ -288,6 +297,7 @@ export default function Planner() {
           on_time: onTime,
           appointment_time: fmt(plan.arriveBy),
           arrival_diff_min: nowMinutes() - plan.arriveBy, // 실제 누른 시각 - 약속 시간 (음수면 일찍 도착)
+          source: openedFromPush.current === current.id ? "push" : "direct", // 도착 푸시를 눌러 들어온 안내면 push
         });
       }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
