@@ -19,7 +19,7 @@ import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
 import { cancelArrivalReminder, scheduleArrivalReminder } from "@/lib/pushReminder";
 import { dateString } from "@/lib/dates";
-import { notifyArrived } from "@/lib/feedback";
+import { hasAskedFeedback, notifyArrived } from "@/lib/feedback";
 import { GO_HOME_EVENT, requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { readCurrentPlace } from "@/lib/currentLocation";
 import { draft, isOriginLocked, unlockOrigin } from "@/lib/draft";
@@ -286,8 +286,10 @@ export default function Planner() {
       }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
       void cancelArrivalReminder(current.id);
+      // 처음 도착하면 1초 뒤 피드백 얼럿이 뜨고, 그 얼럿을 닫으면 로드맵으로 간다. 이때는 기록 완료 얼럿을 겹쳐 띄우지 않는다.
+      const askingFeedback = !hasAskedFeedback();
       notifyArrived();
-      setArrivedAlert(true);
+      if (!askingFeedback) setArrivedAlert(true);
     };
     const closeArrivedAlert = () => {
       setArrivedAlert(false);
