@@ -52,8 +52,8 @@ export default function TabBar() {
   // 설정은 탭이 아니라 홈에서 들어가는 하위 화면이라 탭바를 숨긴다.
   if (pathname.startsWith("/settings")) return null;
   return (
-    // 하늘 위에 떠 있는 유리 막대. 바깥 nav는 투명하고, 클릭은 막대에서만 받는다.
-    <nav className="pointer-events-none fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 bg-linear-to-t from-sky-pale to-sky-pale/0 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-6">
+    // 하늘 위에 떠 있는 유리 막대. 바깥 nav는 막대 뒤와 맨 아래(홈 화면 앱의 하단 안전 영역까지)를 연한 하늘색으로 채우고 위로 갈수록 옅어진다. 클릭은 막대에서만 받는다.
+    <nav className="pointer-events-none fixed bottom-0 left-1/2 z-20 w-full max-w-[480px] -translate-x-1/2 bg-linear-to-t from-sky-pale from-70% to-sky-pale/0 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-8">
       <ul className="glass pointer-events-auto relative grid grid-cols-3 rounded-nav p-1">
         {/* 선택 표시: 탭을 누르면 이 알약이 옆 탭으로 미끄러져 간다. */}
         <li
