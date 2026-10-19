@@ -317,9 +317,11 @@ components:
 
 글꼴은 G마켓 산스(Gmarket Sans)다. 굵기가 Medium·Bold 두 가지뿐이라 `public/fonts`에 그 둘을 두고, 코드의 일반(400)·중간(500) 굵기는 Medium으로, 반굵게(600)·굵게(700)는 Bold로 보여 준다. 불러오지 못하면 Pretendard, Apple SD Gothic Neo, Noto Sans KR 순으로 대체된다. 글자 간격은 크기에 비례해 약간 좁게(-0.01em 안팎) 둔다.
 
+**세미볼드 표현:** 세미볼드를 따로 두지 않아서 Medium에 0.3px 외곽선을 더해 Medium과 Bold 사이 굵기로 보이게 한다. 클래스는 `font-medium [-webkit-text-stroke:0.3px]`이다. 탭바 활성 글자, 필터 칩, 출발 안내 타임라인 제목, 얼럿 제목이 이 방식이다. `font-semibold`(600)를 쓰면 Bold로 보이니 이 굵기가 필요한 곳에는 위 클래스를 쓴다.
+
 - **time (34px):** 출발 시각 전용. 화면에서 가장 크게 읽혀야 하는 숫자에만 쓴다. 홈의 이동 중 카드에서는 도착 시각도 같은 크기로 쓰되, 파랑은 출발 시각에만 준다.
 - **display (58px):** 랜딩·디자인 시스템 페이지 같은 큰 머리말 전용. 앱 화면 안에서는 쓰지 않는다.
-- **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목. 홈·안내 내역·로드맵의 화면 제목과 얼럿 제목은 SemiBold(600)이다.
+- **heading (23px) / subheading (19px):** 화면 제목과 섹션 제목. 홈·안내 내역·로드맵의 화면 제목은 SemiBold(600)이고, 얼럿 제목은 위의 세미볼드 표현(Medium+외곽선)이다.
 - **body-lg (16px) / body-md (15px) / body (14px):** 본문. 앱 기본은 14px. body-md는 출발 안내 타임라인의 맨 윗줄(제목)에 쓴다.
 - **label (14px, 600):** 버튼과 입력 라벨. 버튼 글자는 SemiBold(600)이다.
 - **label-lg (15px, 600):** 지금은 쓰는 곳이 없다. (안내 내역 상세의 "이 계획 다시 검색하기" 버튼은 14px `label`을 쓴다.)
