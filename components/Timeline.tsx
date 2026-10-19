@@ -169,17 +169,17 @@ export default function Timeline({ plan }: { plan: Plan }) {
               </time>
             )}
           </div>
-          <div className="relative flex flex-col items-center">
+          <div className="relative flex w-5 shrink-0 flex-col items-center">
             {s.mode ? (
               // 탑승 줄: 노선 색 테두리는 그대로 두고, 안에 지하철·버스 아이콘을 넣어 수단을 구분한다.
               <span
-                className="z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-pill border-2 bg-surface"
+                className="z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-pill border bg-surface"
                 style={{ borderColor: s.color, color: s.color }}
               >
                 {s.mode === "ride" ? (
-                  <TrainFrontIcon className="size-3" strokeWidth={1.5} aria-label="지하철" />
+                  <TrainFrontIcon className="size-3" strokeWidth={2} aria-label="지하철" />
                 ) : (
-                  <BusFrontIcon className="size-3" strokeWidth={1.5} aria-label="버스" />
+                  <BusFrontIcon className="size-3" strokeWidth={2} aria-label="버스" />
                 )}
               </span>
             ) : (
