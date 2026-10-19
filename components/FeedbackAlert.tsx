@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 interface Props {
   /** 보내기를 눌렀을 때 */
   onSubmit: (rating: number, comment: string) => void;
-  /** 나중에를 누르거나 바깥·Esc로 닫았을 때 */
+  /** 나중에를 눌렀을 때. 바깥 영역·Esc로는 닫히지 않는다. */
   onClose: () => void;
 }
 
@@ -24,7 +24,6 @@ export default function FeedbackAlert({ onSubmit, onClose }: Props) {
     <AlertPanel
       title="약속 시간에 늦지 않게 도착하셨나요?"
       description="도움이 되셨는지 피드백을 남겨 주시면 서비스 개선에 큰 도움이 돼요."
-      onClose={onClose}
       content={
         <div className="space-y-3">
           <div className="flex flex-col items-center gap-1">
