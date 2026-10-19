@@ -302,7 +302,13 @@ export default function Planner() {
       setGroups(result.groups ?? groupPlans(result.plans));
       setTab("recommended");
       setPage(0);
-      // 이동 중이던 이전 안내는 그대로 두고, 새 안내로 출발하는 순간 정리한다. (결과를 보고 뒤로 돌아올 수 있게)
+      // 놓친 이전 안내는 끝난 것으로 보고 바로 정리한다. 남겨 두면 뒤로 돌아간 홈에 옛 출발 시각의 이동 중 카드가 계속 보인다.
+      for (const t of trips) {
+        if (t.departedAt && t.status === "planned") {
+          removeTrip(t.id);
+          void cancelArrivalReminder(t.id);
+        }
+      }
       setActiveId(addTrip(result.plan).id);
       setEditing(false);
     } catch {
