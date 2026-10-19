@@ -392,6 +392,7 @@ export default function Planner() {
           {departed && !done && (
             <div className="ml-auto">
               <TripMenu
+                plan={current.plan}
                 onCancelDeparture={() => {
                   cancelDeparture(current.id);
                   void cancelArrivalReminder(current.id);

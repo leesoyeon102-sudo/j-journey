@@ -7,7 +7,15 @@ const meta = {
   title: "App/TripMenu",
   component: TripMenu,
   tags: ["autodocs"],
-  args: { onCancelDeparture: fn() },
+  args: {
+    plan: {
+      origin: "현재 위치",
+      destination: "서울역",
+      originCoord: { lat: 37.5547, lng: 126.9707 },
+      destCoord: { lat: 37.5665, lng: 126.978 },
+    },
+    onCancelDeparture: fn(),
+  },
   decorators: [
     (Story) => (
       <div className="sky-wash flex h-[200px] w-[390px] justify-end px-2 pt-2">
@@ -23,10 +31,12 @@ type Story = StoryObj<typeof meta>
 // 닫힌 상태: 점 세 개 아이콘만 보인다
 export const Closed: Story = {}
 
-// 열린 상태: "출발 취소" 항목
+// 열린 상태: 카카오맵 검색 · 네이버맵 검색 · 출발 취소 항목
 export const Open: Story = {
   play: async ({ canvas }) => {
     await userEvent.click(canvas.getByRole("button", { name: "더보기" }))
+    await expect(await screen.findByRole("menuitem", { name: "카카오맵 검색" })).toBeVisible()
+    await expect(await screen.findByRole("menuitem", { name: "네이버맵 검색" })).toBeVisible()
     await expect(await screen.findByRole("menuitem", { name: "출발 취소" })).toBeVisible()
   },
 }
