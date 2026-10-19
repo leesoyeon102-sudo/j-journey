@@ -74,7 +74,7 @@ export const ReplanConfirm: Story = {
 export const DepartRecorded: Story = {
   args: {
     title: "38분 뒤 도착 예정",
-    description: "소요 시간 이후 이동을 마칠 수 있도록 알림을 허용해 주세요.",
+    description: "알림을 허용해 주세요. 도착하면 이동 중인 상태를 완료하도록 도와드릴게요.",
     children: <Button size="lg">확인</Button>,
   },
 }
