@@ -36,7 +36,7 @@ export const TwoActions: Story = {
 export const OneAction: Story = {
   args: {
     title: "제시간에 도착했어요",
-    description: "도착을 기록했어요. 확인을 누르면 홈으로 돌아가요.",
+    description: "도착을 기록했어요. 확인을 누르면 로드맵으로 이동해요.",
     children: <Button size="lg">확인</Button>,
   },
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";import { Button } from "@/components/ui/button";
 import AlertPanel from "@/components/AlertPanel";
 import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
@@ -69,6 +69,7 @@ const withoutOrigin = (e: Partial<Form>) => {
 };
 
 export default function Planner() {
+  const router = useRouter();
   const trips = useTrips();
   const home = useHome();
   const savedOrigin = useLastOrigin();
@@ -82,7 +83,7 @@ export default function Planner() {
   const [groups, setGroups] = useState<PlanGroups | null>(null);
   const [tab, setTab] = useState<PlanTab>("recommended");
   const [page, setPage] = useState(0);
-  // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 홈으로 돌아간다.
+  // 도착·늦음 버튼을 누른 뒤 띄우는 얼럿. 확인을 누르면 로드맵으로 간다.
   const [arrivedAlert, setArrivedAlert] = useState(false);
   // "출발할게요"를 누른 직후 띄우는 안내. 도착 예정까지 남은 분과 알림 허용을 부탁한다. 안 띄울 땐 null.
   const [departedAlert, setDepartedAlert] = useState<number | null>(null);
@@ -293,10 +294,8 @@ export default function Planner() {
     };
     const closeArrivedAlert = () => {
       setArrivedAlert(false);
-      // 홈(입력 화면)으로 돌아간다.
-      setEditing(true);
-      setActiveId(null);
-      setGroups(null);
+      // 그려진 길을 볼 수 있게 로드맵으로 간다.
+      router.push("/roadmap");
     };
 
     return (
@@ -384,7 +383,7 @@ export default function Planner() {
         {arrivedAlert && (
           <AlertPanel
             title="로드맵 기록 완료"
-            description="확인을 누르면 홈으로 돌아가요."
+            description="확인을 누르면 로드맵으로 이동해요."
             onClose={closeArrivedAlert}
           >
             <Button size="lg" autoFocus onClick={closeArrivedAlert}>
