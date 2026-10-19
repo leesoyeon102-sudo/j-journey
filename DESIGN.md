@@ -347,6 +347,8 @@ components:
 - **Button:** variant는 default(primary), outline, secondary, ghost, destructive(danger-subtle), danger(danger 채움 + 흰 글자, 경로 삭제처럼 되돌릴 수 없는 동작), link. 높이는 기본 36px, 큰 것(lg) 52px. 포커스는 `on-surface` 테두리로만 표시한다. 링·그림자는 쓰지 않는다.
 - **Switch:** 56×32px 알약 토글. 켜지면 accent, 꺼지면 `toggle-off` 배경에 흰 24px 손잡이. 홈의 "내일 약속이에요"와 설정의 "알림 허용"이 같이 쓴다.
 - **설정 화면(`/settings`):** 홈 제목 오른쪽의 설정 아이콘(lucide `settings`, 선 1.5)으로 들어간다. 탭바 없이 `surface`(흰색) 배경에 위쪽 내비게이션 바(뒤로 가기 + 가운데 제목 "설정", 아래 `border-subtle` 선)와 목록으로 구성한다. 목록은 줄 사이를 `border-subtle`로 나누고, "집 주소 변경"(현재 주소를 보조 글자로, 오른쪽 화살표)과 "알림 허용"(Switch) 두 줄이다. 알림을 거절했거나 지원하지 않는 기기에서는 토글을 눌러도 켜지지 않고 안내 토스트만 띄운다.
+- **놓쳤어요(이동 중 카드):** "출발 안내 상세" 아래의 텍스트 버튼(ghost, `muted-foreground` 글자)이다. 눌러서 찾는 동안은 "경로 찾는 중…"으로 잠기고, 못 찾으면 버튼 아래에 `on-danger` 12px 글자로 이유를 적는다. 찾으면 입력 화면 없이 바로 출발 안내 화면이 열린다.
+- **지금 출발 안내(`departNow`):** 출발 안내 맨 위가 "지금 출발하면 / 00:00에 도착해요"로 바뀌고(지금은 파랑 time 굵기), 그 아래 보조 줄에 원래 약속 시각과 비교해 "약속(14:30) N분 전 도착" 또는 "약속(14:30)보다 N분 늦어요"를 적는다.
 - **Timeline 탑승 점:** 출발 안내 타임라인에서 지하철 승차·버스 탑승 줄의 점은 20px 원에 노선 색 1.5px 테두리를 두르고, 안에 노선 색 12px 아이콘(지하철 `train-front`, 버스 `bus-front`, 선 2)을 넣어 수단을 구분한다. 그 밖의 줄은 2px 테두리의 12px 점이다. 점·선 열은 20px 너비로 고정해 두 점의 중심과 이어지는 선(실선·점선)이 같은 세로축에 놓인다.- **Badge:** 24px 높이의 알약. 기본은 primary 채움, 보조는 muted, 강조(accent)는 accent-subtle 배경에 accent 글자.
 - **Card:** surface 배경, 1px border, 4px 반경. 제목은 heading 글꼴, 설명은 `muted-foreground`.
 - **Input:** 44px 높이, muted 배경, border 테두리. 포커스 시 테두리가 `on-surface`로 진해지고, 오류(`aria-invalid`)면 danger 테두리가 된다.

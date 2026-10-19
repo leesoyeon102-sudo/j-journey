@@ -38,6 +38,8 @@ export interface PlanRequest {
   buffer: number;
   /** 약속 날짜 (YYYY-MM-DD) — 평일·토·일 시간표 선택에 쓴다 */
   date: string;
+  /** "now": 약속에 맞추는 대신 지금 출발하는 안을 계산한다. 이때 arriveBy는 비교용 약속 시각이다. */
+  mode?: "now";
 }
 
 export async function requestPlans(body: PlanRequest): Promise<PlanResult> {

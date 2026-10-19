@@ -107,6 +107,8 @@ export interface Plan {
   dayType?: "weekday" | "saturday" | "sunday";
   /** 약속 날짜(YYYY-MM-DD). 오늘이 아니면 아직 출발할 수 없다. */
   date?: string;
+  /** 계획대로 가지 못해 "지금 출발하면"을 기준으로 다시 계산한 안. 이때 arriveBy는 원래 약속 시각이다. */
+  departNow?: boolean;
   /** 도보 시간을 기준으로 자동 선택된 이용 역 */
   /** 걸어서만 가는 경로면 빈 문자열 */
   originStation: string;

@@ -10,10 +10,16 @@ interface Props {
   leaveAt: number;
   arriveAt: number;
   onDetail: () => void;
+  /** "놓쳤어요": 지금 위치에서 지금 출발하는 경로를 다시 찾는다. */
+  onMissed: () => void;
+  /** 다시 찾는 중이면 버튼을 잠근다. */
+  missing?: boolean;
+  /** 다시 찾지 못했을 때 버튼 아래에 보이는 이유 */
+  missedError?: string | null;
 }
 
 /** 홈 화면: 출발한 뒤 이동 중인 안내를 보여 주는 카드 */
-export default function TripProgressCard({ origin, destination, leaveAt, arriveAt, onDetail }: Props) {
+export default function TripProgressCard({ origin, destination, leaveAt, arriveAt, onDetail, onMissed, missing, missedError }: Props) {
   return (
     <section className="glass-strong rounded-nav p-5" aria-label="이동 중인 경로">
       <div className="flex items-center gap-2">
@@ -55,6 +61,15 @@ export default function TripProgressCard({ origin, destination, leaveAt, arriveA
       <Button size="lg" className="mt-5 w-full" onClick={onDetail}>
         출발 안내 상세
       </Button>
+      {/* 계획대로 못 갔을 때: 눈에 덜 띄는 텍스트 버튼 */}
+      <Button variant="ghost" size="lg" className="mt-1 w-full text-muted-foreground" disabled={missing} onClick={onMissed}>
+        {missing ? "경로 찾는 중…" : "놓쳤어요"}
+      </Button>
+      {missedError && (
+        <p role="alert" className="mt-2 text-center text-caption text-on-danger">
+          {missedError}
+        </p>
+      )}
     </section>
   );
 }

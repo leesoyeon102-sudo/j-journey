@@ -2,6 +2,7 @@ import { nearestStations, type Place } from "../places";
 import { planTrip } from "../planner";
 import { attachWalkCoords } from "../walkCoords";
 import { STATIONS } from "../stations";
+import { groupPlans } from "../planGroups";
 import type { PlanResult } from "../types";
 import { busPlans } from "./busPlan";
 import { kakaoPlans } from "./kakaoPlan";
@@ -115,4 +116,39 @@ export async function computePlans(
     }
   }
   return result;
+}
+
+/**
+ * 계획대로 가지 못했을 때: 지금 출발하는 안을 계산한다. appointment는 원래 약속 시각(지각 여부를 알리는 데만 쓴다).
+ * 계산기는 도착 시각에서 거꾸로 시각을 맞추므로, 출발 시각이 지금이 되는 도착 시각을 몇 번 어림해 찾는다.
+ * 안은 지금 출발하는 추천 하나만 돌려준다. (다른 안은 도착 시각이 같아 비교가 안 된다)
+ */
+export async function computePlansNow(
+  origin: Place,
+  destination: Place,
+  appointment: number,
+  date: string,
+): Promise<PlanResult> {
+  const now = Math.ceil(nowKst().minute);
+  let target = Math.min(1439, now + 60);
+  const tried = new Set<number>();
+  let best: PlanResult | null = null; // 출발이 지금 이후인 안 중 가장 이른 것
+  let last: PlanResult | null = null;
+  for (let i = 0; i < 6 && !tried.has(target); i++) {
+    tried.add(target);
+    const r = await computePlans(origin, destination, target, 0, date);
+    last = r;
+    if (!r.ok) break;
+    const slack = r.plan.leaveAt - now; // 양수면 아직 여유가 있어 도착 시각을 당겨 본다. 음수면 이미 늦어 미룬다.
+    if (slack >= 0 && (!best || (best.ok && r.plan.leaveAt < best.plan.leaveAt))) best = r;
+    if (slack >= 0 && slack <= 1) break;
+    target = Math.max(now, Math.min(1439, target - slack));
+  }
+  const result = best ?? last;
+  if (!result || !result.ok) return result ?? { ok: false, message: "경로를 계산하지 못했어요." };
+  const plan = result.plan;
+  plan.departNow = true;
+  plan.arriveBy = appointment;
+  plan.buffer = 0;
+  return { ok: true, plan, plans: [plan], groups: groupPlans([plan]) };
 }

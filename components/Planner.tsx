@@ -31,6 +31,7 @@ import {
   addTrip,
   recordArrival,
   recordDeparture,
+  removeTrip,
   cancelDeparture,
   saveHome,
   saveLastDestination,
@@ -42,7 +43,7 @@ import {
   useTrips,
 } from "@/lib/storage";
 import { groupPlans } from "@/lib/planGroups";
-import type { Plan, PlanGroups } from "@/lib/types";
+import type { Plan, PlanGroups, Trip } from "@/lib/types";
 import { fmt, parseTime } from "@/lib/time";
 
 interface Form {
@@ -94,6 +95,9 @@ export default function Planner() {
   const arrivalTracked = useRef<string | null>(null);
   // 도착 푸시를 눌러 연 안내의 id. 도착 기록의 진입 경로(source)를 가린다. pushTracked: 푸시 진입 이벤트를 이미 보냈는지.
   const openedFromPush = useRef<string | null>(null);
+  // "놓쳤어요"로 경로를 다시 찾는 중인지와, 못 찾았을 때의 이유
+  const [missing, setMissing] = useState(false);
+  const [missedError, setMissedError] = useState<string | null>(null);
   const pushTracked = useRef(false);
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
@@ -256,6 +260,46 @@ export default function Planner() {
     }
   }
 
+  /** 계획대로 가지 못했을 때: 지금 위치에서 같은 도착지로 지금 출발하는 경로를 바로 찾아 출발 안내를 연다. */
+  async function missedTrip(trip: Trip) {
+    const dest = trip.plan.destCoord;
+    if (!dest) {
+      setMissedError("도착지 정보를 찾지 못했어요. 상세에서 다시 검색해 주세요.");
+      return;
+    }
+    setMissing(true);
+    setMissedError(null);
+    try {
+      const here = await readCurrentPlace().catch(() => null);
+      if (!here) {
+        setMissedError("현재 위치를 확인하지 못했어요. 위치 권한을 허용해 주세요.");
+        return;
+      }
+      const result = await requestPlans({
+        origin: { name: here.name, area: here.address, lat: here.lat, lng: here.lng },
+        destination: { name: trip.plan.destination, area: "", lat: dest.lat, lng: dest.lng },
+        arriveBy: trip.plan.arriveBy, // 원래 약속 시각. 지각 여부를 알리는 데만 쓴다.
+        buffer: 0,
+        date: dateString(0),
+        mode: "now",
+      });
+      if (!result.ok) {
+        setMissedError(result.message);
+        return;
+      }
+      setGroups(result.groups ?? groupPlans(result.plans));
+      setTab("recommended");
+      setPage(0);
+      // 이동 중이던 이전 안내는 그대로 두고, 새 안내로 출발하는 순간 정리한다. (결과를 보고 뒤로 돌아올 수 있게)
+      setActiveId(addTrip(result.plan).id);
+      setEditing(false);
+    } catch {
+      setMissedError("경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setMissing(false);
+    }
+  }
+
   if (current) {
     const done = current.status !== "planned";
     // 출발하거나 기록을 남긴 뒤에는 따라간 안 하나만 보여준다.
@@ -279,6 +323,13 @@ export default function Planner() {
         is_recommended: groups ? active === groups.recommended : true,
         transfers: active.transfers,
       });
+      // 놓쳐서 다시 찾은 안으로 출발하면, 이동 중이던 이전 안내는 끝난 것으로 정리하고 도착 알림도 취소한다.
+      for (const t of trips) {
+        if (t.id !== current.id && t.departedAt && t.status === "planned") {
+          removeTrip(t.id);
+          void cancelArrivalReminder(t.id);
+        }
+      }
       recordDeparture(current.id, active === current.plan ? undefined : active);
       setPage(0);
       setDepartedAlert(active.arriveAt - active.leaveAt);
@@ -428,6 +479,9 @@ export default function Planner() {
               setActiveId(moving.id);
               setEditing(false);
             }}
+            onMissed={() => void missedTrip(moving)}
+            missing={missing}
+            missedError={missedError}
           />
         </div>
       </main>
@@ -600,15 +654,36 @@ const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta
             {delta > 0 ? `추천보다 ${delta}분 일찍 나가야 해요` : `추천보다 ${-delta}분 늦게 나가도 돼요`}
           </p>
         )}
-        <p className="text-time font-medium">
-          <span className="font-bold text-brand">{fmt(plan.leaveAt)}</span>
-          <span className="ml-1 text-subheading font-medium text-on-surface">에 출발하면</span>
-        </p>
-        <p className="text-time font-medium">
-          <span className="font-bold">{fmt(plan.arriveAt)}</span>
-          <span className="ml-1 text-subheading font-medium text-on-surface">에 도착해요</span>
-        </p>
-        <p className="mt-3 text-body text-muted-foreground">약속 {plan.arriveBy - plan.arriveAt}분 전 도착</p>
+        {plan.departNow ? (
+          // 놓쳐서 지금 위치에서 다시 찾은 안: "지금 출발하면 00:00에 도착해요"
+          <>
+            <p className="text-time font-medium">
+              <span className="font-bold text-brand">지금</span>
+              <span className="ml-1 text-subheading font-medium text-on-surface">출발하면</span>
+            </p>
+            <p className="text-time font-medium">
+              <span className="font-bold">{fmt(plan.arriveAt)}</span>
+              <span className="ml-1 text-subheading font-medium text-on-surface">에 도착해요</span>
+            </p>
+            <p className="mt-3 text-body text-muted-foreground">
+              {plan.arriveBy - plan.arriveAt >= 0
+                ? `약속(${fmt(plan.arriveBy)}) ${plan.arriveBy - plan.arriveAt}분 전 도착`
+                : `약속(${fmt(plan.arriveBy)})보다 ${plan.arriveAt - plan.arriveBy}분 늦어요`}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-time font-medium">
+              <span className="font-bold text-brand">{fmt(plan.leaveAt)}</span>
+              <span className="ml-1 text-subheading font-medium text-on-surface">에 출발하면</span>
+            </p>
+            <p className="text-time font-medium">
+              <span className="font-bold">{fmt(plan.arriveAt)}</span>
+              <span className="ml-1 text-subheading font-medium text-on-surface">에 도착해요</span>
+            </p>
+            <p className="mt-3 text-body text-muted-foreground">약속 {plan.arriveBy - plan.arriveAt}분 전 도착</p>
+          </>
+        )}
       </section>
 
       <div className="border-t border-divider" />

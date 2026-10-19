@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { computePlans } from "@/lib/server/plan";
+import { computePlans, computePlansNow } from "@/lib/server/plan";
 import { inKorea } from "@/lib/server/osm";
 
 const validPlace = (p: unknown) => {
@@ -17,7 +17,8 @@ const validPlace = (p: unknown) => {
 
 /**
  * POST /api/plan
- * { origin, destination, arriveBy(분), buffer(분), date("YYYY-MM-DD") } → PlanResult
+ * { origin, destination, arriveBy(분), buffer(분), date("YYYY-MM-DD"), mode?: "now" } → PlanResult
+ * mode가 "now"면 약속에 맞추지 않고 지금 출발하는 안을 계산한다. (arriveBy는 원래 약속 시각)
  */
 export async function POST(req: NextRequest) {
   let b: Record<string, unknown>;
@@ -44,6 +45,10 @@ export async function POST(req: NextRequest) {
   try {
     const o = b.origin as { name: string; area?: string; lat: number; lng: number };
     const d = b.destination as typeof o;
+    const place = (x: typeof o) => ({ name: x.name, area: String(x.area ?? ""), lat: x.lat, lng: x.lng });
+    if (b.mode === "now") {
+      return NextResponse.json(await computePlansNow(place(o), place(d), b.arriveBy as number, b.date as string));
+    }
     const result = await computePlans(
       { name: o.name, area: String(o.area ?? ""), lat: o.lat, lng: o.lng },
       { name: d.name, area: String(d.area ?? ""), lat: d.lat, lng: d.lng },
