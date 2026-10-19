@@ -41,7 +41,7 @@ export default function AlertPanel({ title, description, content, onClose, child
         className="fade-in w-full rounded-nav border border-glass-border bg-surface p-6 shadow-glass"
       >
         {title && (
-          <h2 id={`${id}-title`} className="text-subheading font-semibold">
+          <h2 id={`${id}-title`} className="text-subheading font-medium [-webkit-text-stroke:0.3px]">
             {title}
           </h2>
         )}
