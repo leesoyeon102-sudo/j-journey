@@ -142,7 +142,7 @@ function toSteps(plan: Plan): Step[] {
   steps.push({
     time: plan.arriveAt,
     title: "약속 장소 도착",
-    detail: `${fmt(plan.arriveBy)} 약속 · ${plan.arriveBy - plan.arriveAt}분 여유`,
+    detail: `${fmt(plan.arriveBy)} 약속 · ${plan.arriveBy >= plan.arriveAt ? `${plan.arriveBy - plan.arriveAt}분 여유` : `${plan.arriveAt - plan.arriveBy}분 늦음`}`,
     strong: true,
   });
   return steps;
