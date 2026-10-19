@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import { SettingsIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import AlertPanel from "@/components/AlertPanel";
 import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as amplitude from "@amplitude/analytics-browser";
@@ -12,7 +15,6 @@ import PlanSlider from "./PlanSlider";
 import SkyBackdrop from "./SkyBackdrop";
 import ThemeColor from "./ThemeColor";
 import RouteCard from "./RouteCard";
-import { HomeEditIcon } from "./HomeIcon";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
 import TripMenu from "./TripMenu";
@@ -92,9 +94,9 @@ export default function Planner() {
   const arrivalTracked = useRef<string | null>(null);
   const [editing, setEditing] = useState(false);
   // 장소 고르는 화면. 집 주소가 없으면 앱을 시작할 때 먼저 받는다. (등록 전에는 닫을 수 없음)
-  const [picker, setPicker] = useState<"origin" | "destination" | "home" | null>(null);
+  const [picker, setPicker] = useState<"origin" | "destination" | null>(null);
   const needHome = home === null;
-  const showHomePicker = needHome || picker === "home";
+  const showHomePicker = needHome;
   const leaveHomePicker = () => setPicker(null);
 
   /** 출발지·도착지 선택 화면의 주소 입력 아래에 놓는 집 칩 */
@@ -129,6 +131,7 @@ export default function Planner() {
 
   // 도착 확인 푸시를 눌러 들어오면(/?trip=<id>) 그 안내의 출발 안내 화면을 바로 연다. 이미 도착을 기록했거나 없는 안내면 무시한다.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- 주소로 들어온 안내를 한 번 여는 동기화라 effect 안에서 상태를 바꾼다. */
     const id = new URLSearchParams(window.location.search).get("trip");
     if (!id) return;
     const trip = trips.find((t) => t.id === id);
@@ -139,6 +142,7 @@ export default function Planner() {
     setPage(0);
     setActiveId(trip.id);
     setEditing(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [trips]);
 
   // 홈 입력 화면이 열릴 때마다 출발지를 현재 위치로 자동 입력한다. 위치를 못 읽으면(권한 꺼짐, http 주소 등) 조용히 건너뛰고
@@ -429,15 +433,14 @@ export default function Planner() {
         sub="어디로, 몇 시까지 갈지만 알려주세요."
         onSky
         action={
-          // 집 주소를 다시 설정하는 화면을 연다.
-          <button
-            type="button"
-            onClick={() => setPicker("home")}
-            aria-label="집 주소 변경"
+          // 설정 화면(집 주소 변경, 알림)을 연다.
+          <Link
+            href="/settings"
+            aria-label="설정"
             className="-mr-2 flex size-10 items-center justify-center rounded-pill text-on-sky transition-colors active:bg-glass"
           >
-            <HomeEditIcon className="size-6" />
-          </button>
+            <SettingsIcon className="size-6" strokeWidth={1.5} />
+          </Link>
         }
       />
 
@@ -532,22 +535,11 @@ export default function Planner() {
           <span id="tomorrow-label" className="text-body text-on-surface">
             내일 약속이에요
           </span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={form.tomorrow}
+          <Switch
+            checked={form.tomorrow}
+            onCheckedChange={(v) => set("tomorrow", v)}
             aria-labelledby="tomorrow-label"
-            onClick={() => set("tomorrow", !form.tomorrow)}
-            className={`relative h-8 w-14 rounded-pill transition-colors ${
-              form.tomorrow ? "bg-brand" : "bg-toggle-off"
-            }`}
-          >
-            <span
-              className={`absolute left-1 top-1 size-6 rounded-pill bg-surface transition-transform ${
-                form.tomorrow ? "translate-x-6" : ""
-              }`}
-            />
-          </button>
+          />
         </div>
 
         {error && (

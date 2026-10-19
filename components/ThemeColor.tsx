@@ -3,7 +3,7 @@
 import { useEffect, useId } from "react";
 
 /** 브라우저 상태 표시줄(status bar) 색으로 쓸 수 있는 배경 토큰 */
-type Token = "sky" | "sky-pale";
+type Token = "sky" | "sky-pale" | "surface";
 
 const DEFAULT: Token = "sky-pale";
 
