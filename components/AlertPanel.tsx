@@ -9,8 +9,8 @@ interface Props {
   description: React.ReactNode;
   /** 설명 아래에 놓는 내용(입력란 등). 없으면 설명 바로 아래에 버튼이 온다. */
   content?: React.ReactNode;
-  /** 바깥 영역 누르기, Esc */
-  onClose: () => void;
+  /** 바깥 영역 누르기, Esc. 없으면 버튼으로만 닫을 수 있다. */
+  onClose?: () => void;
   /** 버튼들. 같은 너비로 한 줄에 나란히 놓인다. */
   children: React.ReactNode;
 }
@@ -20,6 +20,7 @@ export default function AlertPanel({ title, description, content, onClose, child
   const id = useId();
 
   useEffect(() => {
+    if (!onClose) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -40,7 +41,7 @@ export default function AlertPanel({ title, description, content, onClose, child
         className="fade-in w-full rounded-nav border border-glass-border bg-surface p-6 shadow-glass"
       >
         {title && (
-          <h2 id={`${id}-title`} className="text-subheading font-medium">
+          <h2 id={`${id}-title`} className="text-subheading font-semibold">
             {title}
           </h2>
         )}

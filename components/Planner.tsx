@@ -358,7 +358,6 @@ export default function Planner() {
           <AlertPanel
             title={`${departedAlert}분 뒤 도착 예정`}
             description="알림을 허용해 주세요. 도착하면 이동 중인 상태를 완료하도록 도와드릴게요."
-            onClose={() => setDepartedAlert(null)}
           >
             <Button size="lg" autoFocus onClick={confirmDeparted}>
               확인
