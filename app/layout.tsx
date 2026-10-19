@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AmplitudeInit from "@/components/AmplitudeInit";
+import PushClickListener from "@/components/PushClickListener";
 import FeedbackPrompt from "@/components/FeedbackPrompt";
 import LeaveConfirm from "@/components/LeaveConfirm";
 import TabBar from "@/components/TabBar";
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <AmplitudeInit />
+        <PushClickListener />
         <ThemeColor />
         <div className="app-shell pb-[calc(5rem+env(safe-area-inset-bottom))]">
           {children}

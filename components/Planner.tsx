@@ -20,7 +20,14 @@ import TripActionButton from "./TripActionButton";
 import TripMenu from "./TripMenu";
 import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
-import { cancelArrivalReminder, scheduleArrivalReminder, shouldAskPush } from "@/lib/pushReminder";
+import {
+  cancelArrivalReminder,
+  clearPushOpened,
+  markPushOpened,
+  scheduleArrivalReminder,
+  shouldAskPush,
+  wasPushOpened,
+} from "@/lib/pushReminder";
 import { dateString } from "@/lib/dates";
 import { hasAskedFeedback, notifyArrived } from "@/lib/feedback";
 import { GO_HOME_EVENT, requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
@@ -162,6 +169,7 @@ export default function Planner() {
     window.history.replaceState(null, "", window.location.pathname);
     if (trip.status !== "planned") return;
     openedFromPush.current = trip.id;
+    markPushOpened(trip.id);
     setGroups(null);
     setPage(0);
     setActiveId(trip.id);
@@ -373,10 +381,11 @@ export default function Planner() {
           on_time: onTime,
           appointment_time: fmt(plan.arriveBy),
           arrival_diff_min: nowMinutes() - plan.arriveBy, // 실제 누른 시각 - 약속 시간 (음수면 일찍 도착)
-          source: openedFromPush.current === current.id ? "push" : "direct", // 도착 푸시를 눌러 들어온 안내면 push
+          source: openedFromPush.current === current.id || wasPushOpened(current.id) ? "push" : "direct", // 도착 푸시를 눌러 들어온 안내면 push
         });
       }
       recordArrival(current.id, onTime, plan === current.plan ? undefined : plan);
+      clearPushOpened(current.id);
       void cancelArrivalReminder(current.id);
       // 처음 도착하면 1초 뒤 피드백 얼럿이 뜨고, 그 얼럿을 닫으면 로드맵으로 간다. 이때는 기록 완료 얼럿을 겹쳐 띄우지 않는다.
       const askingFeedback = !hasAskedFeedback();

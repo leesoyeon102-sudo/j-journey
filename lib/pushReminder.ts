@@ -126,3 +126,30 @@ export async function turnOffPush(): Promise<PushState> {
   if (token) await post("/api/push/subscribe", "DELETE", { token });
   return readPushState();
 }
+
+// 도착 푸시를 눌러 연 안내의 id. 도착을 누를 때까지(화면을 옮기거나 새로고침해도) 남겨 두어 도착 기록의 source를 가린다.
+const PUSH_OPENED_KEY = "j-outing:push-opened";
+
+export function markPushOpened(tripId: string) {
+  try {
+    localStorage.setItem(PUSH_OPENED_KEY, tripId);
+  } catch {
+    // 저장이 막힌 환경에서는 Planner가 메모리에 둔 값으로만 가린다.
+  }
+}
+
+export function wasPushOpened(tripId: string): boolean {
+  try {
+    return localStorage.getItem(PUSH_OPENED_KEY) === tripId;
+  } catch {
+    return false;
+  }
+}
+
+export function clearPushOpened(tripId: string) {
+  try {
+    if (localStorage.getItem(PUSH_OPENED_KEY) === tripId) localStorage.removeItem(PUSH_OPENED_KEY);
+  } catch {
+    // 지울 수 없어도 다음 안내 id와 달라 영향이 없다.
+  }
+}

@@ -24,16 +24,20 @@ messaging.onBackgroundMessage((payload) => {
   });
 });
 
-// 알림을 누르면 앱을 열거나, 이미 열려 있으면 그 창으로 간다.
+// 알림을 누르면 앱을 열거나, 이미 열려 있으면 그 창을 앞으로 가져와 알림이 가리키는 주소를 알려 준다.
+// 창이 열려 있을 때는 주소를 바꾸지 않고 메시지로 알리고(components/PushClickListener.tsx가 받아 이동한다),
+// 닫혀 있으면 그 주소로 새로 연다. (?trip=<id>를 읽어 "도착 푸시로 들어옴"을 기록한다)
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const url = (event.notification.data && event.notification.data.url) || "/";
   event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
-      for (const c of list) {
-        if ("focus" in c) return c.focus().then((w) => (w && "navigate" in w ? w.navigate(url) : w));
-      }
-      return clients.openWindow(url);
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (list) => {
+      const open = list.find((c) => "focus" in c);
+      if (!open) return clients.openWindow(url);
+      const focused = await open.focus().catch(() => null);
+      const target = focused || open;
+      target.postMessage({ type: "j-push-click", url });
+      return target;
     }),
   );
 });
