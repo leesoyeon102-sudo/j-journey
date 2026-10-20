@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import InstallAlert from "@/components/InstallAlert";
 import { dismissInstallAlert, readInstallKind } from "@/lib/install";
@@ -11,7 +11,6 @@ import { dismissInstallAlert, readInstallKind } from "@/lib/install";
  */
 export default function InstallPrompt() {
   const pathname = usePathname();
-  const router = useRouter();
   // 기기·브라우저는 클라이언트에서만 알 수 있어서 서버 렌더에서는 안내 없음(none)으로 둔다.
   const kind = useSyncExternalStore(
     () => () => {},
@@ -27,14 +26,5 @@ export default function InstallPrompt() {
     setClosed(true);
   };
 
-  return (
-    <InstallAlert
-      inApp={kind === "inapp"}
-      onClose={close}
-      onGuide={() => {
-        close();
-        router.push("/welcome#install");
-      }}
-    />
-  );
+  return <InstallAlert inApp={kind === "inapp"} onClose={close} />;
 }
