@@ -739,6 +739,21 @@ const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta
   );
 });
 
+/** 막차가 끊겼거나 첫차 전일 수 있는 시각(23시~5시 30분) */
+function isLateNight(minute: number) {
+  const m = ((minute % 1440) + 1440) % 1440;
+  return m >= 23 * 60 || m < 5 * 60 + 30;
+}
+
+/** 시간표가 없는 열차나 현재 도착 정보가 없는 버스를 막차·첫차가 걸리는 시각에 타는 구간이 있는지 */
+function hasUncheckedLateLeg(plan: Plan) {
+  return plan.legs.some((l) => {
+    if (l.type === "ride") return !l.scheduled && isLateNight(l.start);
+    if (l.type === "bus") return !l.realtime && isLateNight(l.start);
+    return false;
+  });
+}
+
 /** 경로 아래에 작게 적는 출처·기준 안내 */
 function SourceNote({ plan }: { plan: Plan }) {
   const notes: string[] = [];
@@ -752,6 +767,10 @@ function SourceNote({ plan }: { plan: Plan }) {
     if (plan.scheduleEstimated) notes.push("시간표가 없는 노선은 배차 간격으로 예상한 시각이에요");
   }
   if (plan.walkEstimated) notes.push("일부 도보 시간은 직선거리로 추정했어요");
+  // 서울 1~9호선 외 지하철과 현재 도착 정보가 없는 버스는 막차·첫차를 확인하지 못한다. 막차가 끊겼거나 첫차 전일 수 있는 시각이면 미리 알린다.
+  if (hasUncheckedLateLeg(plan)) {
+    notes.push("이 경로에는 막차·첫차 시각을 확인하지 못한 노선이 있어요. 늦은 밤이나 이른 새벽이라 탑승 전에 운행 여부를 꼭 확인해 주세요");
+  }
   return (
     <>
       {notes.length > 0 && (
