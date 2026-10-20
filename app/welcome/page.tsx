@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import LandingArt from "@/components/LandingArt";
@@ -17,8 +18,8 @@ const SURVEY_URL = "";
 
 const STEPS = [
   {
-    title: "홈 화면에 추가하기",
-    body: "아이폰은 사파리에서 공유 버튼 → 홈 화면에 추가를 눌러 주세요. 설치한 앱에서만 도착 알림이 와요.",
+    title: "홈 화면에 추가하기 (아이폰 필수)",
+    body: "아이폰은 위의 방법대로 꼭 홈 화면에 추가한 뒤 그 아이콘으로 열어 주세요. 추가한 앱에서만 도착 알림이 와요.",
   },
   {
     title: "집 주소와 알림 허용하기",
@@ -56,6 +57,9 @@ export default function WelcomePage() {
             <ArrowRightIcon />
           </Link>
         </Button>
+        <a href="#install" className="mt-3 block text-center text-body font-medium text-on-sky [-webkit-text-stroke:0.3px]">
+          아이폰이라면 먼저 홈 화면에 추가해 주세요 ↓
+        </a>
       </section>
 
       <section className="mt-10 px-5">
@@ -81,6 +85,43 @@ export default function WelcomePage() {
             </p>
           </div>
         </div>
+      </section>
+
+      <section id="install" className="mt-10 scroll-mt-6 px-5">
+        <Badge variant="destructive">아이폰 필수</Badge>
+        <h2 className="mt-2 text-heading font-medium">아이폰이라면 꼭 먼저 해 주세요</h2>
+        <p className="mt-2 rounded-nav bg-danger-subtle p-4 text-body font-medium text-on-danger [-webkit-text-stroke:0.3px]">
+          홈 화면에 추가한 앱으로 열어야만 도착 알림이 와요. 링크로만 쓰면 알림을 받을 수 없으니 아래 방법을 꼭 따라 해 주세요.
+        </p>
+        <ol className="mt-4 space-y-2">
+          <li className="glass-strong rounded-nav p-4">
+            <h3 className="text-body-md font-medium [-webkit-text-stroke:0.3px]">1. 사파리 아래의 공유 버튼 누르기</h3>
+            <Image
+              src="/landing/install-share.jpeg"
+              alt="사파리 화면 아래 가운데의 공유 버튼"
+              width={1170}
+              height={724}
+              className="mt-3 w-full rounded-input border border-border"
+            />
+          </li>
+          <li className="glass-strong rounded-nav p-4">
+            <h3 className="text-body-md font-medium [-webkit-text-stroke:0.3px]">2. &apos;홈 화면에 추가&apos; 누르기</h3>
+            <Image
+              src="/landing/install-add.jpeg"
+              alt="공유 메뉴에서 홈 화면에 추가 항목"
+              width={1170}
+              height={1278}
+              className="mt-3 w-full rounded-input border border-border"
+            />
+          </li>
+          <li className="glass-strong rounded-nav p-4">
+            <h3 className="text-body-md font-medium [-webkit-text-stroke:0.3px]">3. 홈 화면에 생긴 J의 외출 아이콘으로 열기</h3>
+            <p className="mt-1 text-body text-muted-foreground">
+              앞으로는 사파리가 아니라 이 아이콘으로 열어 주세요. 인스타그램 안에서 열었다면 메뉴(···)에서 &apos;Safari로
+              열기&apos;를 먼저 눌러 주세요.
+            </p>
+          </li>
+        </ol>
       </section>
 
       <section className="mt-10 px-5">
