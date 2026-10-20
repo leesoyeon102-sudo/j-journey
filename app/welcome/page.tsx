@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 const STEPS = [
   {
-    title: "홈 화면에 추가하기 (아이폰 필수)",
+    title: "홈 화면에 추가하기 (아이폰 해당)",
     body: "아이폰은 위의 방법대로 꼭 홈 화면에 추가한 뒤 그 아이콘으로 열어 주세요. 추가한 앱에서만 도착 알림이 와요.",
   },
   {
@@ -55,9 +55,6 @@ export default function WelcomePage() {
             <ArrowRightIcon />
           </Link>
         </Button>
-        <a href="#install" className="mt-3 block text-center text-body font-medium text-on-sky [-webkit-text-stroke:0.3px]">
-          아이폰이라면 먼저 홈 화면에 추가해 주세요 ↓
-        </a>
       </section>
 
       <section className="mt-10 px-5">
@@ -114,6 +111,13 @@ export default function WelcomePage() {
           </li>
           <li className="glass-strong rounded-nav p-4">
             <h3 className="text-body-md font-medium [-webkit-text-stroke:0.3px]">3. 홈 화면에 생긴 J의 외출 아이콘으로 열기</h3>
+            <Image
+              src="/landing/install-open.jpeg"
+              alt="홈 화면에 생긴 J의 외출 앱 아이콘"
+              width={1169}
+              height={350}
+              className="mt-3 w-full rounded-input border border-border"
+            />
             <p className="mt-1 text-body text-muted-foreground">
               앞으로는 사파리가 아니라 이 아이콘으로 열어 주세요. 인스타그램 안에서 열었다면 메뉴(···)에서 &apos;Safari로
               열기&apos;를 먼저 눌러 주세요.
