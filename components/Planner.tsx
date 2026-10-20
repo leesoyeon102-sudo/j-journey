@@ -483,8 +483,8 @@ export default function Planner() {
 
         {arrivedAlert && (
           <AlertPanel
-            title="로드맵 기록 완료"
-            description="확인을 누르면 로드맵으로 이동해요."
+            title="도착 기록 완료"
+            description="로드맵에 그려진 길을 확인해보세요"
             onClose={closeArrivedAlert}
           >
             <Button size="lg" autoFocus onClick={closeArrivedAlert}>
