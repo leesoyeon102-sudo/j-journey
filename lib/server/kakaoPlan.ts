@@ -56,6 +56,8 @@ export interface KakaoPlanContext {
   /** 지금 시각(하루 0시 기준 분) */
   nowMin: number;
   loadTimetable?: (stops: { line: string; station: string }[]) => Promise<Timetable | undefined>;
+  /** 막차가 끊겼거나 첫차 전이라서 안을 하나라도 버렸으면 true로 바뀐다. 경로가 하나도 안 나올 때 이유를 알리는 데 쓴다. */
+  serviceEnded?: boolean;
 }
 
 // ─── 카카오 호출 ──────────────────────────────────────────────
@@ -332,7 +334,10 @@ async function buildPlan(
     if (s.type === "SUBWAY") {
       const info = subwayInfo(s);
       const real = info.line && info.from && info.to ? tt?.latest(info.line.id, info.from, info.to, need, dur * 1.8 + 8) : undefined;
-      if (real === null) return null; // 시간표는 있는데 그 시각에 탈 열차가 없다.
+      if (real === null) {
+        ctx.serviceEnded = true;
+        return null; // 시간표는 있는데 그 시각에 탈 열차가 없다.
+      }
       let start: number;
       let end: number;
       let trainNo: string | undefined;
@@ -344,7 +349,10 @@ async function buildPlan(
         // 시간표가 없는 노선: 배차 간격(우리 노선도에 있을 때)이나 소요 시간만으로 예상한다.
         start = info.line && info.from ? latestDeparture(info.line, info.dir, info.from, need - dur) : need - dur;
         end = start + dur;
-        if (info.line && start < FIRST_TRAIN) return null;
+        if (info.line && start < FIRST_TRAIN) {
+          ctx.serviceEnded = true;
+          return null;
+        }
       }
       segs.unshift({
         kind: "ride",
@@ -364,7 +372,10 @@ async function buildPlan(
 
     // BUS
     const bus = await scheduleBus(s, need, dur, ctx, data);
-    if (!bus) return null;
+    if (!bus) {
+      ctx.serviceEnded = true; // 심야버스 시간대 밖, 막차 이후, 가장 빠른 버스도 마감 이후
+      return null;
+    }
     segs.unshift(bus);
     need = bus.start - bus.wait;
   }
@@ -509,7 +520,10 @@ async function scheduleBus(
 
   const m = matchBus(data, s);
   if (!m) {
-    // 우리 버스 데이터에 없는 노선: 같은 구간을 지나는 버스가 여러 대면 더 자주 오는 것으로 본다.
+    // 우리 버스 데이터에 없는 노선은 첫차·막차를 모른다. 일반 버스는 새벽 1시~3시 30분에는 다니지 않는 것으로 보고 건너뛴다. (심야버스는 위에서 따로 걸렀다)
+    const at = ((Math.floor(latestBoard) % 1440) + 1440) % 1440;
+    if (!/심야|^N\d/.test(vehicle?.name ?? "") && at >= 60 && at < 3 * 60 + 30) return null;
+    // 같은 구간을 지나는 버스가 여러 대면 더 자주 오는 것으로 본다.
     const h = s.vehicles.length >= 3 ? 6 : s.vehicles.length === 2 ? 8 : 10;
     const t = Math.floor(latestBoard);
     return { ...base, start: t, end: Math.ceil(t + rideMin), wait: avgWait(h), headway: h, realtime: false };

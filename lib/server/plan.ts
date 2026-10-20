@@ -5,11 +5,14 @@ import { STATIONS } from "../stations";
 import { groupPlans } from "../planGroups";
 import type { PlanResult } from "../types";
 import { busPlans } from "./busPlan";
-import { kakaoPlans } from "./kakaoPlan";
+import { kakaoPlans, type KakaoPlanContext } from "./kakaoPlan";
 import { loadTimetable, type DayType } from "./seoul";
 import { walkMatrix } from "./walk";
 
 const CANDIDATES = 4;
+
+/** 막차·첫차 때문에 이용할 수 있는 경로가 하나도 없을 때의 안내 */
+const NO_SERVICE_MESSAGE = "그 시각에는 이용할 수 있는 경로가 없어요";
 
 export function dayTypeOf(date: string): DayType {
   const d = new Date(`${date}T00:00:00Z`).getUTCDay();
@@ -37,19 +40,19 @@ export async function computePlans(
   date: string,
 ): Promise<PlanResult> {
   // 카카오맵 경로(어떤 수단을 어떤 순서로 타는지)를 먼저 따라가 본다. 실패하거나 결과가 없으면 아래 기존 계산으로 대신한다.
+  const kakaoCtx: KakaoPlanContext = {
+    origin,
+    destination,
+    arriveBy,
+    buffer,
+    dayType: dayTypeOf(date),
+    isToday: date === nowKst().date,
+    nowMin: nowKst().minute,
+    loadTimetable: (stops) => loadTimetable(stops, dayTypeOf(date)),
+  };
   {
     const dayType = dayTypeOf(date);
-    const now = nowKst();
-    const kakao = await kakaoPlans({
-      origin,
-      destination,
-      arriveBy,
-      buffer,
-      dayType,
-      isToday: date === now.date,
-      nowMin: now.minute,
-      loadTimetable: (stops) => loadTimetable(stops, dayType),
-    }).catch(() => null);
+    const kakao = await kakaoPlans(kakaoCtx).catch(() => null);
     if (kakao) {
       const destCoord = { lat: destination.lat, lng: destination.lng };
       const originCoord = { lat: origin.lat, lng: origin.lng };
@@ -114,6 +117,10 @@ export async function computePlans(
       attachWalkCoords(p, o, d);
       p.date = date;
     }
+  }
+  // 막차가 끊기거나 첫차 전이라서 버린 경로가 있었는데 하나도 안 남았다면, 이유를 알 수 있게 안내한다.
+  if (!result.ok && (kakaoCtx.serviceEnded || /막차/.test(result.message))) {
+    return { ok: false, message: NO_SERVICE_MESSAGE };
   }
   return result;
 }
