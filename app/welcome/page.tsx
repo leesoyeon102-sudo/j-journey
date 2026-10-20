@@ -7,14 +7,12 @@ import SkyBackdrop from "@/components/SkyBackdrop";
 import ThemeColor from "@/components/ThemeColor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SURVEY_URL } from "@/lib/survey";
 
 export const metadata: Metadata = {
   title: "하루만 써보세요 · J의 외출",
   description: "약속 시각만 넣으면 몇 시에 나가야 하는지 알려주는 J의 외출을 하루 동안 써보고 설문에 참여해 주세요.",
 };
-
-/** 체험 후 참여할 설문 주소. 설문을 만들면 여기에 넣는다. 비어 있으면 설문 버튼을 숨긴다. */
-const SURVEY_URL = "";
 
 const STEPS = [
   {
