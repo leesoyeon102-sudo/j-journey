@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
+import LandingArt from "@/components/LandingArt";
 import SkyBackdrop from "@/components/SkyBackdrop";
 import ThemeColor from "@/components/ThemeColor";
 import { Badge } from "@/components/ui/badge";
@@ -58,21 +59,27 @@ export default function WelcomePage() {
       </section>
 
       <section className="mt-10 px-5">
-        <div className="glass-strong rounded-nav p-4">
-          <p className="text-caption text-muted-foreground">이렇게 알려 드려요</p>
-          <p className="mt-1 text-body-md">도착 시각에서 거꾸로 계산해</p>
-          <p className="mt-1 text-time font-medium text-brand">나갈 시각</p>
-          <p className="mt-1 text-body text-muted-foreground">도보, 열차 대기, 환승 시간까지 자동으로 더해요.</p>
+        <div className="glass-strong flex items-center gap-4 rounded-nav p-4">
+          <LandingArt variant="clock" />
+          <div>
+            <p className="text-caption text-muted-foreground">이렇게 알려 드려요</p>
+            <p className="mt-1 text-body-md">도착 시각에서 거꾸로 계산해</p>
+            <p className="mt-1 text-time font-medium text-brand">나갈 시각</p>
+            <p className="mt-1 text-body text-muted-foreground">도보, 열차 대기, 환승 시간까지 자동으로 더해요.</p>
+          </div>
         </div>
       </section>
 
       <section className="mt-2 px-5">
-        <div className="glass-strong rounded-nav p-4">
-          <p className="text-caption text-muted-foreground">참여 선물</p>
-          <p className="mt-1 text-body-md font-medium [-webkit-text-stroke:0.3px]">추첨을 통해 치킨 기프티콘을 드려요</p>
-          <p className="mt-1 text-body text-muted-foreground">
-            하루 써보고 설문까지 참여해 주신 분 중 추첨해서 10월 26일에 발표해요.
-          </p>
+        <div className="glass-strong flex items-center gap-4 rounded-nav p-4">
+          <LandingArt variant="gift" />
+          <div>
+            <p className="text-caption text-muted-foreground">참여 선물</p>
+            <p className="mt-1 text-body-md font-medium [-webkit-text-stroke:0.3px]">추첨을 통해 치킨 기프티콘을 드려요</p>
+            <p className="mt-1 text-body text-muted-foreground">
+              하루 써보고 설문까지 참여해 주신 분 중 추첨해서 10월 26일에 발표해요.
+            </p>
+          </div>
         </div>
       </section>
 

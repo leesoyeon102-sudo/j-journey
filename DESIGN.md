@@ -360,6 +360,7 @@ components:
 - **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#838B91) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
 - **Status bar:** 화면 맨 위 배경색과 같은 색으로 칠한다(`ThemeColor`). 홈·이동 중 홈은 `sky`, 나머지 화면은 `sky-pale`이라 배경이 상태 표시줄까지 끊김 없이 이어진다. 안내 화면의 위쪽 내비게이션도 흰색 대신 `sky-pale` 80% + 블러로 둬서 같은 이음새를 만든다.
 - **Sky backdrop:** 홈과 이동 중 홈의 맨 위에 깔리는 하늘(위 sky → sky-soft → 흰색, 한쪽에 sun 번짐, 흰 뭉게구름 세 점). `SkyBackdrop` 컴포넌트.
+- **Landing art:** 광고 랜딩(`/welcome`)의 카드 왼쪽에 놓는 80px 동그라미 일러스트. 위 sky-pale → 아래 surface 원 위에 시계(나갈 시각)·선물 상자(참여 선물)를 sky·sun 토큰 색의 그라데이션으로 입체감 있게 그린다. `LandingArt` 컴포넌트.
 
 ## Do's and Don'ts
 
