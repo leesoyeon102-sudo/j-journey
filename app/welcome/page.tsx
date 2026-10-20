@@ -118,7 +118,7 @@ export default function WelcomePage() {
               height={350}
               className="mt-3 w-full rounded-input border border-border"
             />
-            <p className="mt-1 text-body text-muted-foreground">
+            <p className="mt-3 text-body text-muted-foreground">
               앞으로는 사파리가 아니라 이 아이콘으로 열어 주세요. 인스타그램 안에서 열었다면 메뉴(···)에서 &apos;Safari로
               열기&apos;를 먼저 눌러 주세요.
             </p>
