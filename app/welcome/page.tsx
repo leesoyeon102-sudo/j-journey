@@ -17,7 +17,7 @@ const SURVEY_URL = "";
 const STEPS = [
   {
     title: "홈 화면에 추가하기",
-    body: "아이폰은 사파리에서 공유 버튼 → 홈 화면에 추가를 눌러 주세요. 설치한 앱에서만 출발 알림이 와요.",
+    body: "아이폰은 사파리에서 공유 버튼 → 홈 화면에 추가를 눌러 주세요. 설치한 앱에서만 도착 알림이 와요.",
   },
   {
     title: "집 주소와 알림 허용하기",
@@ -66,6 +66,16 @@ export default function WelcomePage() {
         </div>
       </section>
 
+      <section className="mt-2 px-5">
+        <div className="glass-strong rounded-nav p-4">
+          <p className="text-caption text-muted-foreground">참여 선물</p>
+          <p className="mt-1 text-body-md font-medium [-webkit-text-stroke:0.3px]">추첨을 통해 치킨 기프티콘을 드려요</p>
+          <p className="mt-1 text-body text-muted-foreground">
+            하루 써보고 설문까지 참여해 주신 분 중 추첨해서 10월 26일에 발표해요.
+          </p>
+        </div>
+      </section>
+
       <section className="mt-10 px-5">
         <h2 className="text-heading font-medium">참여 방법</h2>
         <ol className="mt-4 space-y-2">
@@ -81,6 +91,15 @@ export default function WelcomePage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="mt-6 px-5">
+        <div className="rounded-nav bg-note-fill p-4">
+          <p className="text-body font-medium [-webkit-text-stroke:0.3px]">베타 버전이라 이런 점은 양해해 주세요</p>
+          <p className="mt-1 text-body text-muted-foreground">
+            지금은 서울·경기권 대중교통(지하철·버스)만 안내해요. 고속버스·시외버스는 아직 지원하지 않아요.
+          </p>
+        </div>
       </section>
 
       <section className="mt-10 px-5">
