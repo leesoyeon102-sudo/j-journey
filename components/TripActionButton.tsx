@@ -29,12 +29,10 @@ interface Props {
   durationMin: number;
   onDepart: () => void;
   onArrive: (onTime: boolean) => void;
-  /** 약속이 오늘이 아니면(내일 약속) 아직 출발할 수 없다. 출발 전에만 쓴다. */
-  notToday?: boolean;
 }
 
 /** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요! */
-export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive, notToday }: Props) {
+export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive }: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!departedAt) return;
@@ -46,13 +44,6 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
 
   const phase = tripPhase(departedAt, durationMin, now);
 
-  if (phase === "ready" && notToday) {
-    return (
-      <Button size="lg" className="w-full" disabled>
-        내일 출발할 수 있어요
-      </Button>
-    );
-  }
   if (phase === "ready") {
     return (
       <Button size="lg" className="w-full" onClick={onDepart}>

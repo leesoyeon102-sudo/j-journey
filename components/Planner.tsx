@@ -335,6 +335,8 @@ export default function Planner() {
     const filtering = choices.length > 0;
     const shown = filtering ? choices : [current.plan];
     const active = shown[Math.min(page, shown.length - 1)];
+    // 내일 이후 약속은 아직 출발할 수 없어서 하단 버튼을 아예 보여 주지 않는다. (비활성 버튼이 헷갈린다는 의견)
+    const tomorrowPlan = !departed && Boolean(active.date && active.date > dateString(0));
     const changeTab = (t: PlanTab) => {
       setTab(t);
       setPage(0);
@@ -455,7 +457,7 @@ export default function Planner() {
         </PlanSlider>
 
         {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 바로 위에 달라붙는다. */}
-        {!done && (
+        {!done && !tomorrowPlan && (
           // 뒤 내용이 자연스럽게 묻히도록 위는 투명, 아래는 흰색으로 이어지는 그라데이션. 빈 부분은 클릭이 아래 내용으로 지나간다.
           <div className="pointer-events-none sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 bg-linear-to-b from-surface/0 to-surface to-30% px-5 pb-3 pt-5">
             <div className="pointer-events-auto">
@@ -464,7 +466,6 @@ export default function Planner() {
                 durationMin={active.arriveAt - active.leaveAt}
                 onDepart={depart}
                 onArrive={(onTime) => arrive(active, onTime)}
-                notToday={Boolean(active.date && active.date > dateString(0))}
               />
             </div>
           </div>
