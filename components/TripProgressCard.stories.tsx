@@ -43,10 +43,10 @@ export const LongNames: Story = {
   args: { origin: "서울특별시 중구 세종대로 110 서울특별시청 본관 앞", destination: "경기도 성남시 분당구 판교역로 235 에이치스퀘어" },
 }
 
-// 놓쳤어요를 누르면 지금 출발하는 경로를 다시 찾는다
+// "현재 위치에서 다시 찾기"를 누르면 지금 출발하는 경로를 다시 찾는다
 export const Missed: Story = {
   play: async ({ canvas, args }) => {
-    await canvas.getByRole("button", { name: "놓쳤어요" }).click()
+    await canvas.getByRole("button", { name: "현재 위치에서 다시 찾기" }).click()
     await expect(args.onMissed).toHaveBeenCalled()
   },
 }

@@ -10,7 +10,7 @@ interface Props {
   leaveAt: number;
   arriveAt: number;
   onDetail: () => void;
-  /** "놓쳤어요": 지금 위치에서 지금 출발하는 경로를 다시 찾는다. */
+  /** "현재 위치에서 다시 찾기"(이전 이름 놓쳤어요): 지금 위치에서 지금 출발하는 경로를 다시 찾는다. */
   onMissed: () => void;
   /** 다시 찾는 중이면 버튼을 잠근다. */
   missing?: boolean;
@@ -63,7 +63,7 @@ export default function TripProgressCard({ origin, destination, leaveAt, arriveA
       </Button>
       {/* 계획대로 못 갔을 때: 눈에 덜 띄는 텍스트 버튼 */}
       <Button variant="ghost" size="lg" className="mt-1 w-full text-muted-foreground" disabled={missing} onClick={onMissed}>
-        {missing ? "경로 찾는 중…" : "놓쳤어요"}
+        {missing ? "경로 찾는 중…" : "현재 위치에서 다시 찾기"}
       </Button>
       {missedError && (
         <p role="alert" className="mt-2 text-center text-caption text-on-danger">
