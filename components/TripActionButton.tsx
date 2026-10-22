@@ -29,10 +29,12 @@ interface Props {
   durationMin: number;
   onDepart: () => void;
   onArrive: (onTime: boolean) => void;
+  /** 현재 위치에서 다시 찾은 안이면 출발 전 버튼 글자가 "이어서 출발할게요"가 된다. 출발 전에만 쓴다. */
+  resume?: boolean;
 }
 
 /** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요! */
-export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive }: Props) {
+export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive, resume }: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!departedAt) return;
@@ -47,7 +49,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   if (phase === "ready") {
     return (
       <Button size="lg" className="w-full" onClick={onDepart}>
-        출발할게요
+        {resume ? "이어서 출발할게요" : "출발할게요"}
       </Button>
     );
   }

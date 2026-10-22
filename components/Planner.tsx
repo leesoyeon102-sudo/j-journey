@@ -458,6 +458,7 @@ export default function Planner() {
                 durationMin={active.arriveAt - active.leaveAt}
                 onDepart={depart}
                 onArrive={(onTime) => arrive(active, onTime)}
+                resume={Boolean(active.departNow)}
               />
             </div>
           </div>

@@ -30,6 +30,15 @@ export const Ready: Story = {
   },
 }
 
+// 현재 위치에서 다시 찾은 안: 버튼 글자가 "이어서 출발할게요"
+export const Resume: Story = {
+  args: { resume: true },
+  play: async ({ canvas, args }) => {
+    await canvas.getByRole("button", { name: "이어서 출발할게요" }).click()
+    await expect(args.onDepart).toHaveBeenCalled()
+  },
+}
+
 // 이동 중: 눌러도 아무 일이 없다
 export const Moving: Story = {
   args: { departedAt: Date.now() - 2 * MIN },
