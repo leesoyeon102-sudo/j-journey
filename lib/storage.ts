@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import type { Place } from "./places";
 import type { Plan, Trip } from "./types";
 import { routeKeyOf } from "./planner";
+import type { RoadExtra } from "./routes";
 
 const KEY = "j-outing:trips:v2";
 const EMPTY: Trip[] = [];
@@ -40,6 +41,43 @@ function subscribe(cb: () => void) {
     listeners.delete(cb);
     window.removeEventListener("storage", cb);
   };
+}
+
+// 놓쳐서 다시 찾은 경로의 이전 구간(로드맵에 이어 그리는 용도). 안내 기록과 따로 둔다.
+const EXTRA_KEY = "j-outing:road-extra:v1";
+const EMPTY_EXTRA: RoadExtra[] = [];
+let extraRaw: string | null = null;
+let extraValue: RoadExtra[] = EMPTY_EXTRA;
+
+function readExtra(): RoadExtra[] {
+  try {
+    const raw = localStorage.getItem(EXTRA_KEY);
+    if (raw === extraRaw) return extraValue;
+    extraRaw = raw;
+    extraValue = raw ? (JSON.parse(raw) as RoadExtra[]) : EMPTY_EXTRA;
+    return extraValue;
+  } catch {
+    return EMPTY_EXTRA;
+  }
+}
+
+export function useRoadExtra() {
+  return useSyncExternalStore(subscribe, readExtra, () => EMPTY_EXTRA);
+}
+
+/**
+ * 놓쳐서 다시 찾을 때 이전 안내(oldTripId)에서 지나온 구간을 새 안내(newTripId)에 이어 붙인다.
+ * 이전 안내가 앞서 이어받아 둔 조각도 새 안내로 옮겨, 여러 번 다시 찾아도 한 줄로 이어진다.
+ */
+export function addRoadExtra(oldTripId: string, newTripId: string, partial: Omit<RoadExtra, "forTripId">) {
+  const moved = readExtra().map((e) => (e.forTripId === oldTripId ? { ...e, forTripId: newTripId } : e));
+  const next = partial.segments.length ? [...moved, { forTripId: newTripId, ...partial }] : moved;
+  try {
+    localStorage.setItem(EXTRA_KEY, JSON.stringify(next));
+  } catch {
+    // 저장 공간을 쓸 수 없는 환경에서는 조용히 무시
+  }
+  listeners.forEach((l) => l());
 }
 
 /** 저장된 안내 기록(최신순). 서버 렌더에서는 빈 배열. */

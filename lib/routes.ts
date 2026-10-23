@@ -120,7 +120,67 @@ function tripSegments(t: Trip): RoadSegment[] {
   return segs;
 }
 
-export function buildRoadmap(trips: Trip[]): Roadmap {
+/**
+ * 놓쳐서 현재 위치에서 경로를 다시 찾을 때 이전 안내에서 실제로 지나온 구간. 이전 안내는 지우지만 이 조각은 남겨,
+ * 새 안내가 도착으로 끝나면 로드맵에 끊김 없이 이어서 그린다. forTripId는 이 조각을 이어받는(최종 도착할) 안내다.
+ */
+export interface RoadExtra {
+  forTripId: string;
+  segments: RoadSegment[];
+  stations: string[];
+}
+
+/**
+ * 이전 안내 중 현재 위치까지 지나온 구간만 잘라 낸다. 경로 위에서 현재 위치와 가장 가까운 지점까지를 지나온 것으로 보고,
+ * 거기서 현재 위치까지는 점선으로 잇는다. 그래서 새 안내(현재 위치에서 출발)와 선이 끊기지 않는다.
+ */
+export function partialRoad(t: Trip, here: MapPoint): Omit<RoadExtra, "forTripId"> {
+  const segs = tripSegments(t);
+  // 경로의 각 선분 위에서 현재 위치와 가장 가까운 점(선분의 j번째 점과 j+1번째 점 사이, 비율 f)을 찾는다.
+  const kx = Math.cos((here.lat * Math.PI) / 180);
+  let best = { d: Infinity, i: -1, j: -1, f: 0 };
+  segs.forEach((s, i) => {
+    if (s.points.length === 1) {
+      const d = km(s.points[0], here);
+      if (d < best.d) best = { d, i, j: 0, f: 0 };
+    }
+    for (let j = 0; j + 1 < s.points.length; j++) {
+      const a = s.points[j];
+      const b = s.points[j + 1];
+      const vx = (b.lng - a.lng) * kx;
+      const vy = b.lat - a.lat;
+      const len2 = vx * vx + vy * vy;
+      const f = len2 === 0 ? 0 : Math.max(0, Math.min(1, (((here.lng - a.lng) * kx) * vx + (here.lat - a.lat) * vy) / len2));
+      const d = km({ lat: a.lat + vy * f, lng: a.lng + (b.lng - a.lng) * f }, here);
+      if (d < best.d) best = { d, i, j, f };
+    }
+  });
+  if (best.i < 0) return { segments: [], stations: [] }; // 좌표가 없어 그릴 수 없다.
+
+  const kept: RoadSegment[] = segs.slice(0, best.i);
+  const cut = segs[best.i];
+  const pts = cut.points.slice(0, best.j + 1);
+  if (best.f > 0 && best.j + 1 < cut.points.length) {
+    const a = cut.points[best.j];
+    const b = cut.points[best.j + 1];
+    pts.push({ lat: a.lat + (b.lat - a.lat) * best.f, lng: a.lng + (b.lng - a.lng) * best.f });
+  }
+  if (pts.length > 1) kept.push({ points: pts, ride: cut.ride });
+  const last = pts[pts.length - 1];
+  if (km(last, here) > 0.01) kept.push({ points: [last, here], ride: false });
+
+  // 지나온 지하철 구간에 있는 역
+  const key = (p: MapPoint) => `${p.lat},${p.lng}`;
+  const ridden = new Set(kept.filter((s) => s.ride).flatMap((s) => s.points.map(key)));
+  const stations = new Set<string>();
+  for (const leg of t.plan.legs) {
+    if (leg.type !== "ride") continue;
+    leg.stations.filter((n) => STATIONS[n] && ridden.has(key(STATIONS[n]))).forEach((n) => stations.add(n));
+  }
+  return { segments: kept, stations: [...stations] };
+}
+
+export function buildRoadmap(trips: Trip[], extras: RoadExtra[] = []): Roadmap {
   const segments: RoadSegment[] = [];
   const stations = new Set<string>();
   const routes = new Set<string>();
@@ -134,6 +194,18 @@ export function buildRoadmap(trips: Trip[]): Roadmap {
       if (leg.type === "ride") leg.stations.filter((n) => STATIONS[n]).forEach((n) => stations.add(n));
     }
     for (const seg of tripSegments(t)) {
+      segments.push(seg);
+      seg.points.forEach((p, i) => {
+        if (i > 0) dist += km(seg.points[i - 1], p);
+      });
+    }
+  }
+  // 놓쳐서 다시 찾은 경로: 새 안내가 도착으로 끝났을 때만 앞서 지나온 구간을 이어 그린다.
+  const arrivedIds = new Set(trips.filter(arrived).map((t) => t.id));
+  for (const e of extras) {
+    if (!arrivedIds.has(e.forTripId)) continue;
+    e.stations.forEach((n) => stations.add(n));
+    for (const seg of e.segments) {
       segments.push(seg);
       seg.points.forEach((p, i) => {
         if (i > 0) dist += km(seg.points[i - 1], p);

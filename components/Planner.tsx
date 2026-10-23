@@ -35,6 +35,7 @@ import { readCurrentPlace } from "@/lib/currentLocation";
 import { draft, isOriginLocked, unlockOrigin } from "@/lib/draft";
 import type { Place } from "@/lib/places";
 import {
+  addRoadExtra,
   addTrip,
   recordArrival,
   recordDeparture,
@@ -49,6 +50,7 @@ import {
   useTrips,
 } from "@/lib/storage";
 import { groupPlans } from "@/lib/planGroups";
+import { partialRoad } from "@/lib/routes";
 import type { Plan, PlanGroups, Trip } from "@/lib/types";
 import { fmt, parseTime } from "@/lib/time";
 
@@ -304,13 +306,16 @@ export default function Planner() {
       setTab("recommended");
       setPage(0);
       // 놓친 이전 안내는 끝난 것으로 보고 바로 정리한다. 남겨 두면 뒤로 돌아간 홈에 옛 출발 시각의 이동 중 카드가 계속 보인다.
-      for (const t of trips) {
-        if (t.departedAt && t.status === "planned") {
-          removeTrip(t.id);
-          void cancelArrivalReminder(t.id);
-        }
+      // 다만 거기까지 실제로 이동한 구간은 로드맵에 남도록, 지나온 부분을 잘라 새 안내에 이어 붙인다.
+      const interrupted = trips.filter((t) => t.departedAt && t.status === "planned");
+      const partials = interrupted.map((t) => ({ id: t.id, road: partialRoad(t, { lat: here.lat, lng: here.lng }) }));
+      for (const t of interrupted) {
+        removeTrip(t.id);
+        void cancelArrivalReminder(t.id);
       }
-      setActiveId(addTrip(result.plan).id);
+      const next = addTrip(result.plan);
+      for (const p of partials) addRoadExtra(p.id, next.id, p.road);
+      setActiveId(next.id);
       setEditing(false);
     } catch {
       setMissedError("경로를 계산하지 못했어요. 잠시 후 다시 시도해 주세요.");
