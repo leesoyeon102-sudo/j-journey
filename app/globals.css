@@ -53,9 +53,9 @@
   --color-success: #22b35e;
   --color-success-subtle: #e9f7ef; /* success 10%를 흰 배경에 올린 색 */
   /* 하늘 + 블러 반투명 유리 */
-  --color-sky: #713deb;
-  --color-sky-soft: #c5a6f7;
-  --color-sky-pale: #e5d6fb;
+  --color-sky: #3d8beb;
+  --color-sky-soft: #a6ccf7;
+  --color-sky-pale: #d6e8fb;
   --color-sun: #ffd9a8; /* 하늘에 번지는 노을빛, 배경 장식 전용 */
   --color-on-sky: #ffffff;
   --color-on-sky-muted: rgb(255 255 255 / 0.78);

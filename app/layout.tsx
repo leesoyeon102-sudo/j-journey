@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   // 홈 화면 앱에서 하단 여백(env(safe-area-inset-bottom))이 0으로 잡혀 탭바가 맨 아래에 붙던 문제를 막는다.
   viewportFit: "cover",
   // 상태 표시줄 기본색 = sky-pale. 화면마다 ThemeColor가 맨 위 배경색으로 바꾼다.
-  themeColor: "#e5d6fb",
+  themeColor: "#d6e8fb",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
