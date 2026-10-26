@@ -45,8 +45,8 @@
   --color-border: #e7e8e8;
   --color-border-subtle: #f0f1f1;
   /* DESIGN.md의 accent(파랑). shadcn의 accent(호버 배경)와 겹쳐 코드에서는 brand, 값은 --color-accent-brand */
-  --color-accent-brand: #713deb;
-  --color-accent-subtle: #cdb8ff; /* accent 10%를 흰 배경에 올린 색 */
+  --color-accent-brand: #3473fc;
+  --color-accent-subtle: #ebf1ff; /* accent 10%를 흰 배경에 올린 색 */
   --color-danger: #ff5a5e;
   --color-danger-subtle: #ffefef;
   --color-on-danger: #45192f;
