@@ -454,9 +454,9 @@ export default function Planner() {
           ))}
         </PlanSlider>
 
-        {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 위에 달라붙는다. 이 영역은 isolate된 main 안이라 z-index로는 탭바(z-20) 위로 올라갈 수 없어서, 탭바 뒤 하늘색 그라데이션(pt-8=2rem)이 시작되는 높이(탭바 전체 높이 6rem) 위에 두어 버튼과 겹치지 않게 한다. 버튼 뒤에는 배경을 두지 않는다. 빈 부분은 클릭이 아래 내용으로 지나간다. */}
+        {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 위에 달라붙는다. 이 영역은 isolate된 main 안이라 z-index로는 탭바(z-20) 위로 올라갈 수 없다. 대신 탭바 뒤 하늘색 그라데이션을 막대 위 0.75rem(pt-3)까지만 두어, 버튼(막대 위 1rem)과 겹치지 않게 한다. 버튼 뒤에는 배경을 두지 않는다. 빈 부분은 클릭이 아래 내용으로 지나간다. */}
         {!done && !tomorrowPlan && (
-          <div className="pointer-events-none sticky bottom-[calc(6rem+env(safe-area-inset-bottom))] z-30 px-5 pb-3 pt-5">
+          <div className="pointer-events-none sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 px-5 pb-3 pt-5">
             <div className="pointer-events-auto">
               <TripActionButton
                 departedAt={current.departedAt}
