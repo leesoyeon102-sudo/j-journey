@@ -3,7 +3,7 @@ version: alpha
 name: J의 외출
 description: 약속 출발 시각을 알려주는 390px 모바일 플래너. 맑은 하늘색 배경 위에 블러 반투명 유리 면을 얹고, 버튼은 블랙을 유지한다. 출발 시각만 파랑으로 강조한다.
 colors:
-  primary: "#2236c9ff"
+  primary: "#050A15"
   on-primary: "#FFFFFF"
   primary-hover: "#1A2132"
   toast: "#646769"
@@ -26,7 +26,7 @@ colors:
   inactive: "#C9CBCC"
   border: "#E7E8E8"
   border-subtle: "#F0F1F1"
-  accent: "#16c625ff"
+  accent: "#3473FC"
   accent-subtle: "#EBF1FF"
   danger: "#FF5A5E"
   danger-subtle: "#FFEFEF"
@@ -113,7 +113,7 @@ rounded:
   toast: 10px
   input: 10px
   nav: 16px
-  button: 6px
+  button: 24px
   tag: 32px
   pill: 40px
 spacing:
