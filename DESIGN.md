@@ -125,8 +125,8 @@ spacing:
   section-gap: 64px
   page-max-width: 1200px
 motion:
-  ease: "cubic-bezier(0.65, 0, 0.35, 1)"
-  duration-base: 220ms
+  ease: "cubic-bezier(0.34, 1.3, 0.64, 1)"
+  duration-base: 300ms
   duration-fast: 120ms
   stagger: 40ms
   press-scale: 0.98
@@ -350,8 +350,8 @@ components:
 
 움직임 값은 모션 랩에서 같은 장면을 네 가지씩 비교해 골랐고, 코드에서는 `app/globals.css`의 `--motion-*` 토큰으로만 쓴다. ms 값이나 cubic-bezier를 컴포넌트에 직접 쓰지 않는다.
 
-- **ease (`--motion-ease`, cubic-bezier(0.65, 0, 0.35, 1)):** 천천히 시작해서 천천히 멈추는 곡선. 튕기는 움직임은 쓰지 않는다.
-- **duration-base (`--motion-duration-base`, 220ms):** 화면·얼럿·시트·탭바 알약처럼 나타나고 움직이는 모든 것.
+- **ease (`--motion-ease`, cubic-bezier(0.34, 1.3, 0.64, 1)):** 도착점을 살짝 넘었다가 돌아오는, 가볍게 튕기는 곡선.
+- **duration-base (`--motion-duration-base`, 300ms):** 화면·얼럿·시트·탭바 알약처럼 나타나고 움직이는 모든 것.
 - **duration-fast (`--motion-duration-fast`, 120ms):** 버튼의 호버·눌림 반응과 색 변화.
 - **stagger (`--motion-stagger`, 40ms):** 여러 요소가 차례로 나타날 때의 간격. 출발 안내 타임라인의 줄이 위에서부터 40ms씩 늦게 나타난다.
 - **press-scale (`--motion-press-scale`, 0.98):** 버튼을 눌렀을 때의 크기. 눌렀다 놓으면 원래대로 돌아온다.
