@@ -704,7 +704,7 @@ const PlanView = memo(function PlanView({ plan, delta = 0 }: { plan: Plan; delta
               <span className="text-subheading font-medium text-on-surface">지금 출발하면</span>
             </p>
             <p className="text-time font-medium">
-              <span className="font-bold">{fmt(plan.arriveAt)}</span>
+              <span className="font-bold text-brand">{fmt(plan.arriveAt)}</span>
               <span className="ml-1 text-subheading font-medium text-on-surface">에 도착해요</span>
             </p>
             <p className="mt-3 text-body text-muted-foreground">
