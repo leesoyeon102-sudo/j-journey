@@ -17,7 +17,7 @@ const LOCK_PX = 8;
 /** 칸 너비의 이 비율 이상 끌거나, 이 속도(px/ms) 이상으로 튕기면 다음 칸으로 넘어간다. */
 const SWIPE_RATIO = 0.2;
 const SWIPE_SPEED = 0.4;
-const EASE = "transform 300ms cubic-bezier(0.22, 1, 0.36, 1)";
+const EASE = "transform var(--motion-duration-base) var(--motion-ease)";
 
 /**
  * 좌우로 넘기는 슬라이더. 브라우저의 스크롤·스냅 기능을 쓰지 않고 손가락·마우스 움직임을 직접 처리한다.

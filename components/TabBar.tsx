@@ -60,7 +60,7 @@ export default function TabBar() {
         {/* 선택 표시: 탭을 누르면 이 알약이 옆 탭으로 미끄러져 간다. */}
         <li
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-input bg-glass-strong transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.34,1.3,0.64,1)] motion-reduce:transition-none"
+          className="pointer-events-none absolute inset-y-1 left-1 w-[calc((100%-0.5rem)/3)] rounded-input bg-glass-strong transition-[transform,opacity] duration-(--motion-duration-base) ease-(--motion-ease) motion-reduce:transition-none"
           style={{ transform: `translateX(${Math.max(activeIndex, 0) * 100}%)`, opacity: activeIndex < 0 ? 0 : 1 }}
         />
         {TABS.map((t) => {
@@ -82,12 +82,12 @@ export default function TabBar() {
                   }
                 }}
                 // G마켓 산스에는 세미볼드가 없어서(Medium·Bold뿐) Medium에 아주 얇은 외곽선을 더해 그 사이 굵기로 보이게 한다.
-                className={`relative flex h-12 flex-col items-center justify-center gap-0.5 rounded-input text-caption transition-colors duration-300 ${
+                className={`relative flex h-12 flex-col items-center justify-center gap-0.5 rounded-input text-caption transition-colors duration-(--motion-duration-base) ${
                   active ? "font-medium text-primary [-webkit-text-stroke:0.3px]" : "font-normal text-tab-label"
                 }`}
               >
                 {/* 비활성 아이콘은 글자보다 한 단계 연한 inactive 색 */}
-                <span className={`flex transition-colors duration-300 ${active ? "" : "text-tab-icon"}`}>{t.icon(active)}</span>
+                <span className={`flex transition-colors duration-(--motion-duration-base) ${active ? "" : "text-tab-icon"}`}>{t.icon(active)}</span>
                 {t.label}
               </Link>
             </li>

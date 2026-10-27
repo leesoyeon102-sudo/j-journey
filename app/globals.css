@@ -20,6 +20,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* ── 모션 토큰 (DESIGN.md의 motion). 애니메이션·전환에는 이 값만 쓴다. ── */
+  --motion-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --motion-duration-base: 220ms;
+  --motion-duration-fast: 120ms;
+  --motion-stagger: 0ms;
+  --motion-press-scale: 0.98;
+
   /* ── DESIGN.md 역할 토큰 (값의 원본). 팔레트 이름(ink, mist …)과 shadcn 변수는 아래에서 이 값을 가리킨다. ── */
   --color-primary: #050a15;
   --color-on-primary: #ffffff;
@@ -225,7 +232,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .fade-in {
-  animation: fade-in 0.25s ease-out both;
+  animation: fade-in var(--motion-duration-base) var(--motion-ease) both;
 }
 
 @keyframes backdrop-in {
@@ -238,7 +245,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .fade-backdrop {
-  animation: backdrop-in 0.2s ease-out both;
+  animation: backdrop-in var(--motion-duration-base) var(--motion-ease) both;
 }
 
 @keyframes alert-in {
@@ -253,7 +260,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .alert-in {
-  animation: alert-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: alert-in var(--motion-duration-base) var(--motion-ease) both;
 }
 
 /* 이동 중 점 세 개: 차례로 올라갔다 내려오며 진행 중임을 알린다. */
@@ -289,6 +296,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-base: 0.01ms;
+    --motion-duration-fast: 0.01ms;
+    --motion-stagger: 0ms;
+    --motion-press-scale: 1;
+  }
+
   .dot-wave {
     animation: none;
     opacity: 0.7;

@@ -49,7 +49,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   if (phase === "ready") {
     return (
       <Button size="lg" className="w-full" onClick={onDepart}>
-        {resume ? "이어서 출발할게요" : "출발할게요"}
+        <span key="ready" className="fade-in">{resume ? "이어서 출발할게요" : "출발할게요"}</span>
       </Button>
     );
   }
@@ -63,7 +63,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
         aria-disabled="true"
         aria-live="polite"
       >
-        이 계획대로 이동중
+        <span key="moving" className="fade-in">이 계획대로 이동중</span>
         {/* 점 세 개가 차례로 움직이는 진행 중 표시 */}
         <span className="ml-1 inline-flex items-center gap-1" aria-hidden="true">
           {[0, 1, 2].map((i) => (
@@ -75,7 +75,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
   }
   return (
     <Button size="lg" className="w-full" onClick={() => onArrive(!isLate(departedAt!, durationMin, Date.now()))}>
-      도착했어요!
+      <span key="arrivable" className="fade-in">도착했어요!</span>
     </Button>
   );
 }

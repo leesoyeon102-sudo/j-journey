@@ -124,6 +124,12 @@ spacing:
   toast-offset: 10px
   section-gap: 64px
   page-max-width: 1200px
+motion:
+  ease: "cubic-bezier(0.65, 0, 0.35, 1)"
+  duration-base: 220ms
+  duration-fast: 120ms
+  stagger: 0ms
+  press-scale: 0.98
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
@@ -340,6 +346,18 @@ components:
 
 모양으로 컴포넌트의 종류를 구분한다. 버튼은 24px 알약, 태그·배지는 32px, 입력 컴포넌트(`Input`·`Textarea`)는 10px, 유리 카드·팝업·내비게이션은 16px(`nav`)이다. 노선 탑승 시각 chip은 8px(`chip`)이다. 같은 종류의 요소는 항상 같은 반경을 쓰고, 임의의 `rounded-lg`를 새로 섞지 않는다.
 
+## Motion
+
+움직임 값은 모션 랩에서 같은 장면을 네 가지씩 비교해 골랐고, 코드에서는 `app/globals.css`의 `--motion-*` 토큰으로만 쓴다. ms 값이나 cubic-bezier를 컴포넌트에 직접 쓰지 않는다.
+
+- **ease (`--motion-ease`, cubic-bezier(0.65, 0, 0.35, 1)):** 천천히 시작해서 천천히 멈추는 곡선. 튕기는 움직임은 쓰지 않는다.
+- **duration-base (`--motion-duration-base`, 220ms):** 화면·얼럿·시트·탭바 알약처럼 나타나고 움직이는 모든 것.
+- **duration-fast (`--motion-duration-fast`, 120ms):** 버튼의 호버·눌림 반응과 색 변화.
+- **stagger (`--motion-stagger`, 0ms):** 여러 요소가 차례로 나타날 때의 간격. 0ms라서 지금은 한꺼번에 나타난다.
+- **press-scale (`--motion-press-scale`, 0.98):** 버튼을 눌렀을 때의 크기. 눌렀다 놓으면 원래대로 돌아온다.
+- **상태 전환(색 + 글자 + 점):** "출발할게요"가 "이 계획대로 이동중"으로 바뀔 때 배경색이 부드럽게 변하고, 글자가 아래에서 올라오며 바뀌고, 점 세 개가 차례로 움직인다.
+- 움직임 줄이기 설정이면 길이를 거의 0으로 줄이고 눌림 크기 변화도 끈다.
+
 ## Components
 
 `components/ui`의 shadcn 컴포넌트를 그대로 쓴다.
@@ -357,7 +375,7 @@ components:
 - **Filter chip:** 출발 안내 맨 위의 알약 칩. 선택 안 된 칩은 `glass`(반투명 흰 배경 + 흰 1px 테두리 + 블러)에 `placeholder`(#949CA1, 연한 블루톤 회색) 글자, 선택된 칩은 같은 유리 모양에 accent 15% 배경, accent 1px 테두리, accent 글자로 바뀐다.
 - **로드맵 선:** 도착 기록마다 출발지에서 도착지까지 한 줄씩 이어 그린다. 지하철 구간은 역을 따라 실선, 걷기·버스 구간은 앞뒤 지점을 직선으로 이은 점선이다. 같은 `primary` 28% 투명이라 겹칠수록 진해진다.
 - **Glass card:** 홈의 출발지·도착지·약속 시각 칸, 이동 중 카드, 안내 내역 항목, 로드맵 통계가 쓴다. `glass`(또는 `glass-strong`) + 16px 반경. 코드에서는 `glass`, `glass-strong` 유틸리티로 쓴다.
-- **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 0.3초 동안 옆 탭으로 미끄러지고(끝에서 살짝 튕김) 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#838B91) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
+- **Tab bar:** 화면 아래에 떠 있는 `glass` 막대(16px). 선택된 탭은 `glass-strong` 알약 위에 `primary` 글자·아이콘이다. 탭을 누르면 이 알약이 `--motion-duration-base` 동안 `--motion-ease`로 옆 탭으로 미끄러지고 글자·아이콘 색도 같이 바뀐다. 모션 줄이기 설정에서는 움직이지 않는다. 선택되지 않은 탭은 `tab-label`(#838B91) 글자에 `tab-icon`(#D2D5D9) 아이콘이다. 막대 뒤에는 `sky-pale`이 아래에서 위로 옅게 번져 유리가 보이게 한다.
 - **Status bar:** 화면 맨 위 배경색과 같은 색으로 칠한다(`ThemeColor`). 홈·이동 중 홈은 `sky`, 나머지 화면은 `sky-pale`이라 배경이 상태 표시줄까지 끊김 없이 이어진다. 안내 화면의 위쪽 내비게이션도 흰색 대신 `sky-pale` 80% + 블러로 둬서 같은 이음새를 만든다.
 - **Sky backdrop:** 홈과 이동 중 홈의 맨 위에 깔리는 하늘(위 sky → sky-soft → 흰색, 한쪽에 sun 번짐, 흰 뭉게구름 세 점). `SkyBackdrop` 컴포넌트.
 - **Landing art:** 광고 랜딩(`/welcome`)의 카드 왼쪽에 놓는 80px 동그라미 일러스트. 위 sky-pale → 아래 surface 원 위에 시계(나갈 시각)·선물 상자(참여 선물)를 sky·sun 토큰 색의 그라데이션으로 입체감 있게 그린다. `LandingArt` 컴포넌트.

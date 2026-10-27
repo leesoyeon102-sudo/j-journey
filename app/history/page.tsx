@@ -143,7 +143,7 @@ export default function HistoryPage() {
                     className="relative touch-pan-y select-none"
                     style={{
                       transform: `translateX(${drag?.key === r.key ? drag.x : swiped === r.key ? -DELETE_W : 0}px)`,
-                      transition: drag?.key === r.key ? "none" : "transform 0.2s ease-out",
+                      transition: drag?.key === r.key ? "none" : "transform var(--motion-duration-base) var(--motion-ease)",
                     }}
                   >
                 <button
