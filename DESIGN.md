@@ -128,7 +128,7 @@ motion:
   ease: "cubic-bezier(0.65, 0, 0.35, 1)"
   duration-base: 220ms
   duration-fast: 120ms
-  stagger: 0ms
+  stagger: 40ms
   press-scale: 0.98
 components:
   button-primary:
@@ -353,7 +353,7 @@ components:
 - **ease (`--motion-ease`, cubic-bezier(0.65, 0, 0.35, 1)):** 천천히 시작해서 천천히 멈추는 곡선. 튕기는 움직임은 쓰지 않는다.
 - **duration-base (`--motion-duration-base`, 220ms):** 화면·얼럿·시트·탭바 알약처럼 나타나고 움직이는 모든 것.
 - **duration-fast (`--motion-duration-fast`, 120ms):** 버튼의 호버·눌림 반응과 색 변화.
-- **stagger (`--motion-stagger`, 0ms):** 여러 요소가 차례로 나타날 때의 간격. 0ms라서 지금은 한꺼번에 나타난다.
+- **stagger (`--motion-stagger`, 40ms):** 여러 요소가 차례로 나타날 때의 간격. 출발 안내 타임라인의 줄이 위에서부터 40ms씩 늦게 나타난다.
 - **press-scale (`--motion-press-scale`, 0.98):** 버튼을 눌렀을 때의 크기. 눌렀다 놓으면 원래대로 돌아온다.
 - **상태 전환(색 + 글자 + 점):** "출발할게요"가 "이 계획대로 이동중"으로 바뀔 때 배경색이 부드럽게 변하고, 글자가 아래에서 올라오며 바뀌고, 점 세 개가 차례로 움직인다.
 - 움직임 줄이기 설정이면 길이를 거의 0으로 줄이고 눌림 크기 변화도 끈다.

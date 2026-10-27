@@ -153,7 +153,12 @@ export default function Timeline({ plan }: { plan: Plan }) {
   return (
     <ol className="relative">
       {steps.map((s, i) => (
-        <li key={i} className="relative flex gap-3 pb-6 last:pb-0">
+        <li
+          key={i}
+          // 줄이 위에서부터 --motion-stagger 간격으로 차례로 나타난다.
+          className="fade-in relative flex gap-3 pb-6 last:pb-0"
+          style={{ animationDelay: `calc(var(--motion-stagger) * ${i})` }}
+        >
           <div className="w-14 shrink-0">
             {s.color ? (
               // 탑승 시각: 노선 색 글자 + 같은 색 10% 배경의 태그
