@@ -26,10 +26,10 @@ export default function AlertPanel({ title, description, content, onClose, child
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  // .fade-in 같은 transform을 가진 부모 안에서는 fixed가 화면 기준이 아니라서 body에 직접 붙인다.
+  // .fade-in·.alert-in 같은 transform을 가진 부모 안에서는 fixed가 화면 기준이 아니라서 body에 직접 붙인다.
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] mx-auto flex w-full max-w-[480px] items-center justify-center bg-on-surface/15 px-8 backdrop-blur-sm"
+      className="fade-backdrop fixed inset-0 z-[60] mx-auto flex w-full max-w-[480px] items-center justify-center bg-on-surface/15 px-8 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -38,7 +38,7 @@ export default function AlertPanel({ title, description, content, onClose, child
         aria-labelledby={title ? `${id}-title` : undefined}
         aria-describedby={`${id}-desc`}
         onClick={(e) => e.stopPropagation()}
-        className="fade-in w-full rounded-nav border border-glass-border bg-surface p-6 shadow-glass"
+        className="alert-in w-full rounded-nav border border-glass-border bg-surface p-6 shadow-glass"
       >
         {title && (
           <h2 id={`${id}-title`} className="text-subheading font-medium [-webkit-text-stroke:0.3px]">
