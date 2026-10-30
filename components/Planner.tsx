@@ -461,6 +461,7 @@ export default function Planner() {
               <TripActionButton
                 departedAt={current.departedAt}
                 durationMin={active.arriveAt - active.leaveAt}
+                arriveAtMin={active.arriveAt}
                 onDepart={depart}
                 onArrive={(onTime) => arrive(active, onTime)}
                 resume={Boolean(active.departNow)}

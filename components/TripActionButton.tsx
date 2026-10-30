@@ -11,11 +11,19 @@ export const LATE_AFTER_MIN = 5;
 
 export type TripPhase = "ready" | "moving" | "arrivable";
 
-/** 출발 전 → 이동 중 → 도착 가능. 소요 시간(분)보다 5분 일찍 지나면 도착을 누를 수 있다. */
-export function tripPhase(departedAt: number | undefined, durationMin: number, now: number): TripPhase {
+/**
+ * 출발 전 → 이동 중 → 도착 가능. 출발한 뒤 소요 시간(분)보다 5분 일찍 지나면 도착을 누를 수 있다.
+ * 안내의 도착 예정 시각(arriveAtMin, 하루 0시 기준 분)을 알면, 늦게 출발해서 소요 시간이 덜 지났어도 그 시각이 되면 누를 수 있다.
+ */
+export function tripPhase(departedAt: number | undefined, durationMin: number, now: number, arriveAtMin?: number): TripPhase {
   if (!departedAt) return "ready";
   const elapsedMin = (now - departedAt) / 60_000;
-  return elapsedMin >= durationMin - ARRIVE_OPEN_BEFORE_MIN ? "arrivable" : "moving";
+  if (elapsedMin >= durationMin - ARRIVE_OPEN_BEFORE_MIN) return "arrivable";
+  if (arriveAtMin !== undefined && new Date(now).toDateString() === new Date(departedAt).toDateString()) {
+    const d = new Date(now);
+    if (d.getHours() * 60 + d.getMinutes() >= arriveAtMin - ARRIVE_OPEN_BEFORE_MIN) return "arrivable";
+  }
+  return "moving";
 }
 
 /** 출발한 뒤 걸린 시간이 안내된 소요 시간을 크게 넘겼는지 */
@@ -28,6 +36,8 @@ interface Props {
   departedAt?: number;
   /** 안내된 총 소요 시간(분) */
   durationMin: number;
+  /** 안내된 도착 예정 시각(하루 0시 기준 분). 이 시각이 지나면 출발한 지 오래되지 않았어도 도착을 누를 수 있다. */
+  arriveAtMin?: number;
   onDepart: () => void;
   onArrive: (onTime: boolean) => void;
   /** 현재 위치에서 다시 찾은 안이면 출발 전 버튼 글자가 "이어서 출발할게요"가 된다. 출발 전에만 쓴다. */
@@ -35,7 +45,7 @@ interface Props {
 }
 
 /** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요! */
-export default function TripActionButton({ departedAt, durationMin, onDepart, onArrive, resume }: Props) {
+export default function TripActionButton({ departedAt, durationMin, arriveAtMin, onDepart, onArrive, resume }: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!departedAt) return;
@@ -45,7 +55,7 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
     return () => clearInterval(id);
   }, [departedAt]);
 
-  const phase = tripPhase(departedAt, durationMin, now);
+  const phase = tripPhase(departedAt, durationMin, now, arriveAtMin);
 
   // 도착했어요!를 누르면 버튼에서 컨페티가 터지고, 연출이 끝난 뒤에 onArrive를 부른다. (얼럿이 연출과 겹치지 않게)
   const buttonRef = useRef<HTMLButtonElement>(null);
