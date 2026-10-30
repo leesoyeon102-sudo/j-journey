@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AmplitudeInit from "@/components/AmplitudeInit";
 import PushClickListener from "@/components/PushClickListener";
-import FeedbackPrompt from "@/components/FeedbackPrompt";
 import InstallPrompt from "@/components/InstallPrompt";
 import LeaveConfirm from "@/components/LeaveConfirm";
 import TabBar from "@/components/TabBar";
@@ -36,7 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <TabBar />
           <LeaveConfirm />
-          <FeedbackPrompt />
           <InstallPrompt />
         </div>
       </body>
