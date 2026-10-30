@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { burstConfetti } from "@/lib/celebrate";
 
 /** 도착 버튼은 안내된 소요 시간보다 이만큼 일찍부터 누를 수 있다. */
 export const ARRIVE_OPEN_BEFORE_MIN = 5;
@@ -46,6 +47,33 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
 
   const phase = tripPhase(departedAt, durationMin, now);
 
+  // 도착했어요!를 누르면 버튼에서 컨페티가 터지고, 연출이 끝난 뒤에 onArrive를 부른다. (얼럿이 연출과 겹치지 않게)
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const finish = useRef<(() => void) | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  useEffect(
+    () => () => {
+      // 연출 도중 화면을 떠나도 도착 기록은 남긴다.
+      if (timer.current) clearTimeout(timer.current);
+      finish.current?.();
+    },
+    [],
+  );
+  const arrive = () => {
+    if (celebrating) return;
+    const onTime = !isLate(departedAt!, durationMin, Date.now());
+    const run = () => {
+      finish.current = null;
+      onArrive(onTime);
+    };
+    const wait = buttonRef.current ? burstConfetti(buttonRef.current) : 0;
+    if (wait === 0) return run();
+    setCelebrating(true);
+    finish.current = run;
+    timer.current = setTimeout(run, wait);
+  };
+
   if (phase === "ready") {
     return (
       <Button size="lg" className="w-full" onClick={onDepart}>
@@ -74,8 +102,12 @@ export default function TripActionButton({ departedAt, durationMin, onDepart, on
     );
   }
   return (
-    <Button size="lg" className="w-full" onClick={() => onArrive(!isLate(departedAt!, durationMin, Date.now()))}>
-      <span key="arrivable" className="fade-in">도착했어요!</span>
+    <Button ref={buttonRef} size="lg" className="w-full" onClick={arrive} aria-disabled={celebrating || undefined}>
+      {celebrating ? (
+        <span key="done" className="fade-in">도착 기록 완료</span>
+      ) : (
+        <span key="arrivable" className="fade-in">도착했어요!</span>
+      )}
     </Button>
   );
 }
