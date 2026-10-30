@@ -26,7 +26,7 @@
   --motion-duration-fast: 120ms;
   --motion-stagger: 40ms;
   --motion-press-scale: 0.98;
-  --motion-celebrate-duration: 900ms; /* 도착했어요! 컨페티 연출 */
+  --motion-celebrate-duration: 1400ms; /* 도착했어요! 컨페티 연출 */
 
   /* ── DESIGN.md 역할 토큰 (값의 원본). 팔레트 이름(ink, mist …)과 shadcn 변수는 아래에서 이 값을 가리킨다. ── */
   --color-primary: #050a15;

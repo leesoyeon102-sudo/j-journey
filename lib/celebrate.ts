@@ -9,6 +9,14 @@ const COLORS = [
 
 const PIECES = 22;
 
+/** --motion-celebrate-duration 토큰을 ms로 읽는다. 빌드가 1400ms를 1.4s로 줄여 쓰기도 해서 단위를 구분한다. */
+function celebrateDuration(): number {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue("--motion-celebrate-duration").trim();
+  const n = parseFloat(raw);
+  if (!Number.isFinite(n)) return 1400;
+  return raw.endsWith("ms") ? n : n * 1000;
+}
+
 /**
  * 버튼에서 색 조각(컨페티)이 팡 터지는 완료 연출. 화면 맨 위(body)에 잠깐 그렸다가 지운다.
  * 연출이 끝날 때까지 걸리는 시간(ms)을 돌려준다. 움직임 줄이기 설정이면 아무것도 그리지 않고 0을 돌려준다.
@@ -16,8 +24,7 @@ const PIECES = 22;
 export function burstConfetti(anchor: HTMLElement): number {
   if (typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
 
-  // --motion-celebrate-duration 토큰(기본 900ms)을 읽는다.
-  const base = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--motion-celebrate-duration")) || 900;
+  const base = celebrateDuration();
   const rect = anchor.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
@@ -45,11 +52,12 @@ export function burstConfetti(anchor: HTMLElement): number {
         { transform: `translate(${dx}px,${dy}px) rotate(${rotate / 2}deg) scale(1)`, opacity: 1, offset: 0.45 },
         { transform: `translate(${dx * 1.15}px,${dy + 70}px) rotate(${rotate}deg) scale(.9)`, opacity: 0 },
       ],
-      { duration: base + Math.random() * 200, easing: "cubic-bezier(.2,.7,.3,1)", fill: "both" },
+      { duration: base + Math.random() * 300, easing: "cubic-bezier(.2,.7,.3,1)", fill: "both" },
     );
   }
 
-  const total = base + 200;
+  // 조각이 다 떨어진 뒤 잠깐 머물렀다가(0.5초) 끝난 것으로 본다.
+  const total = base + 500;
   window.setTimeout(() => layer.remove(), total + 50);
   return total;
 }

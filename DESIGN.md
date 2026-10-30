@@ -130,7 +130,7 @@ motion:
   duration-fast: 120ms
   stagger: 40ms
   press-scale: 0.98
-  celebrate-duration: 900ms
+  celebrate-duration: 1400ms
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
@@ -356,7 +356,7 @@ components:
 - **duration-fast (`--motion-duration-fast`, 120ms):** 버튼의 호버·눌림 반응과 색 변화.
 - **stagger (`--motion-stagger`, 40ms):** 여러 요소가 차례로 나타날 때의 간격. 출발 안내 타임라인의 줄이 위에서부터 40ms씩 늦게 나타난다.
 - **press-scale (`--motion-press-scale`, 0.98):** 버튼을 눌렀을 때의 크기. 눌렀다 놓으면 원래대로 돌아온다.
-- **celebrate-duration (`--motion-celebrate-duration`, 900ms):** "도착했어요!" 완료 연출. 버튼에서 컨페티(accent·sky·sky-soft·sun·success 색 조각 22개)가 위로 팡 터졌다 떨어지고, 연출이 끝난 뒤에 "도착 기록 완료" 얼럿이 뜬다. 연출과 얼럿이 겹치지 않는다. 움직임 줄이기 설정이면 연출 없이 바로 얼럿이 뜬다.
+- **celebrate-duration (`--motion-celebrate-duration`, 1400ms):** "도착했어요!" 완료 연출. 버튼에서 컨페티(accent·sky·sky-soft·sun·success 색 조각 22개)가 위로 팡 터졌다 떨어지고, 조각이 다 떨어지고 0.5초쯤 머문 뒤에 "도착 기록 완료" 얼럿이 뜬다. 연출과 얼럿이 겹치지 않는다. 움직임 줄이기 설정이면 연출 없이 바로 얼럿이 뜬다.
 - **얼럿:** 뒤 배경이 투명에서 나타나고, 얼럿 면은 10px 아래에서 94% 크기로 시작해 제자리로 올라오며 커진다. 모든 얼럿과 시각 선택 창이 같은 모션을 쓴다.
 - **상태 전환(색 + 글자 + 점):** "출발할게요"가 "이 계획대로 이동중"으로 바뀔 때 배경색이 부드럽게 변하고, 글자가 아래에서 올라오며 바뀌고, 점 세 개가 차례로 움직인다.
 - 움직임 줄이기 설정이면 길이를 거의 0으로 줄이고 눌림 크기 변화도 끈다.
