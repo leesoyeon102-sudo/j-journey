@@ -40,7 +40,8 @@ export function burstConfetti(anchor: HTMLElement): number {
   document.body.appendChild(layer);
 
   for (let i = 0; i < count; i++) {
-    const angle = -Math.PI + Math.random() * Math.PI; // 위쪽 반원 방향
+    // 위쪽 반원을 조각 수만큼 나눠 칸마다 하나씩 보내서, 어느 한쪽으로 쏠려 보이지 않게 한다.
+    const angle = -Math.PI + ((i + Math.random()) / count) * Math.PI;
     const distance = (50 + Math.random() * 70) * scale;
     const dx = Math.cos(angle) * distance;
     const dy = Math.sin(angle) * distance;
@@ -48,7 +49,7 @@ export function burstConfetti(anchor: HTMLElement): number {
     const w = (5 + Math.random() * 4) * scale;
     const h = (8 + Math.random() * 5) * scale;
     const piece = document.createElement("span");
-    piece.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${w}px;height:${h}px;margin:${-h / 2}px 0 0 ${-w / 2}px;background:${COLORS[i % COLORS.length]};border-radius:${i % 3 ? 2 : 6}px`;
+    piece.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${w}px;height:${h}px;margin:${-h / 2}px 0 0 ${-w / 2}px;background:${COLORS[Math.floor(Math.random() * COLORS.length)]};border-radius:${i % 3 ? 2 : 6}px`;
     layer.appendChild(piece);
     piece.animate(
       [
