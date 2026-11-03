@@ -110,15 +110,31 @@ export function addTrip(plan: Plan): Trip {
   return trip;
 }
 
-/** 출발 기록. 추천이 아닌 안을 따라 출발했다면 `plan`으로 기록된 경로를 바꾼다. */
-export function recordDeparture(id: string, plan?: Plan) {
+/** 출발 기록. 추천이 아닌 안을 따라 출발했다면 `plan`으로 기록된 경로를 바꾼다. 자동 출발이면 `at`에 예약한 출발 시각을 넘긴다. */
+export function recordDeparture(id: string, plan?: Plan, at?: number) {
   write(
     read().map((t) =>
       t.id === id && !t.departedAt
-        ? { ...t, ...(plan ? { plan, routeKey: routeKeyOf(plan) } : {}), departedAt: Date.now() }
+        ? { ...t, ...(plan ? { plan, routeKey: routeKeyOf(plan) } : {}), departedAt: at ?? Date.now(), reservedLeaveAt: undefined }
         : t,
     ),
   );
+}
+
+/** 외출 예약. 추천이 아닌 안을 예약했다면 `plan`으로 기록된 경로를 바꾼다. */
+export function reserveTrip(id: string, leaveAtMs: number, plan?: Plan) {
+  write(
+    read().map((t) =>
+      t.id === id && !t.departedAt
+        ? { ...t, ...(plan ? { plan, routeKey: routeKeyOf(plan) } : {}), reservedLeaveAt: leaveAtMs }
+        : t,
+    ),
+  );
+}
+
+/** 외출 예약 취소 */
+export function cancelReservation(id: string) {
+  write(read().map((t) => (t.id === id ? { ...t, reservedLeaveAt: undefined } : t)));
 }
 
 /** 기록 하나를 지운다. (이동 중이던 계획을 버릴 때) */

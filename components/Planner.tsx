@@ -22,13 +22,15 @@ import TripProgressCard from "./TripProgressCard";
 import { requestPlans } from "@/lib/api";
 import {
   cancelArrivalReminder,
+  cancelDepartureReminders,
   clearPushOpened,
   markPushOpened,
+  reserveDepartureReminders,
   scheduleArrivalReminder,
   shouldAskPush,
   wasPushOpened,
 } from "@/lib/pushReminder";
-import { dateString } from "@/lib/dates";
+import { dateString, dateTimeMs } from "@/lib/dates";
 import { GO_HOME_EVENT, requestLeave, setLeaveGuard } from "@/lib/leaveGuard";
 import { readCurrentPlace } from "@/lib/currentLocation";
 import { draft, isOriginLocked, unlockOrigin } from "@/lib/draft";
@@ -36,9 +38,11 @@ import type { Place } from "@/lib/places";
 import {
   addRoadExtra,
   addTrip,
+  cancelReservation,
   recordArrival,
   recordDeparture,
   removeTrip,
+  reserveTrip,
   cancelDeparture,
   saveHome,
   saveLastDestination,
@@ -49,6 +53,7 @@ import {
   useTrips,
 } from "@/lib/storage";
 import { groupPlans } from "@/lib/planGroups";
+import { routeKeyOf } from "@/lib/planner";
 import { partialRoad } from "@/lib/routes";
 import type { Plan, PlanGroups, Trip } from "@/lib/types";
 import { fmt, parseTime } from "@/lib/time";
@@ -98,6 +103,8 @@ export default function Planner() {
   const [arrivedAlert, setArrivedAlert] = useState(false);
   // "출발할게요"를 누른 직후 띄우는 안내. 도착 예정까지 남은 분과 알림 허용을 부탁한다. 안 띄울 땐 null.
   const [departedAlert, setDepartedAlert] = useState<number | null>(null);
+  // "외출 예약하기"를 누를 때 띄우는 얼럿. ask: 알림 허용을 부탁하는 안내(최초 한 번), blocked: 알림을 받을 수 없어 예약하지 못했다는 안내.
+  const [reserveAlert, setReserveAlert] = useState<"ask" | "blocked" | null>(null);
   // 도착 이벤트를 이미 보낸 안내. 버튼을 빠르게 두 번 눌러도 한 번만 보낸다.
   const arrivalTracked = useRef<string | null>(null);
   // 도착 푸시를 눌러 연 안내의 id. 도착 기록의 진입 경로(source)를 가린다. pushTracked: 푸시 진입 이벤트를 이미 보냈는지.
@@ -160,21 +167,71 @@ export default function Planner() {
     /* eslint-disable react-hooks/set-state-in-effect -- 주소로 들어온 안내를 한 번 여는 동기화라 effect 안에서 상태를 바꾼다. */
     const id = new URLSearchParams(window.location.search).get("trip");
     if (!id) return;
+    // push가 있으면 외출 예약의 출발 알림(before: 1시간 전, depart: 출발 시각), 없으면 도착 확인 알림이다.
+    const departurePush = new URLSearchParams(window.location.search).get("push");
     if (!pushTracked.current) {
       pushTracked.current = true;
-      amplitude.track("Arrival Push Opened");
+      if (departurePush) amplitude.track("Departure Push Opened", { push_type: departurePush });
+      else amplitude.track("Arrival Push Opened");
     }
     const trip = trips.find((t) => t.id === id);
     if (!trip) return; // 저장된 기록을 아직 못 읽었을 수 있어 주소는 그대로 두고 다음에 다시 본다.
     window.history.replaceState(null, "", window.location.pathname);
     if (trip.status !== "planned") return;
-    openedFromPush.current = trip.id;
-    markPushOpened(trip.id);
+    // 도착 기록의 진입 경로(source)는 도착 확인 알림으로 들어왔을 때만 push로 남긴다.
+    if (!departurePush) {
+      openedFromPush.current = trip.id;
+      markPushOpened(trip.id);
+    }
     setGroups(null);
     setPage(0);
     setActiveId(trip.id);
     setEditing(false);
     /* eslint-enable react-hooks/set-state-in-effect */
+  }, [trips]);
+
+  // 외출 예약한 안내는 출발 시각이 되면 "출발할게요"가 저절로 눌린다. 앱이 닫혀 있었다면 다시 열 때 처리한다.
+  // 출발 시각은 예약한 시각으로 기록하고, 도착 예정 시각까지 남은 시간으로 도착 확인 알림을 예약한다.
+  // 도착 예정 시각이 이미 지났다면 의미가 없어서 예약만 풀어 준다.
+  const autoDeparted = useRef(new Set<string>());
+  useEffect(() => {
+    const check = () => {
+      const now = Date.now();
+      for (const t of trips) {
+        if (!t.reservedLeaveAt || t.departedAt || t.status !== "planned" || now < t.reservedLeaveAt) continue;
+        if (autoDeparted.current.has(t.id)) continue;
+        autoDeparted.current.add(t.id);
+        const arriveMs = dateTimeMs(t.plan.date ?? dateString(0), t.plan.arriveAt);
+        if (now >= arriveMs) {
+          cancelReservation(t.id);
+          void cancelDepartureReminders(t.id);
+          continue;
+        }
+        amplitude.track("Departure Recorded", {
+          planned_departure_time: fmt(t.plan.leaveAt),
+          departure_diff_min: Math.round((now - t.reservedLeaveAt) / 60_000), // 자동 출발이 처리된 시각 - 예약한 출발 시각
+          is_recommended: true,
+          transfers: t.plan.transfers,
+          source: "auto",
+        });
+        // 이동 중이던 다른 안내는 끝난 것으로 정리한다. (직접 출발할 때와 같다)
+        for (const o of trips) {
+          if (o.id !== t.id && o.departedAt && o.status === "planned") {
+            removeTrip(o.id);
+            void cancelArrivalReminder(o.id);
+          }
+        }
+        recordDeparture(t.id, undefined, t.reservedLeaveAt);
+        void scheduleArrivalReminder(t.id, Math.max(1, Math.round((arriveMs - now) / 60_000)));
+      }
+    };
+    check();
+    const id = setInterval(check, 15_000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", check);
+    };
   }, [trips]);
 
   // 홈 입력 화면이 열릴 때마다 출발지를 현재 위치로 자동 입력한다. 위치를 못 읽으면(권한 꺼짐, http 주소 등) 조용히 건너뛰고
@@ -203,7 +260,8 @@ export default function Planner() {
 
   // 출발 안내 화면이 떠 있는 동안에는 나갈 때 확인 창을 띄운다. (이미 출발했으면 이동 중 카드로 돌아올 수 있어 띄우지 않는다.)
   const showingResult = Boolean(current);
-  const guardLeave = showingResult && !current?.departedAt;
+  // 출발했거나 외출을 예약해 둔 안내는 나가도 다시 열 수 있어서 확인 창을 띄우지 않는다.
+  const guardLeave = showingResult && !current?.departedAt && !current?.reservedLeaveAt;
   useEffect(() => {
     setLeaveGuard(guardLeave);
     return () => setLeaveGuard(false);
@@ -263,6 +321,11 @@ export default function Planner() {
       setGroups(result.groups ?? groupPlans(result.plans));
       setTab("recommended");
       setPage(0);
+      // 같은 경로를 다시 검색하면 이전 안내가 새 안내로 대체되므로, 거기에 걸어 둔 외출 예약 알림은 거둔다.
+      const replacedKey = routeKeyOf(result.plan);
+      for (const t of trips) {
+        if (t.status === "planned" && t.routeKey === replacedKey && t.reservedLeaveAt) void cancelDepartureReminders(t.id);
+      }
       // 추천 안을 우선 저장하고, 다른 안으로 도착 기록을 남기면 그 안으로 바꾼다.
       setActiveId(addTrip(result.plan).id);
       // 검색한 도착지와 약속 시각은 그대로 둔다. 출발 안내를 보고 홈으로 돌아와도 입력칸에 남아 있고, 출발지만 현재 위치로 다시 채워진다.
@@ -327,12 +390,14 @@ export default function Planner() {
     const done = current.status !== "planned";
     // 출발하거나 기록을 남긴 뒤에는 따라간 안 하나만 보여준다.
     const departed = Boolean(current.departedAt);
+    // 외출을 예약한 뒤에도 예약한 안 하나만 보여준다.
+    const reserved = Boolean(current.reservedLeaveAt);
     // 출발 전에는 고른 칩의 안들을 보여주고(추천은 하나), 칩에 해당하는 경로가 없으면 지금 안 하나만 보여준다.
-    const choices = !done && !departed && groups ? (tab === "recommended" ? [groups.recommended] : groups[tab]) : [];
+    const choices = !done && !departed && !reserved && groups ? (tab === "recommended" ? [groups.recommended] : groups[tab]) : [];
     const filtering = choices.length > 0;
     const shown = filtering ? choices : [current.plan];
     const active = shown[Math.min(page, shown.length - 1)];
-    // 내일 이후 약속은 아직 출발할 수 없어서 하단 버튼을 아예 보여 주지 않는다. (비활성 버튼이 헷갈린다는 의견)
+    // 내일 이후 약속은 아직 출발할 수 없어서 "출발할게요" 대신 "외출 예약하기"를 보여 준다.
     const tomorrowPlan = !departed && Boolean(active.date && active.date > dateString(0));
     const changeTab = (t: PlanTab) => {
       setTab(t);
@@ -347,6 +412,7 @@ export default function Planner() {
         plan_tab: tab,
         is_recommended: groups ? active === groups.recommended : true,
         transfers: active.transfers,
+        source: "manual",
       });
       // 놓쳐서 다시 찾은 안으로 출발하면, 이동 중이던 이전 안내는 끝난 것으로 정리하고 도착 알림도 취소한다.
       for (const t of trips) {
@@ -356,6 +422,8 @@ export default function Planner() {
         }
       }
       recordDeparture(current.id, active === current.plan ? undefined : active);
+      // 예약해 둔 출발 알림은 이미 출발했으니 더 보내지 않는다.
+      if (reserved) void cancelDepartureReminders(current.id);
       setPage(0);
       const minutes = active.arriveAt - active.leaveAt;
       if (shouldAskPush()) {
@@ -371,6 +439,38 @@ export default function Planner() {
     const confirmDeparted = () => {
       if (departedAlert !== null) void scheduleArrivalReminder(current.id, departedAlert);
       setDepartedAlert(null);
+    };
+    // 외출 예약하기: 출발 시각 1시간 전과 출발 시각에 알림을 예약한다. 알림 허용을 아직 고르지 않았다면 안내 얼럿을 먼저 띄운다.
+    const reserve = async () => {
+      setReserveAlert(null);
+      const leaveAtMs = dateTimeMs(active.date ?? dateString(1), active.leaveAt);
+      const ok = await reserveDepartureReminders(current.id, leaveAtMs, fmt(active.leaveAt));
+      if (!ok) {
+        setReserveAlert("blocked");
+        amplitude.track("Alert Panel Shown", { alert_type: "reserve_blocked" });
+        return;
+      }
+      reserveTrip(current.id, leaveAtMs, active === current.plan ? undefined : active);
+      setPage(0);
+      amplitude.track("Departure Reserved", {
+        planned_departure_time: fmt(active.leaveAt),
+        plan_tab: tab,
+        is_recommended: groups ? active === groups.recommended : true,
+        transfers: active.transfers,
+      });
+    };
+    const startReserve = () => {
+      if (shouldAskPush()) {
+        setReserveAlert("ask");
+        amplitude.track("Alert Panel Shown", { alert_type: "reserve_guide" });
+      } else {
+        void reserve();
+      }
+    };
+    const cancelReserve = () => {
+      cancelReservation(current.id);
+      void cancelDepartureReminders(current.id);
+      amplitude.track("Departure Reservation Canceled");
     };
     const arrive = (plan: Plan, onTime: boolean) => {
       // 같은 안내에는 한 번만 보낸다. (이미 기록했거나, 빠르게 두 번 눌러도)
@@ -451,7 +551,7 @@ export default function Planner() {
         </PlanSlider>
 
         {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 위에 달라붙는다. 이 영역은 isolate된 main 안이라 z-index로는 탭바(z-20) 위로 올라갈 수 없다. 대신 탭바 뒤 하늘색 그라데이션을 막대 위 0.75rem(pt-3)까지만 두어, 버튼(막대 위 1rem)과 겹치지 않게 한다. 버튼 뒤에는 배경을 두지 않는다. 빈 부분은 클릭이 아래 내용으로 지나간다. */}
-        {!done && !tomorrowPlan && (
+        {!done && (
           <div className="pointer-events-none sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 px-5 pb-3 pt-5">
             <div className="pointer-events-auto">
               <TripActionButton
@@ -461,9 +561,41 @@ export default function Planner() {
                 onDepart={depart}
                 onArrive={(onTime) => arrive(active, onTime)}
                 resume={Boolean(active.departNow)}
+                upcoming={tomorrowPlan}
+                reserved={reserved}
+                onReserve={startReserve}
               />
+              {/* 예약한 뒤 마음이 바뀌었을 때: 눈에 덜 띄는 텍스트 버튼 */}
+              {reserved && !departed && (
+                <Button variant="ghost" size="lg" className="mt-1 w-full text-muted-foreground" onClick={cancelReserve}>
+                  예약 취소
+                </Button>
+              )}
             </div>
           </div>
+        )}
+
+        {reserveAlert === "ask" && (
+          <AlertPanel
+            title="당일에 알림을 보내드릴게요"
+            description="알림을 허용해 주세요. 나가기 1시간 전과 출발 시각에 알려드리고, 출발 시각이 되면 출발 안내를 시작해 둘게요."
+          >
+            <Button size="lg" autoFocus onClick={() => void reserve()}>
+              확인
+            </Button>
+          </AlertPanel>
+        )}
+
+        {reserveAlert === "blocked" && (
+          <AlertPanel
+            title="알림을 받을 수 없어요"
+            description="알림이 꺼져 있어서 예약하지 못했어요. 설정에서 알림을 켠 뒤 다시 눌러 주세요."
+            onClose={() => setReserveAlert(null)}
+          >
+            <Button size="lg" autoFocus onClick={() => setReserveAlert(null)}>
+              확인
+            </Button>
+          </AlertPanel>
         )}
 
         {departedAlert !== null && (

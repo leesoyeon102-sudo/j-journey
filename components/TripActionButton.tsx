@@ -42,10 +42,25 @@ interface Props {
   onArrive: (onTime: boolean) => void;
   /** 현재 위치에서 다시 찾은 안이면 출발 전 버튼 글자가 "이어서 출발할게요"가 된다. 출발 전에만 쓴다. */
   resume?: boolean;
+  /** 내일 이후 약속이면 지금은 출발할 수 없어서 "출발할게요" 대신 "외출 예약하기"가 보인다. */
+  upcoming?: boolean;
+  /** 예약을 마친 상태. 버튼이 "당일에 알림을 보내드릴게요"로 바뀐다. */
+  reserved?: boolean;
+  onReserve?: () => void;
 }
 
 /** 출발 안내 화면 하단의 단계 버튼: 출발했어요 → 이 계획대로 이동중 → 도착했어요! */
-export default function TripActionButton({ departedAt, durationMin, arriveAtMin, onDepart, onArrive, resume }: Props) {
+export default function TripActionButton({
+  departedAt,
+  durationMin,
+  arriveAtMin,
+  onDepart,
+  onArrive,
+  resume,
+  upcoming,
+  reserved,
+  onReserve,
+}: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!departedAt) return;
@@ -84,6 +99,24 @@ export default function TripActionButton({ departedAt, durationMin, arriveAtMin,
     timer.current = setTimeout(run, wait);
   };
 
+  if (phase === "ready" && upcoming) {
+    // 예약을 마치면 이동중 버튼과 같은 회색(fill-strong)으로 부드럽게 바뀌고 글자가 올라온다. 점은 진행 중일 때만 쓴다.
+    return (
+      <Button
+        size="lg"
+        className={reserved ? "w-full cursor-default bg-fill-strong text-on-surface hover:bg-fill-strong" : "w-full"}
+        aria-disabled={reserved || undefined}
+        aria-live="polite"
+        onClick={reserved ? undefined : onReserve}
+      >
+        {reserved ? (
+          <span key="reserved" className="fade-in">당일에 알림을 보내드릴게요</span>
+        ) : (
+          <span key="reserve" className="fade-in">외출 예약하기</span>
+        )}
+      </Button>
+    );
+  }
   if (phase === "ready") {
     return (
       <Button size="lg" className="w-full" onClick={onDepart}>

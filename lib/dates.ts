@@ -13,3 +13,9 @@ export function nextOccurrence(arriveBy: number): { date: string; tomorrow: bool
   const tomorrow = arriveBy <= now.getHours() * 60 + now.getMinutes();
   return { date: dateString(tomorrow ? 1 : 0), tomorrow };
 }
+
+/** 날짜(YYYY-MM-DD)와 하루 0시 기준 분을 합친 시각(ms) */
+export function dateTimeMs(date: string, minutes: number) {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(y, m - 1, d, 0, Math.round(minutes)).getTime();
+}

@@ -1,8 +1,9 @@
 import { Receiver } from "@upstash/qstash";
 import { NextRequest, NextResponse } from "next/server";
 import { deliverArrivalReminder, validTripId } from "@/lib/server/arrivalReminder";
+import { deliverDepartureReminder } from "@/lib/server/departureReminder";
 
-/** QStash가 예약 시각에 부른다. QStash가 서명한 요청만 받는다. */
+/** QStash가 예약 시각에 부른다. (도착 확인, 출발 1시간 전·출발 시각 알림) QStash가 서명한 요청만 받는다. */
 export async function POST(req: NextRequest) {
   const current = process.env.QSTASH_CURRENT_SIGNING_KEY;
   const next = process.env.QSTASH_NEXT_SIGNING_KEY;
@@ -16,14 +17,20 @@ export async function POST(req: NextRequest) {
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   let tripId: unknown;
+  let kind: unknown;
   try {
-    tripId = (JSON.parse(body) as { tripId?: unknown }).tripId;
+    ({ tripId, kind } = JSON.parse(body) as { tripId?: unknown; kind?: unknown });
   } catch {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
   if (!validTripId(tripId)) return NextResponse.json({ error: "bad_request" }, { status: 400 });
   try {
-    return NextResponse.json({ ok: true, result: await deliverArrivalReminder(tripId) });
+    // kind가 없으면 도착 확인 알림이다. (예전에 예약된 메시지도 그대로 처리된다)
+    const result =
+      kind === "before" || kind === "depart"
+        ? await deliverDepartureReminder(tripId, kind)
+        : await deliverArrivalReminder(tripId);
+    return NextResponse.json({ ok: true, result });
   } catch {
     // 일시적인 오류면 QStash가 다시 부른다.
     return NextResponse.json({ error: "send_failed" }, { status: 500 });

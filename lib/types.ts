@@ -147,6 +147,8 @@ export interface Trip {
   /** "출발했어요"를 누른 시각. 도착을 기록하기 전까지 이동 중으로 본다. */
   departedAt?: number;
   arrivedAt?: number;
+  /** "외출 예약하기"를 누른 안내의 출발 시각(ms). 이 시각이 되면 출발할게요가 자동으로 눌린다. 출발하거나 예약을 취소하면 지운다. */
+  reservedLeaveAt?: number;
   status: TripStatus;
   plan: Plan;
   /** 경로 내역에서 삭제한 기록. 내역에는 안 보이지만 로드맵에는 계속 쌓인다. */

@@ -39,6 +39,26 @@ export const Resume: Story = {
   },
 }
 
+// 내일 이후 약속: 출발할 수 없어서 "외출 예약하기"가 보이고, 누르면 onReserve
+export const Reserve: Story = {
+  args: { upcoming: true, onReserve: fn() },
+  play: async ({ canvas, args }) => {
+    await canvas.getByRole("button", { name: "외출 예약하기" }).click()
+    await expect(args.onReserve).toHaveBeenCalled()
+  },
+}
+
+// 예약을 마친 상태: 눌러도 아무 일이 없다
+export const Reserved: Story = {
+  args: { upcoming: true, reserved: true, onReserve: fn() },
+  play: async ({ canvas, args }) => {
+    const button = canvas.getByRole("button", { name: "당일에 알림을 보내드릴게요" })
+    await expect(button).toHaveAttribute("aria-disabled", "true")
+    await button.click()
+    await expect(args.onReserve).not.toHaveBeenCalled()
+  },
+}
+
 // 이동 중: 눌러도 아무 일이 없다
 export const Moving: Story = {
   args: { departedAt: Date.now() - 2 * MIN },

@@ -96,6 +96,28 @@ export async function cancelArrivalReminder(tripId: string) {
   await post("/api/push/reminder", "DELETE", { tripId });
 }
 
+/**
+ * 내일 이후 약속의 출발 1시간 전·출발 시각 알림을 예약한다. "외출 예약하기"를 누를 때 부른다.
+ * 아직 허용 여부를 고르지 않았다면 이때 허용 창을 띄운다. (반드시 버튼 클릭 안에서 불러야 창이 뜬다)
+ * 알림을 받을 수 없거나 예약에 실패하면 false.
+ */
+export async function reserveDepartureReminders(tripId: string, leaveAtMs: number, leaveTime: string): Promise<boolean> {
+  if (typeof Notification === "undefined" || Notification.permission === "denied" || isOff()) return false;
+  const prompted = Notification.permission === "default";
+  const registered = readToken() ? true : await askPush();
+  trackPermission(prompted, "departure");
+  const token = registered ? readToken() : null;
+  if (!token) return false;
+  const res = await post("/api/push/departure", "POST", { token, tripId, leaveAtMs, leaveTime });
+  return Boolean(res?.ok);
+}
+
+/** 예약한 출발 알림을 취소한다. (예약을 취소했거나, 예약 시각 전에 직접 출발했을 때) */
+export async function cancelDepartureReminders(tripId: string) {
+  if (!readToken()) return;
+  await post("/api/push/departure", "DELETE", { tripId });
+}
+
 /** 설정 화면의 알림 토글 상태. denied는 브라우저·기기 설정에서만 다시 켤 수 있다. */
 export type PushState = "on" | "off" | "denied" | "unsupported";
 
