@@ -14,6 +14,7 @@ import PlanFilter, { type PlanTab } from "./PlanFilter";
 import PlanSlider from "./PlanSlider";
 import SkyBackdrop from "./SkyBackdrop";
 import ThemeColor from "./ThemeColor";
+import ReservedTripBanner from "./ReservedTripBanner";
 import RouteCard from "./RouteCard";
 import Timeline from "./Timeline";
 import TripActionButton from "./TripActionButton";
@@ -151,6 +152,27 @@ export default function Planner() {
 
   // 출발했어요를 누르고 아직 도착을 기록하지 않은 안내. 있으면 홈에는 검색 대신 이동 중 카드를 보여준다.
   const moving = trips.find((t) => t.departedAt && t.status === "planned");
+  // 외출을 예약해 둔 안내(가까운 순). 홈 상단에 작은 배너로 보여 주고, 누르면 그 출발 안내 화면을 다시 연다.
+  const reservedTrips = trips
+    .filter((t) => t.reservedLeaveAt && !t.departedAt && t.status === "planned")
+    .sort((a, b) => a.reservedLeaveAt! - b.reservedLeaveAt!);
+  const reservedBanners = reservedTrips.length > 0 && (
+    <div className="space-y-2 px-5 pb-3">
+      {reservedTrips.map((t) => (
+        <ReservedTripBanner
+          key={t.id}
+          leaveAtMs={t.reservedLeaveAt!}
+          destination={t.plan.destination}
+          onClick={() => {
+            setGroups(null);
+            setPage(0);
+            setActiveId(t.id);
+            setEditing(false);
+          }}
+        />
+      ))}
+    </div>
+  );
   // 홈 제목줄 오른쪽 설정 아이콘(집 주소 변경, 알림). 이동 중 홈에도 똑같이 보인다.
   const settingsLink = (
     <Link
@@ -550,9 +572,9 @@ export default function Planner() {
           ))}
         </PlanSlider>
 
-        {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 위에 달라붙는다. 이 영역은 isolate된 main 안이라 z-index로는 탭바(z-20) 위로 올라갈 수 없다. 대신 탭바 뒤 하늘색 그라데이션을 막대 위 0.75rem(pt-3)까지만 두어, 버튼(막대 위 1rem)과 겹치지 않게 한다. 버튼 뒤에는 배경을 두지 않는다. 빈 부분은 클릭이 아래 내용으로 지나간다. */}
+        {/* 경로 아래 20px에 붙어 있다가, 경로가 길어 스크롤이 생기면 탭바 위에 달라붙는다. 빈 부분은 클릭이 아래 내용으로 지나간다. 뒤에는 흰색 그라데이션(아래 100% → 위 0%)을 깔아, 스크롤하면 내용이 버튼·예약 취소 글자와 겹쳐 묻히지 않게 한다. */}
         {!done && (
-          <div className="pointer-events-none sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 px-5 pb-3 pt-5">
+          <div className="pointer-events-none sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 bg-linear-to-t from-surface from-60% to-surface/0 px-5 pb-3 pt-8">
             <div className="pointer-events-auto">
               <TripActionButton
                 departedAt={current.departedAt}
@@ -630,6 +652,7 @@ export default function Planner() {
         <SkyBackdrop />
         <ThemeColor token="sky" />
         <Header title="J의 외출" sub="지금 이동 중이에요." onSky action={settingsLink} />
+        {reservedBanners}
         <div className="px-5 pb-8">
           <TripProgressCard
             origin={moving.plan.origin}
@@ -679,6 +702,7 @@ export default function Planner() {
         onSky
         action={settingsLink}
       />
+      {reservedBanners}
 
       {showHomePicker && (
         <LocationPicker
