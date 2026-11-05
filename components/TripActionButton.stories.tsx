@@ -39,7 +39,7 @@ export const Resume: Story = {
   },
 }
 
-// 내일 이후 약속: 출발할 수 없어서 "외출 예약하기"가 보이고, 누르면 onReserve
+// 출발까지 30분 넘게 남음(내일 약속 포함): "외출 예약하기"가 보이고, 누르면 onReserve
 export const Reserve: Story = {
   args: { upcoming: true, onReserve: fn() },
   play: async ({ canvas, args }) => {

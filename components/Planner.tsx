@@ -70,6 +70,9 @@ interface Form {
 /** 약속 시각보다 이만큼 일찍 도착하도록 계산한다. (유저 설정 없음) */
 const ARRIVE_EARLY_MIN = 5;
 
+/** 출발까지 이만큼(분)보다 많이 남았을 때만 "외출 예약하기"를 보여 준다. */
+const RESERVE_MIN_LEAD_MIN = 30;
+
 /** 지금 시각 "HH:MM" */
 const nowHHMM = () => {
   const d = new Date();
@@ -215,6 +218,12 @@ export default function Planner() {
   // 외출 예약한 안내는 출발 시각이 되면 "출발할게요"가 저절로 눌린다. 앱이 닫혀 있었다면 다시 열 때 처리한다.
   // 출발 시각은 예약한 시각으로 기록하고, 도착 예정 시각까지 남은 시간으로 도착 확인 알림을 예약한다.
   // 도착 예정 시각이 이미 지났다면 의미가 없어서 예약만 풀어 준다.
+  // 출발까지 남은 시간에 따라 하단 버튼이 바뀌어서(예약 ↔ 출발), 화면이 열려 있는 동안 현재 시각을 반 분마다 갱신한다.
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
   const autoDeparted = useRef(new Set<string>());
   useEffect(() => {
     const check = () => {
@@ -419,8 +428,10 @@ export default function Planner() {
     const filtering = choices.length > 0;
     const shown = filtering ? choices : [current.plan];
     const active = shown[Math.min(page, shown.length - 1)];
-    // 내일 이후 약속은 아직 출발할 수 없어서 "출발할게요" 대신 "외출 예약하기"를 보여 준다.
-    const tomorrowPlan = !departed && Boolean(active.date && active.date > dateString(0));
+    // 출발까지 30분 넘게 남았으면(내일 약속이거나, 당일이라도 여유가 있으면) "출발할게요" 대신 "외출 예약하기"를 보여 준다.
+    // 30분 이하로 남으면 예약 없이 바로 출발할 수 있게 "출발할게요"로 돌아온다.
+    const upcoming =
+      !departed && dateTimeMs(active.date ?? dateString(0), active.leaveAt) - nowMs > RESERVE_MIN_LEAD_MIN * 60_000;
     const changeTab = (t: PlanTab) => {
       setTab(t);
       setPage(0);
@@ -465,7 +476,7 @@ export default function Planner() {
     // 외출 예약하기: 출발 시각 1시간 전과 출발 시각에 알림을 예약한다. 알림 허용을 아직 고르지 않았다면 안내 얼럿을 먼저 띄운다.
     const reserve = async () => {
       setReserveAlert(null);
-      const leaveAtMs = dateTimeMs(active.date ?? dateString(1), active.leaveAt);
+      const leaveAtMs = dateTimeMs(active.date ?? dateString(0), active.leaveAt);
       const ok = await reserveDepartureReminders(current.id, leaveAtMs, fmt(active.leaveAt));
       if (!ok) {
         setReserveAlert("blocked");
@@ -583,7 +594,7 @@ export default function Planner() {
                 onDepart={depart}
                 onArrive={(onTime) => arrive(active, onTime)}
                 resume={Boolean(active.departNow)}
-                upcoming={tomorrowPlan}
+                upcoming={upcoming}
                 reserved={reserved}
                 onReserve={startReserve}
               />
@@ -600,7 +611,7 @@ export default function Planner() {
         {reserveAlert === "ask" && (
           <AlertPanel
             title="당일에 알림을 보내드릴게요"
-            description="알림을 허용해 주세요. 나가기 1시간 전과 출발 시각에 알려드리고, 출발 시각이 되면 출발 안내를 시작해 둘게요."
+            description="알림을 허용해 주세요. 출발 시각에 맞춰 알려드리고, 출발할게요를 못 눌러도 출발 안내를 시작해 둘게요."
           >
             <Button size="lg" autoFocus onClick={() => void reserve()}>
               확인
