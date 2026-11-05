@@ -430,6 +430,8 @@ export default function Planner() {
     const active = shown[Math.min(page, shown.length - 1)];
     // 출발까지 30분 넘게 남았으면(내일 약속이거나, 당일이라도 여유가 있으면) "출발할게요" 대신 "외출 예약하기"를 보여 준다.
     // 30분 이하로 남으면 예약 없이 바로 출발할 수 있게 "출발할게요"로 돌아온다.
+    // 예약한 날이 오늘이면 안내 글자가 "당일에" 대신 "오늘"로 바뀐다. (어제 예약해 둔 안내가 자정을 넘겨 오늘이 된 경우도)
+    const reservedToday = (active.date ?? dateString(0)) <= dateString(0);
     const upcoming =
       !departed && dateTimeMs(active.date ?? dateString(0), active.leaveAt) - nowMs > RESERVE_MIN_LEAD_MIN * 60_000;
     const changeTab = (t: PlanTab) => {
@@ -596,6 +598,7 @@ export default function Planner() {
                 resume={Boolean(active.departNow)}
                 upcoming={upcoming}
                 reserved={reserved}
+                reservedToday={reservedToday}
                 onReserve={startReserve}
               />
               {/* 예약한 뒤 마음이 바뀌었을 때: 눈에 덜 띄는 텍스트 버튼 */}
@@ -610,7 +613,7 @@ export default function Planner() {
 
         {reserveAlert === "ask" && (
           <AlertPanel
-            title="당일에 알림을 보내드릴게요"
+            title={`${reservedToday ? "오늘" : "당일에"} 알림을 보내드릴게요`}
             description="알림을 허용해 주세요. 출발 시각에 맞춰 알려드리고, 출발할게요를 못 눌러도 출발 안내를 시작해 둘게요."
           >
             <Button size="lg" autoFocus onClick={() => void reserve()}>

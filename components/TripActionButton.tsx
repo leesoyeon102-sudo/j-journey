@@ -46,6 +46,8 @@ interface Props {
   upcoming?: boolean;
   /** 예약을 마친 상태. 버튼이 "당일에 알림을 보내드릴게요"로 바뀐다. */
   reserved?: boolean;
+  /** 예약한 날이 오늘이면 "당일에" 대신 "오늘"로 적는다. */
+  reservedToday?: boolean;
   onReserve?: () => void;
 }
 
@@ -59,6 +61,7 @@ export default function TripActionButton({
   resume,
   upcoming,
   reserved,
+  reservedToday,
   onReserve,
 }: Props) {
   const [now, setNow] = useState(() => Date.now());
@@ -110,7 +113,7 @@ export default function TripActionButton({
         onClick={reserved ? undefined : onReserve}
       >
         {reserved ? (
-          <span key="reserved" className="fade-in">당일에 알림을 보내드릴게요</span>
+          <span key="reserved" className="fade-in">{reservedToday ? "오늘" : "당일에"} 알림을 보내드릴게요</span>
         ) : (
           <span key="reserve" className="fade-in">외출 예약하기</span>
         )}

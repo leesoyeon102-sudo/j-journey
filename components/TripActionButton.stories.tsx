@@ -59,6 +59,14 @@ export const Reserved: Story = {
   },
 }
 
+// 예약한 날이 오늘이면 "오늘 알림을 보내드릴게요"
+export const ReservedToday: Story = {
+  args: { upcoming: true, reserved: true, reservedToday: true, onReserve: fn() },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "오늘 알림을 보내드릴게요" })).toHaveAttribute("aria-disabled", "true")
+  },
+}
+
 // 이동 중: 눌러도 아무 일이 없다
 export const Moving: Story = {
   args: { departedAt: Date.now() - 2 * MIN },
